@@ -1,2 +1,4 @@
 .env
-copilot-instructions.md
+node_modules/
+uploads/
+

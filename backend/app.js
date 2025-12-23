@@ -6,7 +6,10 @@ const app = express();
 app.use(express.json())
 
 app.get("/health-check", (req, res) => {
-    res.end("Working....!")
+    res.json({
+        status : "success",
+        message: "API is working fine"
+    })
 })
 
 module.exports = app;

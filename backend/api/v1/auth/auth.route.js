@@ -1,10 +1,12 @@
 const express = require('express');
-const { registerSchema } = require('./auth.validation');
-const { validate } = require('../../../utils/validation.util');
-const { patientRegisterController } = require('./auth.controller');
+const { registerSchema, loginScheema } = require('./auth.validation');
+const { validateInput } = require('../../../utils/validation.util');
+const { patientRegisterController, loginController } = require('./auth.controller');
 
 const authRouter = express.Router();
 
-authRouter.post('/register', validate(registerSchema), patientRegisterController);
+authRouter.post('/register', validateInput(registerSchema), patientRegisterController);
+
+authRouter.post('/login', validateInput(loginScheema), loginController)
 
 module.exports = authRouter;

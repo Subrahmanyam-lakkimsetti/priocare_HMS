@@ -1,26 +1,44 @@
-const { registerUser } = require('./auth.service');
+const { registerUser, loginUser } = require('./auth.service');
+const catchAsync = require('../../../utils/catchAsync.util');
+const { UserDTO } = require('./auth.dto');
 
-const catchAsync = (fn) => {
-  return (req,res, next) => {
-    fn(req, res, next).catch(next);
-  }
-}
+const setCookie = (res, token) => {
+  const cookieOptions = {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  };
+
+  res.cookie('accessToken', token, cookieOptions);
+};
 
 const patientRegisterController = catchAsync(async (req, res) => {
-    const user = await registerUser(req.body);
+  // get the request
+  const { newUser: user, token } = await registerUser(req.body);
 
-    console.log('Registered User:', user);
+  setCookie(res, token);
 
-    res.status(201).json({
-      status: 'success',
-      message: 'User registered successfully',
-      data: {
-        user,
-      },
-    });
-    
+  // send back the response
+  res.status(201).json({
+    status: 'success',
+    message: 'User registered successfully',
+    user: new UserDTO(user),
+  });
+});
+
+const loginController = catchAsync(async (req, res) => {
+  const { user, token } = await loginUser(req.body);
+
+  setCookie(res, token);
+
+  res.status(200).json({
+    status: 'success',
+    user: new UserDTO(user),
+  });
 });
 
 module.exports = {
   patientRegisterController,
+  loginController,
 };

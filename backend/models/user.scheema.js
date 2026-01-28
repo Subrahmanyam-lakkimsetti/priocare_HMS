@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   // email (unique)
@@ -38,6 +39,18 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+userSchema.pre('save', async function () {
+  // Hash the password before saving the user document
+  if (!this.isModified('password')) return;
+
+  const hashedPassword = await bcrypt.hash(this.password, 12);
+  this.password = hashedPassword;
+});
+
+userSchema.methods.comparePasswords = async function (userprovidedPassword) {
+  return await bcrypt.compare(userprovidedPassword, this.password);
+};
 
 const User = mongoose.model('user', userSchema);
 

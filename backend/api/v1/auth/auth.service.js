@@ -1,28 +1,56 @@
-const User = require("../../../models/user.scheema")
-const registerUser = async ({email, password, confirmPassword}) => {
-    // check if user exists with the given email
-    const existingUser = await User.findOne({email});
-    console.log("existingUser", existingUser);
-    if (existingUser) {
-        throw new Error('User already exists with the given email');
-    }
+const User = require('../../../models/user.scheema');
+const AppError = require('../../../utils/AppError.util');
+const { generateToken } = require('../../../utils/jwt.util');
+const registerUser = async ({ email, password }) => {
+  const existingUser = await User.findOne({ email });
 
-    // save the user to the database
-    const newUser = await User.create({
-        email,
-        password,
-        role: 'patient', // default role
-        isActive: true,
-    });
+  if (existingUser) {
+    throw new Error('User already exists with the given email');
+  }
 
-    newUser.password = undefined; // hide password in the returned object
+  const newUser = await User.create({
+    email,
+    password,
+    role: 'patient',
+    isActive: true,
+  });
 
-    // temporarily logging the new user
-    console.log("Newly registered user:", newUser);
-    // return the created user object (without password)
-    return newUser;
-}
+  newUser.password = undefined;
+
+  const token = generateToken({
+    userId: newUser.id,
+    role: newUser.role,
+  });
+
+  return {
+    newUser,
+    token,
+  };
+};
+
+const loginUser = async ({ email, password }) => {
+  // check email and password valid or not
+  const user = await User.findOne({ email });
+
+  if (!user || !(await user.comparePasswords(password))) {
+    throw new AppError('email or password is Invalid', 404);
+  }
+
+  // check isActive
+  if (!user.isActive) {
+    throw new AppError('Account is inActive, contact support.', 403);
+  }
+
+  // generate and send token
+  const token = generateToken({
+    userId: user.id,
+    role: user.role,
+  });
+
+  return { user, token };
+};
 
 module.exports = {
-    registerUser,
-}
+  registerUser,
+  loginUser,
+};

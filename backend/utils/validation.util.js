@@ -1,4 +1,4 @@
-const validate = (schema) => {
+const validateInput = (schema) => {
   return (req, res, next) => {
 
     // checking if request body exists
@@ -19,5 +19,5 @@ const validate = (schema) => {
 };
 
 module.exports = {
-  validate,
+  validateInput,
 };

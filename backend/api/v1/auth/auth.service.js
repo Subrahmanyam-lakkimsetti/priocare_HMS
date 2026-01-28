@@ -1,5 +1,4 @@
 const User = require("../../../models/user.scheema")
-const bcrypt = require("bcrypt");
 const registerUser = async ({email, password, confirmPassword}) => {
     // check if user exists with the given email
     const existingUser = await User.findOne({email});
@@ -19,8 +18,7 @@ const registerUser = async ({email, password, confirmPassword}) => {
     newUser.password = undefined; // hide password in the returned object
 
     // temporarily logging the new user
-    console.log("newUser", newUser);
-
+    console.log("Newly registered user:", newUser);
     // return the created user object (without password)
     return newUser;
 }

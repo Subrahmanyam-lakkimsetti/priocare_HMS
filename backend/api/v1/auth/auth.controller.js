@@ -1,10 +1,15 @@
 const { registerUser } = require('./auth.service');
 
-const patientRegisterController = async (req, res) => {
-  try {
+const catchAsync = (fn) => {
+  return (req,res, next) => {
+    fn(req, res, next).catch(next);
+  }
+}
+
+const patientRegisterController = catchAsync(async (req, res) => {
     const user = await registerUser(req.body);
 
-    console.log("Registered User:", user);
+    console.log('Registered User:', user);
 
     res.status(201).json({
       status: 'success',
@@ -13,13 +18,8 @@ const patientRegisterController = async (req, res) => {
         user,
       },
     });
-  } catch (error) {
-    res.status(400).json({
-      status: 'error',
-      message: error.message,
-    });
-  }
-};
+    
+});
 
 module.exports = {
   patientRegisterController,

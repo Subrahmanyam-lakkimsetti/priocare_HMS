@@ -1,4 +1,4 @@
-const errorController = (err, req, res, next) => {
+const errorMiddleware = (err, req, res, next) => {
   console.log(`error: ${err.stack}`);
 
   const statusCode = err.statusCode || 500;
@@ -10,4 +10,4 @@ const errorController = (err, req, res, next) => {
   });
 };
 
-module.exports = errorController;
+module.exports = errorMiddleware;

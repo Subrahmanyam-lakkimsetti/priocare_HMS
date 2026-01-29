@@ -1,6 +1,6 @@
 const express = require('express');
 const { registerSchema, loginScheema } = require('./auth.validation');
-const { validateInput } = require('../../../utils/validation.util');
+const { validateInput } = require('../../../middlewares/validation.middleware');
 const { patientRegisterController, loginController } = require('./auth.controller');
 
 const authRouter = express.Router();

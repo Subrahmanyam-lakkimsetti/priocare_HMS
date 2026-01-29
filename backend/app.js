@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const apiRouter = require('./api/v1/route');
-const errorController = require('./api/v1/error.controller');
 const AppError = require('./utils/AppError.util');
+const errorMiddleware = require('./middlewares/error.middleware');
 
 const app = express();
 
@@ -33,6 +33,6 @@ app.all(/.*/, (req, res, next) => {
   next(new AppError(`The requested URL ${req.originalUrl} was not found on this server.`, 404));
 });
 
-app.use(errorController);
+app.use(errorMiddleware);
 
 module.exports = app;

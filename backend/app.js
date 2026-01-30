@@ -1,16 +1,17 @@
 const express = require('express');
-const cors = require('cors');
 const apiRouter = require('./api/v1/route');
 const AppError = require('./utils/AppError.util');
 const errorMiddleware = require('./middlewares/error.middleware');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
   res.json({
-    status: 'success',
+    isSuccess: true,
     message: 'Welcome to Priocare HMS Backend',
   });
 });
@@ -19,7 +20,7 @@ app.use('/api/v1', apiRouter);
 
 app.get('/health-check', (req, res) => {
   res.json({
-    status: 'success',
+    isSuccess: true,
     message: 'API is working fine',
   });
 });
@@ -30,7 +31,12 @@ app.all(/.*/, (req, res, next) => {
   // err.status = 'fail';
   // next(err);
 
-  next(new AppError(`The requested URL ${req.originalUrl} was not found on this server.`, 404));
+  next(
+    new AppError(
+      `The requested URL ${req.originalUrl} was not found on this server.`,
+      404,
+    ),
+  );
 });
 
 app.use(errorMiddleware);

@@ -1,4 +1,4 @@
-const { registerUser, loginUser } = require('./auth.service');
+const { registerUser, loginUser, getUser } = require('./auth.service');
 const catchAsync = require('../../../utils/catchAsync.util');
 const { UserDTO } = require('./auth.dto');
 
@@ -21,7 +21,7 @@ const patientRegisterController = catchAsync(async (req, res) => {
 
   // send back the response
   res.status(201).json({
-    status: 'success',
+    isSuccess: true,
     message: 'User registered successfully',
     user: new UserDTO(user),
   });
@@ -33,12 +33,32 @@ const loginController = catchAsync(async (req, res) => {
   setCookie(res, token);
 
   res.status(200).json({
-    status: 'success',
-    user: new UserDTO(user),
+     isSuccess: true,
+    data: new UserDTO(user),
+  });
+});
+
+const logoutController = catchAsync((req, res) => {
+  res.clearCookie('accessToken');
+
+  res.status(200).json({
+     isSuccess: true,
+    message: 'logout sucessfully',
+  });
+});
+
+const getMe = catchAsync(async (req, res) => {
+  const user = await getUser(req.data);
+
+  res.status(200).json({
+    isSuccess: true,
+    user,
   });
 });
 
 module.exports = {
   patientRegisterController,
   loginController,
+  logoutController,
+  getMe,
 };

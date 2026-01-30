@@ -50,7 +50,19 @@ const loginUser = async ({ email, password }) => {
   return { user, token };
 };
 
+const getUser = async ({ id }) => {
+  console.log(id);
+  const user = await User.findById(id).select('email role isActive');
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  return user;
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  getUser,
 };

@@ -3,12 +3,6 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-  // email (unique)
-  // password
-  // role - admin, doctor, nurse, receptionist, patient, lab_tech
-  // lab_tech
-  // isActive
-  // createdAt
 
   email: {
     type: String,

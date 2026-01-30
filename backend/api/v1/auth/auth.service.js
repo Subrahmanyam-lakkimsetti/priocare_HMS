@@ -1,4 +1,4 @@
-const User = require('../../../models/user.scheema');
+const User = require('../../../models/user.model');
 const AppError = require('../../../utils/AppError.util');
 const { generateToken } = require('../../../utils/jwt.util');
 const registerUser = async ({ email, password }) => {

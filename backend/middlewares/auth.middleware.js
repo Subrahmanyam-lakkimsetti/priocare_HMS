@@ -6,7 +6,6 @@ const catchAsync = require('../utils/catchAsync.util');
 const authMiddleware = catchAsync((req, res, next) => {
   // access the token
   const token = req.cookies.accessToken;
-  console.log('token ', token);
 
   // ckeck if token exists
   if (!token) {
@@ -15,7 +14,6 @@ const authMiddleware = catchAsync((req, res, next) => {
 
   // verify and decode the token
   const decode = verifyToken(token);
-  console.log(decode);
 
   // add the payold data tot the req obj
   req.data = {
@@ -26,6 +24,17 @@ const authMiddleware = catchAsync((req, res, next) => {
   next();
 });
 
+const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.data.role)) {
+      throw new AppError('unauthorized', 404);
+    }
+
+    next();
+  };
+};
+
 module.exports = {
   authMiddleware,
+  restrictTo,
 };

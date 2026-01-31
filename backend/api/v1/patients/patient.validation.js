@@ -13,6 +13,27 @@ const patientvalidationSchema = Joi.object({
   insuranceDetails: Joi.string().optional(),
 });
 
+const updatePatientValidationSchema = Joi.object({
+  firstName: Joi.string(),
+  lastname: Joi.string(),
+  age: Joi.number().min(0),
+  gender: Joi.string().valid('male', 'female', 'other'),
+  phoneNumber: Joi.string(),
+  address: Joi.string(),
+  bloodGroup: Joi.string().valid(
+    'A+',
+    'A-',
+    'B+',
+    'B-',
+    'AB+',
+    'AB-',
+    'O+',
+    'O-',
+  ),
+  insuranceDetails: Joi.string(),
+});
+
 module.exports = {
   patientvalidationSchema,
+  updatePatientValidationSchema,
 };

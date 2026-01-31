@@ -1,6 +1,16 @@
 const Patient = require('../../../models/patient.model');
 const AppError = require('../../../utils/AppError.util');
-const catchAsync = require('../../../utils/catchAsync.util');
+
+UPDATE_ALLOWED_FIELDS = [
+  'firstName',
+  'lastName',
+  'age',
+  'gender',
+  'phoneNumber',
+  'address',
+  'bloodGroup',
+  'insuranceDetails',
+];
 
 const createPatient = async (userId, payload) => {
   const isPatientExists = await Patient.findOne({ userId });
@@ -19,6 +29,37 @@ const createPatient = async (userId, payload) => {
   return patient;
 };
 
+const getPatient = async ({ id }) => {
+  // get the patient
+  const patient = await Patient.findOne({ userId: id });
+
+  if (!patient) {
+    throw new AppError('Patient profile does not found', 404);
+  }
+
+  // return that patient
+  return patient;
+};
+
+const updatePatient = async (userId, updates) => {
+  // get the patient
+  const patient = await Patient.findOne({ userId });
+
+  if (!patient) {
+    throw new AppError('Patient profile does not found', 404);
+  }
+
+  Object.keys(updates).forEach((field) => {
+    if (UPDATE_ALLOWED_FIELDS.includes(field)) {
+      patient[field] = updates[field];
+    }
+  });
+
+  return patient;
+};
+
 module.exports = {
   createPatient,
+  getPatient,
+  updatePatient,
 };

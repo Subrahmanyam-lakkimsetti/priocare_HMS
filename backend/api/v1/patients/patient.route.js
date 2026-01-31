@@ -12,11 +12,17 @@ const {
   createPatientController,
   getPatientController,
   updatePatientController,
+  getPatientByIdController,
 } = require('./patient.controller');
+const { getPatient } = require('./patient.service');
 
 const patientRouter = express.Router();
 
 patientRouter.use(authMiddleware);
+
+// get
+patientRouter.get('/patientId/:id', getPatientByIdController);
+
 patientRouter.use(restrictTo('patient'));
 
 // post

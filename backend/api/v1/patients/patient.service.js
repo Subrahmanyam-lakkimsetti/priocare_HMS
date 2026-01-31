@@ -58,8 +58,19 @@ const updatePatient = async (userId, updates) => {
   return patient;
 };
 
+const getPatientById = async (patientId) => {
+  const patient = await Patient.findById(patientId);
+
+  if (!patient) {
+    throw new AppError('patient not found', 404);
+  }
+
+  return patient;
+};
+
 module.exports = {
   createPatient,
   getPatient,
   updatePatient,
+  getPatientById,
 };

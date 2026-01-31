@@ -4,6 +4,7 @@ const {
   createPatient,
   getPatient,
   updatePatient,
+  getPatientById,
 } = require('./patient.service');
 
 const createPatientController = catchAsync(async (req, res) => {
@@ -36,8 +37,19 @@ const updatePatientController = catchAsync(async (req, res) => {
   });
 });
 
+const getPatientByIdController = catchAsync(async (req, res) => {
+  const patient = await getPatientById(req.params.id);
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'patient details',
+    patient: new PatientDTO(patient),
+  });
+});
+
 module.exports = {
   createPatientController,
   getPatientController,
   updatePatientController,
+  getPatientByIdController,
 };

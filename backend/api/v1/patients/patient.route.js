@@ -21,7 +21,11 @@ const patientRouter = express.Router();
 patientRouter.use(authMiddleware);
 
 // get
-patientRouter.get('/patientId/:id', getPatientByIdController);
+patientRouter.get(
+  '/patientId/:id',
+  restrictTo('doctor', 'nurse', 'admin'),
+  getPatientByIdController,
+);
 
 patientRouter.use(restrictTo('patient'));
 

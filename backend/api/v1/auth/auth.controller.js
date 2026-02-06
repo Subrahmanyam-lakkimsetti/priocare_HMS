@@ -1,17 +1,9 @@
 const { registerUser, loginUser, getUser } = require('./auth.service');
 const catchAsync = require('../../../utils/catchAsync.util');
 const { UserDTO } = require('./auth.dto');
+const { setCookie } = require('../../../utils/cookie.util');
 
-const setCookie = (res, token) => {
-  const cookieOptions = {
-    maxAge: 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-  };
 
-  res.cookie('accessToken', token, cookieOptions);
-};
 
 const patientRegisterController = catchAsync(async (req, res) => {
   // get the request
@@ -23,7 +15,7 @@ const patientRegisterController = catchAsync(async (req, res) => {
   res.status(201).json({
     isSuccess: true,
     message: 'User registered successfully',
-    user: new UserDTO(user),
+    data: new UserDTO(user),
   });
 });
 
@@ -42,7 +34,7 @@ const logoutController = catchAsync((req, res) => {
   res.clearCookie('accessToken');
 
   res.status(200).json({
-     isSuccess: true,
+    isSuccess: true,
     message: 'logout sucessfully',
   });
 });

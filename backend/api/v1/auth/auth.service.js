@@ -15,8 +15,6 @@ const registerUser = async ({ email, password }) => {
     isActive: true,
   });
 
-  newUser.password = undefined;
-
   const token = generateToken({
     userId: newUser.id,
     role: newUser.role,
@@ -31,6 +29,12 @@ const registerUser = async ({ email, password }) => {
 const loginUser = async ({ email, password }) => {
   // check email and password valid or not
   const user = await User.findOne({ email });
+
+  // temp log
+  console.log(`user: ${user}`);
+  console.log(`email: ${email}, password: ${password}`);
+  console.log(await user.comparePasswords(password));
+  console.log()
 
   if (!user || !(await user.comparePasswords(password))) {
     throw new AppError('email or password is Invalid', 404);

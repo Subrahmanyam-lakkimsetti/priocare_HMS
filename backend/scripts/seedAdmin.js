@@ -14,11 +14,11 @@ const bcrypt = require('bcrypt');
     throw new AppError('Admin already exists!', 409);
   }
 
-  const hashedPassword = await bcrypt.hash('admin@123', 12);
+  const password = '12346';
 
   await User.create({
     email: 'admin@priocare.in',
-    password: hashedPassword,
+    password,
     role: 'admin',
     isActive: true,
   });

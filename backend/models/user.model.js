@@ -3,7 +3,6 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-
   email: {
     type: String,
     required: [true, 'Email is required'],
@@ -40,10 +39,10 @@ userSchema.pre('save', async function () {
 
   const hashedPassword = await bcrypt.hash(this.password, 12);
   this.password = hashedPassword;
+  console.log(hashedPassword);
 });
 
 userSchema.methods.comparePasswords = async function (userprovidedPassword) {
-  
   return await bcrypt.compare(userprovidedPassword, this.password);
 };
 

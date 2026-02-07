@@ -1,8 +1,7 @@
 const User = require('../../../models/user.model');
 const AppError = require('../../../utils/AppError.util');
-const { generateToken } = require('../../../utils/jwt.util');
 
-const createDoctorUser = async ({ email, password }) => {
+const createDoctorUser = async ({ email }) => {
   // check existing user with email
   const isDoctorExists = await User.findOne({ email });
 
@@ -13,7 +12,7 @@ const createDoctorUser = async ({ email, password }) => {
   // if not create new one
   const doctor = User.create({
     email,
-    password,
+    password: "123456",
     role: 'doctor',
   });
 

@@ -2,7 +2,6 @@ require('dotenv').config();
 const { default: mongoose } = require('mongoose');
 const User = require('../models/user.model');
 const AppError = require('../utils/AppError.util');
-const bcrypt = require('bcrypt');
 
 (async () => {
   const connectionURL = process.env.DB_CONNECTION_STRING;

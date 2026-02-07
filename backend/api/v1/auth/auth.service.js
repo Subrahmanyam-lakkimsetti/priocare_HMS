@@ -36,7 +36,7 @@ const loginUser = async ({ email, password }) => {
 
   // check isActive
   if (!user.isActive) {
-    throw new AppError('Account is inActive, contact support.', 403);
+    throw new AppError('Account is inActive, please contact support.', 403);
   }
 
   // generate and send token

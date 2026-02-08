@@ -3,8 +3,6 @@ const catchAsync = require('../../../utils/catchAsync.util');
 const { UserDTO } = require('./auth.dto');
 const { setCookie } = require('../../../utils/cookie.util');
 
-
-
 const patientRegisterController = catchAsync(async (req, res) => {
   // get the request
   const { newUser: user, token } = await registerUser(req.body);
@@ -25,7 +23,8 @@ const loginController = catchAsync(async (req, res) => {
   setCookie(res, token);
 
   res.status(200).json({
-     isSuccess: true,
+    isSuccess: true,
+    message: 'login successful',
     data: new UserDTO(user),
   });
 });

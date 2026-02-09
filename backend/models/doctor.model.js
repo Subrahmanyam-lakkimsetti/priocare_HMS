@@ -39,6 +39,11 @@ const doctorSchema = new mongoose.Schema(
       min: 50,
       required: true,
     },
+    MaxDailyAppointments: {
+      type: Number,
+      default: 20,
+      min: 1,
+    },
     availabilityStatus: {
       type: String,
       enum: ['available', 'unavailable'],
@@ -73,6 +78,12 @@ const doctorSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+doctorSchema.index({
+  specializations: 1,
+  availabilityStatus: 1,
+  isActive: true,
+});
 
 const Doctor = mongoose.model('Doctor', doctorSchema);
 

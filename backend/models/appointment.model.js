@@ -8,6 +8,8 @@ const triageSchema = new mongoose.Schema({
     temperature: Number,
   },
   comorbidities: [String],
+  age: Number,
+  description: String,
   priorityScore: Number,
   severityLevel: {
     type: String,

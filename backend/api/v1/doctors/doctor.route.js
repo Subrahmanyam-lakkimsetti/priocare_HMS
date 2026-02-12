@@ -5,7 +5,7 @@ const {
   getDoctor,
   updateDoctor,
   getMe,
-} = require('./doctor.controller');
+} = require('./doctorAuth.controller');
 const {
   authMiddleware,
   restrictTo,
@@ -15,6 +15,7 @@ const {
   doctorValidationSchema,
   updateDoctorValidationSchema,
 } = require('./doctor.validation');
+const getQueue = require('./doctor.controller');
 
 const doctorRouter = express.Router();
 
@@ -28,6 +29,12 @@ doctorRouter.get(
 );
 doctorRouter.get('/id/:id', getDoctor);
 doctorRouter.get('/me', restrictTo('doctor'), getMe);
+
+doctorRouter.get(
+  '/doctorId/:doctorId/queue',
+  restrictTo('doctor', 'admin'),
+  getQueue,
+);
 
 // post
 doctorRouter.post(

@@ -1,3 +1,4 @@
+const Appointment = require('../../../models/appointment.model');
 const Patient = require('../../../models/patient.model');
 const AppError = require('../../../utils/AppError.util');
 const assignDoctor = require('./doctorAssign.service');
@@ -11,20 +12,31 @@ const createAppointment = async (userId, triageData) => {
   }
 
   // calculate triage
-  // const triage = await evaluateTriage(triageData);
+  // const triage = JSON.parse(await evaluateTriage(triageData));
 
-  // console.log('triage', triage);
-  console.log('triageData', triageData);
+  console.log('triage', triage);
+  // const triage = {};
 
-  const triage = {};
-
-  console.log();
+  //  assign Doctor
   const doctor = await assignDoctor({
-    priorityScore: triage?.recommendedApecialization || 25,
-    severityLevel: triage?.priorityScore || 'low',
-    specilization: triage?.severityLevel || 'General Medicine',
+    specilization: triage?.recommendedSpecialization || 'General Medicine',
     scheduledDate: triageData.scheduledDate,
-    scheduledTime: triageData.scheduledTime,
+  });
+
+  triageData.triage.priorityScore = triage.priorityScore || 25;
+  triageData.triage.severityLevel = triage.severityLevel || 'low';
+  triageData.triage.source = 'Gemini AI';
+
+  console.log(triageData);
+
+  await Appointment.create({
+    patientId: userId,
+    doctorId: doctor._id,
+    scheduledDate: triageData.scheduledDate,
+    triage: {
+      ...triageData.triage,
+    },
+    createdBy: 'patient',
   });
 
   return 'success';

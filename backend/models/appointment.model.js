@@ -1,24 +1,28 @@
-const { default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 
-const triageSchema = new mongoose.Schema({
-  symptoms: [String],
-  vitals: {
-    heartRate: Number,
-    bloodPressure: String,
-    temperature: Number,
+const triageSchema = new mongoose.Schema(
+  {
+    symptoms: [String],
+    vitals: {
+      heartRate: Number,
+      bloodPressure: String,
+      temperature: Number,
+    },
+    comorbidities: [String],
+    age: Number,
+    description: String,
+    priorityScore: Number,
+    severityLevel: {
+      type: String,
+      enum: ['low', 'medium', 'high', 'emergency'],
+    },
+    recomendedSpecilization: String,
+    source: String,
   },
-  comorbidities: [String],
-  age: Number,
-  description: String,
-  priorityScore: Number,
-  severityLevel: {
-    type: String,
-    enum: ['low', 'medium', 'high', 'emergency'],
+  {
+    timestamps: true,
   },
-  recomendedSpecilization: String,
-  createdAt: Date.now(),
-  source: String,
-});
+);
 
 const appointmentSchema = new mongoose.Schema(
   {
@@ -37,21 +41,19 @@ const appointmentSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    scheduledTime: {
+    preferedTime: {
       type: String,
-      required: true,
     },
+
+    checkedInAt: {
+      type: Date,
+      default: null,
+    },
+
     status: {
       type: String,
-      enum: [
-        'confirmed',
-        'checked_in',
-        'in_consulation',
-        'completed',
-        'cancelled',
-        'no_show',
-      ],
-      default: 'confirmed',
+      enum: ['waiting', 'in_consultation', 'completed', 'cancelled', 'no_show'],
+      default: 'waiting',
     },
     triage: {
       type: triageSchema,

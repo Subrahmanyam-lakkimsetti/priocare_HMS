@@ -27,7 +27,7 @@ priorityScore rules:
 - 86-100 → emergency
 
 recommendedSpecialization must be ONE clear department
-(e.g., Cardiology, Neurology, General Medicine, Pulmonology, Orthopedics, Gastroenterology, Endocrinology, Emergency Medicine, Pediatrics).
+(e.g., Cardiology, Neurology, General Medicine, Pulmonology, Orthopedics, Gastroenterology, Endocrinology, Pediatrics).
 
 Output format MUST be exactly:
 {

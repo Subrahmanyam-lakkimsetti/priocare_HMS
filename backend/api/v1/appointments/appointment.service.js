@@ -4,6 +4,22 @@ const AppError = require('../../../utils/AppError.util');
 const assignDoctor = require('./doctorAssign.service');
 const evaluateTriage = require('./triage/aiAdapter.triage');
 
+const generateToken = async () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTVVWXYZ23456789';
+
+  let token = '';
+
+  for (let i = 0; i < 4; i++) {
+    token += chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  const appointment = await Appointment.findOne({ token });
+
+  if (appointment) generateToken();
+
+  return token;
+};
+
 const createAppointment = async (userId, triageData) => {
   // ckeck patient exists or not
   const isPatientExists = await Patient.findOne({ userId });
@@ -32,6 +48,7 @@ const createAppointment = async (userId, triageData) => {
   await Appointment.create({
     patientId: userId,
     doctorId: doctor._id,
+    token: generateToken(),
     scheduledDate: triageData.scheduledDate,
     triage: {
       ...triageData.triage,

@@ -5,7 +5,7 @@ const {
 } = require('../../../middlewares/auth.middleware');
 const { validateInput } = require('../../../middlewares/validation.middleware');
 const { doctorSchema } = require('./admin.validation');
-const { createDoctorUser } = require('./admin.controller');
+const { createDoctorUser, createReceptionist } = require('./admin.controller');
 
 const adminRouter = express.Router();
 
@@ -17,5 +17,7 @@ adminRouter.post(
   validateInput(doctorSchema),
   createDoctorUser,
 );
+
+adminRouter.post('/receptionists', restrictTo('admin'), createReceptionist);
 
 module.exports = adminRouter;

@@ -10,7 +10,10 @@ const AIGING_FACTOR = 0.2;
 const calculateEffectivePriority = (appointment, clinicStartTime) => {
   // priorityScore + severityLevel + (waitingTime * AIGING_FACTOR)
 
-  const waitingTime = Math.max(0, (Date.now() - clinicStartTime) / 60000);
+  const waitingTime = Math.max(
+    0,
+    (Date.now() - new Date(appointment.checkedInAt)) / 60000,
+  );
 
   const score =
     appointment.triage.priorityScore +

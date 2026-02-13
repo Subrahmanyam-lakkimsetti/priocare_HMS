@@ -41,6 +41,12 @@ const appointmentSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+
+    token: {
+      type: String,
+      required: true,
+    },
+
     preferedTime: {
       type: String,
     },
@@ -52,8 +58,15 @@ const appointmentSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ['waiting', 'in_consultation', 'completed', 'cancelled', 'no_show'],
-      default: 'waiting',
+      enum: [
+        'confirmed',
+        'checked_in',
+        'in_consultation',
+        'completed',
+        'cancelled',
+        'no_show',
+      ],
+      default: 'confirmed',
     },
     triage: {
       type: triageSchema,

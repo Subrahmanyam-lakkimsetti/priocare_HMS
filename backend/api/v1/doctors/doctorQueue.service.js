@@ -4,7 +4,7 @@ const {
   calculateEffectivePriority,
 } = require('../../../utils/effectivePriority.util');
 
-AVG_CONSULT_MIN = 20;
+const AVG_CONSULT_MIN = 20;
 const getDoctorQueue = async (doctorId, scheduledDate) => {
   const { start, end } = getDayRange(scheduledDate);
 
@@ -17,29 +17,99 @@ const getDoctorQueue = async (doctorId, scheduledDate) => {
     status: { $in: ['checked_in'] },
   });
 
+  const activeAppointment = await Appointment.findOne({
+    doctorId,
+    scheduledDate: { $gte: start, $lte: end },
+    status: { $in: ['in_consultation'] },
+  });
+
+  const lastAppointment = await Appointment.findOne({
+    doctorId,
+    scheduledDate: { $gte: start, $lte: end },
+    status: { $in: ['completed'] },
+  }).sort({ consulationEndsAt: -1 });
+
+  if (!activeAppointment && queue.length == 0) {
+    return {
+      isQueueActive: false,
+      message: 'Queue is empty',
+    };
+  }
+
   queue.sort(
     (a, b) =>
       calculateEffectivePriority(b, clinicStartTime) -
       calculateEffectivePriority(a, clinicStartTime),
   );
 
-  return queue.map((appointment, index) => {
-    const est = new Date(clinicStartTime);
-    est.setMinutes(est.getMinutes() + index * AVG_CONSULT_MIN);
+  const now = new Date();
 
-    console.log(est);
+  let doctorStartTime;
 
-    return {
-      ...appointment.toObject(),
-      queuePosition: index + 1,
-      effectiveScore: calculateEffectivePriority(appointment, clinicStartTime),
-      exceptedStartTime: est.toLocaleDateString('en-IN', {
+  if (activeAppointment) {
+    const appointmentEndTime = new Date(activeAppointment.consulationStartsAt);
+    appointmentEndTime.setMinutes(appointmentEndTime.getMinutes() + 20);
+    doctorStartTime = new Date(appointmentEndTime);
+  } else if (lastAppointment) {
+    doctorStartTime = Math.max(lastAppointment.consulationEndsAt, now);
+  } else {
+    const firstPatientArrivalTime = new Date(queue[0].checkedInAt);
+    doctorStartTime = new Date(
+      Math.max(clinicStartTime, firstPatientArrivalTime, now),
+    );
+  }
+
+  const patients = [];
+
+  for (let i = 0; i < queue.length; i++) {
+    const appt = queue[i];
+
+    const startTime = new Date(doctorStartTime);
+
+    const endTime = new Date(startTime);
+    endTime.setMinutes(endTime.getMinutes() + AVG_CONSULT_MIN);
+
+    patients.push({
+      ...appt.toObject(),
+      queuePosition: i + 1,
+      exceptedStartTime: startTime.toLocaleDateString('en-IN', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
       }),
-    };
-  });
+      exceptedEndTime: endTime.toLocaleDateString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      }),
+    });
+
+    doctorStartTime = endTime;
+  }
+
+  return {
+    isQueueActive: true,
+    message: 'patients queue',
+    patients,
+  };
+
+  // return queue.map((appointment, index) => {
+  //   const est = new Date(appointment.checkedInAt);
+  //   est.setMinutes(est.getMinutes() + index * AVG_CONSULT_MIN);
+
+  //   console.log(est);
+
+  //   return {
+  //     ...appointment.toObject(),
+  //     queuePosition: index + 1,
+  //     effectiveScore: calculateEffectivePriority(appointment, clinicStartTime),
+  //     exceptedStartTime: est.toLocaleDateString('en-IN', {
+  //       hour: '2-digit',
+  //       minute: '2-digit',
+  //       hour12: true,
+  //     }),
+  //   };
+  // });
 };
 
 module.exports = {

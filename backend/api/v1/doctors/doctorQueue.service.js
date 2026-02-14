@@ -17,6 +17,12 @@ const getDoctorQueue = async (doctorId, scheduledDate) => {
     status: { $in: ['checked_in'] },
   });
 
+  const calledAppointment = await Appointment.findOne({
+    doctorId,
+    scheduledDate: { $gte: start, $lte: end },
+    status: { $in: ['called'] },
+  });
+
   const activeAppointment = await Appointment.findOne({
     doctorId,
     scheduledDate: { $gte: start, $lte: end },
@@ -29,7 +35,12 @@ const getDoctorQueue = async (doctorId, scheduledDate) => {
     status: { $in: ['completed'] },
   }).sort({ consulationEndsAt: -1 });
 
-  if (!activeAppointment && queue.length == 0) {
+  if (
+    !activeAppointment &&
+    !lastAppointment &&
+    !calledAppointment &&
+    queue.length == 0
+  ) {
     return {
       isQueueActive: false,
       message: 'Queue is empty',
@@ -46,17 +57,21 @@ const getDoctorQueue = async (doctorId, scheduledDate) => {
 
   let doctorStartTime;
 
-  if (activeAppointment) {
+  if (calledAppointment) {
+    console.log('calledAppointment');
+    doctorStartTime = new Date(calledAppointment.calledAt);
+    doctorStartTime.setMinutes(
+      doctorStartTime.getMinutes() + AVG_CONSULT_MIN + 5,
+    );
+  } else if (activeAppointment) {
     const appointmentEndTime = new Date(activeAppointment.consulationStartsAt);
     appointmentEndTime.setMinutes(appointmentEndTime.getMinutes() + 20);
     doctorStartTime = new Date(appointmentEndTime);
   } else if (lastAppointment) {
     doctorStartTime = Math.max(lastAppointment.consulationEndsAt, now);
   } else {
-    const firstPatientArrivalTime = new Date(queue[0].checkedInAt);
-    doctorStartTime = new Date(
-      Math.max(clinicStartTime, firstPatientArrivalTime, now),
-    );
+    // const firstPatientArrivalTime = new Date(queue[0].checkedInAt);
+    doctorStartTime = new Date(Math.max(clinicStartTime, now));
   }
 
   const patients = [];
@@ -92,24 +107,6 @@ const getDoctorQueue = async (doctorId, scheduledDate) => {
     message: 'patients queue',
     patients,
   };
-
-  // return queue.map((appointment, index) => {
-  //   const est = new Date(appointment.checkedInAt);
-  //   est.setMinutes(est.getMinutes() + index * AVG_CONSULT_MIN);
-
-  //   console.log(est);
-
-  //   return {
-  //     ...appointment.toObject(),
-  //     queuePosition: index + 1,
-  //     effectiveScore: calculateEffectivePriority(appointment, clinicStartTime),
-  //     exceptedStartTime: est.toLocaleDateString('en-IN', {
-  //       hour: '2-digit',
-  //       minute: '2-digit',
-  //       hour12: true,
-  //     }),
-  //   };
-  // });
 };
 
 module.exports = {

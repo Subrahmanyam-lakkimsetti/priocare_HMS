@@ -1,28 +1,23 @@
 const mongoose = require('mongoose');
 
-const triageSchema = new mongoose.Schema(
-  {
-    symptoms: [String],
-    vitals: {
-      heartRate: Number,
-      bloodPressure: String,
-      temperature: Number,
-    },
-    comorbidities: [String],
-    age: Number,
-    description: String,
-    priorityScore: Number,
-    severityLevel: {
-      type: String,
-      enum: ['low', 'medium', 'high', 'emergency'],
-    },
-    recomendedSpecilization: String,
-    source: String,
+const triageSchema = new mongoose.Schema({
+  symptoms: [String],
+  vitals: {
+    heartRate: Number,
+    bloodPressure: String,
+    temperature: Number,
   },
-  {
-    timestamps: true,
+  comorbidities: [String],
+  age: Number,
+  description: String,
+  priorityScore: Number,
+  severityLevel: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'emergency'],
   },
-);
+  recomendedSpecilization: String,
+  source: String,
+});
 
 const appointmentSchema = new mongoose.Schema(
   {
@@ -51,20 +46,15 @@ const appointmentSchema = new mongoose.Schema(
       type: String,
     },
 
-    checkedInAt: {
-      type: Date,
-      default: null,
-    },
-
     status: {
       type: String,
       enum: [
         'confirmed',
         'checked_in',
+        'called',
         'in_consultation',
         'completed',
         'cancelled',
-        'no_show',
       ],
       default: 'confirmed',
     },
@@ -72,6 +62,26 @@ const appointmentSchema = new mongoose.Schema(
       type: triageSchema,
       required: true,
     },
+
+    checkedInAt: {
+      type: Date,
+      default: null,
+    },
+
+    calledAt: {
+      type: Date,
+      default: null,
+    },
+
+    consulationStartsAt: {
+      type: Date,
+      default: null,
+    },
+    consulationEndsAt: {
+      type: Date,
+      default: null,
+    },
+
     createdBy: {
       type: String,
       enum: ['patient', 'staff'],

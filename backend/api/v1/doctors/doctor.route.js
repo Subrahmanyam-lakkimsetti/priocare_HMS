@@ -15,7 +15,11 @@ const {
   doctorValidationSchema,
   updateDoctorValidationSchema,
 } = require('./doctor.validation');
-const getQueue = require('./doctor.controller');
+const {
+  getQueue,
+  callPatient,
+  startConsultation,
+} = require('./doctor.controller');
 
 const doctorRouter = express.Router();
 
@@ -30,11 +34,7 @@ doctorRouter.get(
 doctorRouter.get('/id/:id', getDoctor);
 doctorRouter.get('/me', restrictTo('doctor'), getMe);
 
-doctorRouter.get(
-  '/doctorId/:doctorId/queue',
-  restrictTo('doctor', 'admin'),
-  getQueue,
-);
+doctorRouter.get('/queue', restrictTo('doctor', 'admin'), getQueue);
 
 // post
 doctorRouter.post(
@@ -50,6 +50,14 @@ doctorRouter.patch(
   validateInput(updateDoctorValidationSchema),
   restrictTo('doctor'),
   updateDoctor,
+);
+
+doctorRouter.patch('/patients/callNext', restrictTo('doctor'), callPatient);
+
+doctorRouter.patch(
+  '/patients/start-consultation',
+  restrictTo('doctor'),
+  startConsultation,
 );
 
 module.exports = {

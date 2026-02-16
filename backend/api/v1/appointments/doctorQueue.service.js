@@ -59,14 +59,25 @@ const getDoctorQueue = async (doctorId, scheduledDate) => {
 
   if (calledAppointment) {
     console.log('calledAppointment');
-    doctorStartTime = new Date(calledAppointment.calledAt);
-    doctorStartTime.setMinutes(
-      doctorStartTime.getMinutes() + AVG_CONSULT_MIN + 5,
+    patientCalledAt = new Date(calledAppointment.calledAt);
+    patientCalledAt.setMinutes(
+      patientCalledAt.getMinutes() + AVG_CONSULT_MIN + 5,
     );
+
+    const latest = new Date(now);
+    latest.setMinutes(latest.getMinutes() + AVG_CONSULT_MIN + 5);
+
+    doctorStartTime = Math.max(patientCalledAt, latest);
   } else if (activeAppointment) {
     const appointmentEndTime = new Date(activeAppointment.consulationStartsAt);
-    appointmentEndTime.setMinutes(appointmentEndTime.getMinutes() + 20);
-    doctorStartTime = new Date(appointmentEndTime);
+    appointmentEndTime.setMinutes(
+      appointmentEndTime.getMinutes() + AVG_CONSULT_MIN,
+    );
+
+    const latest = new Date(now);
+    latest.setMinutes(latest.getMinutes() + AVG_CONSULT_MIN);
+
+    doctorStartTime = Math.max(appointmentEndTime, latest);
   } else if (lastAppointment) {
     doctorStartTime = Math.max(lastAppointment.consulationEndsAt, now);
   } else {

@@ -1,6 +1,6 @@
 const catchAsync = require('../../../utils/catchAsync.util');
 const { DoctorDTO } = require('./doctor.dto');
-const doctorService = require('./doctor.service');
+const doctorService = require('./doctorAuth.service');
 
 const createDotorController = catchAsync(async (req, res) => {
   const doctor = await doctorService.createDoctor(req.data.id, req.body);

@@ -46,7 +46,7 @@ const createAppointment = async (userId, triageData) => {
   console.log(triageData);
 
   await Appointment.create({
-    patientId: userId,
+    patientId: isPatientExists?._id,
     doctorId: doctor._id,
     token: generateToken(),
     scheduledDate: triageData.scheduledDate,

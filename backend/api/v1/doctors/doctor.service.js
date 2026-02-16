@@ -19,16 +19,6 @@ const callPatient = async (userId, date) => {
     throw new AppError('No waiting patients');
   }
 
-  const isAlreadyCalled = await Appointment.findOne({
-    doctorId: doctor._id,
-    scheduledDate: { $gte: start, $lte: end },
-    status: { $in: ['called'] },
-  });
-
-  if (isAlreadyCalled) {
-    throw new AppError('Patient Already called', 409);
-  }
-
   const firstPatient = queue.patients[0];
 
   const calledPatient = await Appointment.findOneAndUpdate(
@@ -61,15 +51,7 @@ const startConsultation = async (userId, date) => {
     throw new AppError('No Doctor found!', 404);
   }
 
-  const isInConsultation = await Appointment.findOne({
-    doctorId: doctor._id,
-    scheduledDate: { $gte: start, $lte: end },
-    status: 'in_consultation',
-  });
 
-  if (isInConsultation) {
-    throw new AppError('already in consultation', 409);
-  }
 
   const pipeline = [
     {

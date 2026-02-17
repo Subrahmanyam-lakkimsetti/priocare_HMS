@@ -1,10 +1,23 @@
 const { aiClient } = require('../../../../utils/aiClient');
+const AppError = require('../../../../utils/AppError.util');
+const triagePrompt = require('./aiPrompt.triage');
 
 const evaluateTriage = async (input) => {
   try {
-    return await aiClient(input.triage);
+    const { symptoms, vitals, comorbidities, age, description } = input.triage;
+
+    const aiTriagePrompt = `${triagePrompt} 
+        Patient Data:
+        - Age: ${age}
+        - Symptoms: ${symptoms.join(', ')}
+        - Vitals: ${JSON.stringify(vitals || {})} 
+        - Comorbidities: ${comorbidities}
+        - Description: ${description}
+      `;
+
+    return await aiClient(aiTriagePrompt);
   } catch (error) {
-    console.log(error);
+    throw new AppError('AI failed to generate Response', 401);
   }
 };
 

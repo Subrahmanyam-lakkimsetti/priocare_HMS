@@ -15,7 +15,7 @@ const getQueue = catchAsync(async (req, res) => {
   res.status(200).json({
     isSuccess: true,
     message: `Queue for ${date}`,
-    totalDocuments: queue.patients.length,
+    totalDocuments: queue?.patients?.length,
     data: queue,
   });
 });

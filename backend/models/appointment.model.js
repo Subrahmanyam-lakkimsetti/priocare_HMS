@@ -63,6 +63,16 @@ const appointmentSchema = new mongoose.Schema(
       required: true,
     },
 
+    aiSummary: {
+      type: Object,
+      default: null,
+    },
+
+    aisummaryUpdatedAt: {
+      type: Date,
+      default: null,
+    },
+
     checkedInAt: {
       type: Date,
       default: null,
@@ -96,7 +106,6 @@ const appointmentSchema = new mongoose.Schema(
 appointmentSchema.index({
   doctorId: 1,
   scheduledDate: 1,
-  scheduledTime: 1,
 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);

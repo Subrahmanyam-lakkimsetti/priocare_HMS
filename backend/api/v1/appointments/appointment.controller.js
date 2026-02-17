@@ -7,7 +7,10 @@ const createAppointment = catchAsync(async (req, res) => {
     req.body,
   );
 
-  res.send('testing...');
+  res.status(200).json({
+    isSuccess: true,
+    data: appointment,
+  });
 });
 
 module.exports = {

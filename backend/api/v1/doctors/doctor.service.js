@@ -3,6 +3,7 @@ const Doctor = require('../../../models/doctor.model');
 const AppError = require('../../../utils/AppError.util');
 const { getDayRange } = require('../../../utils/dayRange.util');
 const { getDoctorQueue } = require('../appointments/doctorQueue.service');
+const { generateSummary } = require('./prompts/aiAdapter');
 
 const callPatient = async (userId, date) => {
   const { start, end } = getDayRange(date);
@@ -50,8 +51,6 @@ const startConsultation = async (userId, date) => {
   if (!doctor) {
     throw new AppError('No Doctor found!', 404);
   }
-
-
 
   const pipeline = [
     {
@@ -116,6 +115,26 @@ const startConsultation = async (userId, date) => {
     bloodGroup: appt.patientDetails.bloodGroup,
     phoneNumber: appt.patientDetails.phoneNumber,
   };
+
+  // const summary = await generateSummary(appointmentObj);
+
+  (async () => {
+    try {
+      const summary = await generateSummary(appointmentObj);
+
+      await Appointment.findByIdAndUpdate(
+        { _id: appt._id },
+        {
+          aiSummary: summary,
+          aisummaryUpdatedAt: new Date(),
+        },
+      );
+
+      console.log('AI summary saved');
+    } catch (err) {
+      console.log('AI summary failes', err);
+    }
+  })();
 
   delete appointment.patientDetails;
 

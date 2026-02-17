@@ -28,9 +28,12 @@ const createAppointment = async (userId, triageData) => {
   }
 
   // calculate triage
-  // const triage = JSON.parse(await evaluateTriage(triageData));
+  const triage = JSON.parse(await evaluateTriage(triageData));
 
-  console.log('triage', triage);
+  if (!triage) {
+    throw new AppError('failed', 401);
+  }
+
   // const triage = {};
 
   //  assign Doctor
@@ -48,7 +51,7 @@ const createAppointment = async (userId, triageData) => {
   await Appointment.create({
     patientId: isPatientExists?._id,
     doctorId: doctor._id,
-    token: generateToken(),
+    token: await generateToken(),
     scheduledDate: triageData.scheduledDate,
     triage: {
       ...triageData.triage,

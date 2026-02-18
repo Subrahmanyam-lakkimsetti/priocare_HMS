@@ -30,13 +30,10 @@ const generateSummary = async (patientDetails) => {
     AND retuen only JSON response do not put any text before or after the brackets
   `;
 
-  console.log('length: ', summeryPrompt.length);
 
   try {
-    console.log('---- requested forwarded to Client ------');
-    const raw = await aiClient(summeryPrompt);
 
-    console.log('---------- Generated..🔥-----');
+    const raw = await aiClient(summeryPrompt);
 
     console.log(raw);
 

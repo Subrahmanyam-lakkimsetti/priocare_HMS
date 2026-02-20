@@ -20,6 +20,7 @@ const {
   callPatient,
   startConsultation,
 } = require('./doctor.controller');
+const { getAiSummary } = require('./doctor.service');
 
 const doctorRouter = express.Router();
 
@@ -35,6 +36,12 @@ doctorRouter.get('/id/:id', getDoctor);
 doctorRouter.get('/me', restrictTo('doctor'), getMe);
 
 doctorRouter.get('/queue', restrictTo('doctor', 'admin'), getQueue);
+
+doctorRouter.get(
+  '/appointment/token/:token',
+  restrictTo('doctor'),
+  getAiSummary,
+);
 
 // post
 doctorRouter.post(

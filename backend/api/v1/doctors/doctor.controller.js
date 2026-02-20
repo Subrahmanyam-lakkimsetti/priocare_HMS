@@ -50,4 +50,16 @@ const startConsultation = catchAsync(async (req, res) => {
   });
 });
 
-module.exports = { getQueue, callPatient, startConsultation };
+const getAiSummary = catchAsync(async (req, res) => {
+  const { token } = req.params;
+
+  const aiSummary = await doctorService.getAiSummary(token);
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'AI summary',
+    data: aiSummary,
+  });
+});
+
+module.exports = { getQueue, callPatient, startConsultation, getAiSummary };

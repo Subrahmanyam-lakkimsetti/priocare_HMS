@@ -141,7 +141,28 @@ const startConsultation = async (userId, date) => {
   return appointmentObj;
 };
 
+const getAiSummary = async (userId, date) => {
+  // const { start, end } = getDayRange(date);
+
+  // const summary = await Appointment.findOne({
+  //   doctorId: userId,
+  //   scheduledDate: { $gte: start, $lte: end },
+  //   status: { $in: ['in_consultation'] },
+  // }).select('aiSummary');
+
+  const summary = await Appointment.findOne({
+    token,
+  }).select('aisummary');
+
+  if (!summary) {
+    throw new AppError('summary does not exists', 404);
+  }
+
+  return summary;
+};
+
 module.exports = {
   callPatient,
   startConsultation,
+  getAiSummary,
 };

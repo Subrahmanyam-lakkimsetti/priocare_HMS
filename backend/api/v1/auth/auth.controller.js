@@ -30,7 +30,11 @@ const loginController = catchAsync(async (req, res) => {
 });
 
 const logoutController = catchAsync((req, res) => {
-  res.clearCookie('accessToken');
+  res.clearCookie('accessToken', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false, // true in production
+  });
 
   res.status(200).json({
     isSuccess: true,
@@ -43,7 +47,7 @@ const getMe = catchAsync(async (req, res) => {
 
   res.status(200).json({
     isSuccess: true,
-    user,
+    data: user,
   });
 });
 

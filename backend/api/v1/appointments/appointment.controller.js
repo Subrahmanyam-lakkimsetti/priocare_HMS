@@ -13,6 +13,8 @@ const createAppointment = catchAsync(async (req, res) => {
   });
 });
 
+
+
 module.exports = {
   createAppointment,
 };

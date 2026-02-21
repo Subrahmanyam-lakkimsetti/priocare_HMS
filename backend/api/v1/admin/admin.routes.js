@@ -12,7 +12,7 @@ const adminRouter = express.Router();
 adminRouter.use(authMiddleware);
 
 adminRouter.post(
-  '/doctors',
+  'auth/doctors/register',
   restrictTo('admin'),
   validateInput(doctorSchema),
   createDoctorUser,

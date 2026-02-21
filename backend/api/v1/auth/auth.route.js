@@ -12,7 +12,7 @@ const { authMiddleware } = require('../../../middlewares/auth.middleware');
 const authRouter = express.Router();
 
 authRouter.post(
-  '/register',
+  '/patient/register',
   validateInput(registerSchema),
   patientRegisterController,
 );

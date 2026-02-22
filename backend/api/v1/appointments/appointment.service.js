@@ -17,9 +17,25 @@ const generateToken = async () => {
 
   const appointment = await Appointment.findOne({ token });
 
-  if (appointment) generateToken();
+  if (appointment) return generateToken();
 
   return token;
+};
+
+const getAppointmentsForUser = async (userId) => {
+  const patient = await Patient.findOne({ userId });
+  console.log('userId', userId);
+  console.log('patient', patient);
+
+  if (!patient) {
+    throw new AppError('No patient found!', 404);
+  }
+
+  const appointments = await Appointment.find({
+    patientId: patient._id,
+  }).populate('doctorId', 'firstName lastName department experienceYears');
+
+  return appointments;
 };
 
 const createAppointment = async (userId, triageData) => {
@@ -36,6 +52,8 @@ const createAppointment = async (userId, triageData) => {
   if (!triage) {
     throw new AppError('failed', 401);
   }
+
+  console.log('triage', triage);
 
   // const triage = {};
 
@@ -71,28 +89,34 @@ const createAppointment = async (userId, triageData) => {
 };
 
 const getActiveAppointment = async (userId) => {
-  console.log(userId);
   const patient = await Patient.findOne({ userId });
-
-  console.log(patient);
 
   if (!patient) {
     throw new AppError('No patient found', 404);
   }
-
-  console.log('patientId', patient._id);
 
   const appointment = await Appointment.findOne({
     patientId: patient._id,
     status: { $in: ['confirmed', 'checked_in', 'called', 'in_consultation'] },
   }).populate('doctorId', 'firstName lastName department experienceYears');
 
-  console.log('activeappointment', appointment);
+  if (!appointment) {
+    return null;
+  }
+
+  console.log('appointment', appointment);
+  console.log(appointment.doctorId._id);
 
   const { patients: patientDetails } = await getDoctorQueue(
-    appointment.doctorId,
+    appointment.doctorId._id,
     appointment.scheduledDate,
   );
+
+  console.log(patientDetails);
+
+  if (!patientDetails) {
+    return null;
+  }
 
   const patientWaitingDetails = patientDetails.filter((pat) =>
     pat.patientId.equals(patient._id),
@@ -107,7 +131,6 @@ const getActiveAppointment = async (userId) => {
 };
 
 const getAppointmentByToken = async ({ token }, id) => {
-  console.log('token', token);
   const appointment = await Appointment.findOne({ token }).populate(
     'doctorId',
     'firstName lastName department experienceYears',
@@ -116,8 +139,6 @@ const getAppointmentByToken = async ({ token }, id) => {
   if (!appointment) {
     throw new AppError('No appointment found!', 404);
   }
-
-  console.log('appointment', appointment);
 
   const { exceptedStartTime, exceptedEndTime, queuePosition } =
     await getActiveAppointment(id);
@@ -134,4 +155,5 @@ module.exports = {
   createAppointment,
   getActiveAppointment,
   getAppointmentByToken,
+  getAppointmentsForUser,
 };

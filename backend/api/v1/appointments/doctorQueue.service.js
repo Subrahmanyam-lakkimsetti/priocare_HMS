@@ -60,7 +60,6 @@ const getDoctorQueue = async (doctorId, scheduledDate) => {
   let doctorStartTime;
 
   if (calledAppointment) {
-    console.log('calledAppointment');
     patientCalledAt = new Date(calledAppointment.calledAt);
     patientCalledAt.setMinutes(
       patientCalledAt.getMinutes() + AVG_CONSULT_MIN + 5,

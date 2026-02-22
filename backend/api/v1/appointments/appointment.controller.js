@@ -13,6 +13,18 @@ const createAppointment = catchAsync(async (req, res) => {
   });
 });
 
+const getAppointmentsForUser = catchAsync(async (req, res) => {
+  const appointments = await appointmentService.getAppointmentsForUser(
+    req.data.id,
+  );
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'your appointments',
+    data: appointments,
+  });
+});
+
 const getActiveAppointment = catchAsync(async (req, res) => {
   const appointment = await appointmentService.getActiveAppointment(
     req.data.id,
@@ -31,6 +43,13 @@ const getAppointmnetByToken = catchAsync(async (req, res) => {
     req.data.id,
   );
 
+  if (!appointment) {
+    res.status(200).json({
+      isSuccess: true,
+      message: 'No appointment found',
+    });
+  }
+
   res.status(200).json({
     isSuccess: true,
     message: 'appointment details',
@@ -42,4 +61,5 @@ module.exports = {
   createAppointment,
   getAppointmnetByToken,
   getActiveAppointment,
+  getAppointmentsForUser,
 };

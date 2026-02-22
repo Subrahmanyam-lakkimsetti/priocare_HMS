@@ -4,7 +4,7 @@ import { loginUser, fetchCurrentUser } from './authThunks';
 const initialState = {
   user: null,
   isAuthenticated: false,
-  loading: true,
+  loading: false,
   sessionInitialized: false,
   manualLogout: false, // ⭐ NEW
   error: null,
@@ -32,7 +32,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.sessionInitialized = true;
-        state.manualLogout = false; 
+        state.manualLogout = false;
         state.user = action.payload;
         state.isAuthenticated = true;
       })

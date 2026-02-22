@@ -27,12 +27,16 @@ const assignDoctor = async ({ specilization, scheduledDate }) => {
   let bestScore = Infinity;
 
   for (let doctor of doctors) {
+    console.log(doctors);
+
     // check availability
     const isAvailable = doctor.availableDays.includes(appointmentDay);
     if (!isAvailable) continue;
 
     const load = await calculateTotalAppointments(doctor, scheduledDate);
     if (load >= doctor.MaxDailyAppointments) continue;
+
+    console.log(doctors);
 
     if (load < bestScore) {
       selectedDoctor = doctor;

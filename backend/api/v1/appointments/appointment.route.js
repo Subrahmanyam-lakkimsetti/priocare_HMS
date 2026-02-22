@@ -7,6 +7,7 @@ const {
   createAppointment,
   getActiveAppointment,
   getAppointmnetByToken,
+  getAppointmentsForUser,
 } = require('./appointment.controller');
 
 const appointementRouter = express.Router();
@@ -22,6 +23,8 @@ appointementRouter.get(
 );
 
 appointementRouter.get('/token/:token', getAppointmnetByToken);
+
+appointementRouter.get('/all', restrictTo('patient'), getAppointmentsForUser);
 
 module.exports = {
   appointementRouter,

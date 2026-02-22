@@ -1,7 +1,9 @@
 const Appointment = require('../../../models/appointment.model');
 const Patient = require('../../../models/patient.model');
 const AppError = require('../../../utils/AppError.util');
+const { getDoctor } = require('../doctors/doctorAuth.service');
 const assignDoctor = require('./doctorAssign.service');
+const { getDoctorQueue } = require('./doctorQueue.service');
 const evaluateTriage = require('./triage/aiAdapter.triage');
 
 const generateToken = async () => {
@@ -23,6 +25,7 @@ const generateToken = async () => {
 const createAppointment = async (userId, triageData) => {
   // ckeck patient exists or not
   const isPatientExists = await Patient.findOne({ userId });
+
   if (!isPatientExists) {
     throw new AppError('Patient Not found!', 404);
   }
@@ -48,7 +51,7 @@ const createAppointment = async (userId, triageData) => {
 
   console.log(triageData);
 
-  await Appointment.create({
+  const appointmentdoc = await Appointment.create({
     patientId: isPatientExists?._id,
     doctorId: doctor._id,
     token: await generateToken(),
@@ -59,9 +62,76 @@ const createAppointment = async (userId, triageData) => {
     createdBy: 'patient',
   });
 
-  return 'success';
+  const appointment = await Appointment.findById(appointmentdoc._id).populate(
+    'doctorId',
+    'firstName lastName department experienceYears consultationFee',
+  );
+
+  return appointment;
+};
+
+const getActiveAppointment = async (userId) => {
+  console.log(userId);
+  const patient = await Patient.findOne({ userId });
+
+  console.log(patient);
+
+  if (!patient) {
+    throw new AppError('No patient found', 404);
+  }
+
+  console.log('patientId', patient._id);
+
+  const appointment = await Appointment.findOne({
+    patientId: patient._id,
+    status: { $in: ['confirmed', 'checked_in', 'called', 'in_consultation'] },
+  }).populate('doctorId', 'firstName lastName department experienceYears');
+
+  console.log('activeappointment', appointment);
+
+  const { patients: patientDetails } = await getDoctorQueue(
+    appointment.doctorId,
+    appointment.scheduledDate,
+  );
+
+  const patientWaitingDetails = patientDetails.filter((pat) =>
+    pat.patientId.equals(patient._id),
+  );
+
+  return {
+    ...appointment.toObject(),
+    exceptedStartTime: patientWaitingDetails[0].exceptedStartTime,
+    exceptedEndTime: patientWaitingDetails[0].exceptedEndTime,
+    queuePosition: patientWaitingDetails[0].queuePosition,
+  };
+};
+
+const getAppointmentByToken = async ({ token }, id) => {
+  console.log('token', token);
+  const appointment = await Appointment.findOne({ token }).populate(
+    'doctorId',
+    'firstName lastName department experienceYears',
+  );
+
+  if (!appointment) {
+    throw new AppError('No appointment found!', 404);
+  }
+
+  console.log('appointment', appointment);
+
+  const { exceptedStartTime, exceptedEndTime, queuePosition } =
+    await getActiveAppointment(id);
+
+  return {
+    ...appointment.toObject(),
+    exceptedStartTime,
+    exceptedEndTime,
+    queuePosition,
+  };
 };
 
 module.exports = {
   createAppointment,
+  getActiveAppointment,
+  getAppointmentByToken,
 };

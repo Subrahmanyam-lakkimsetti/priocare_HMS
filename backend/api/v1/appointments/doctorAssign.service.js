@@ -14,14 +14,11 @@ const calculateTotalAppointments = async (doctor, date) => {
 };
 
 const assignDoctor = async ({ specilization, scheduledDate }) => {
-
   const doctors = await Doctor.find({
     isActive: true,
     availabilityStatus: 'available',
     specializations: { $in: [specilization] },
   });
-
-  console.log(doctors);
 
   // for checking doctor is available or not on that day
   const appointmentDay = getDay(scheduledDate);
@@ -30,7 +27,6 @@ const assignDoctor = async ({ specilization, scheduledDate }) => {
   let bestScore = Infinity;
 
   for (let doctor of doctors) {
-
     // check availability
     const isAvailable = doctor.availableDays.includes(appointmentDay);
     if (!isAvailable) continue;

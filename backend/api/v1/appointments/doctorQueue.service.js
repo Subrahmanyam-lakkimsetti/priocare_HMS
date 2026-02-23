@@ -17,8 +17,6 @@ const getDoctorQueue = async (doctorId, scheduledDate) => {
     status: { $in: ['checked_in'] },
   });
 
-  
-
   const calledAppointment = await Appointment.findOne({
     doctorId,
     scheduledDate: { $gte: start, $lte: end },

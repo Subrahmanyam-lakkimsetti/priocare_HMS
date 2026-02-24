@@ -7,7 +7,7 @@ import PatientHome from '../../features/patient/pages/PatientHome';
 import IntakeFlow from '../../features/patient/pages/IntakeFlow';
 import Confirmation from '../../features/patient/pages/Confirmation';
 import AppointmentDetails from '../../features/patient/pages/AppointmentDetails';
-import PatientSidebar from '../../components/shared/patientSideBar';
+import PatientSidebar from '../../components/shared/PatientSidebar';
 import PatientAppointments from '../../features/patient/pages/PatientAppointments';
 
 const NAV_ITEMS = [

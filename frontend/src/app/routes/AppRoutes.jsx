@@ -8,6 +8,7 @@ import PatientLayout from '../layouts/PatientLayout';
 import DoctorLayout from '../layouts/DoctorLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from './ProtectedRoute';
+import SmartHospitalLanding from '../../pages/EntryPage';
 
 function AuthLoader({ children }) {
   const dispatch = useDispatch();
@@ -34,7 +35,9 @@ export default function AppRoutes() {
     <BrowserRouter>
       <AuthLoader>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<SmartHospitalLanding />} />
+
+          <Route path="/login" element={<Login />} />
 
           <Route
             path="/patient/*"

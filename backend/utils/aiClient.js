@@ -1,7 +1,7 @@
 const { GoogleGenAI } = require('@google/genai');
-const { Gemini_API_KEY, Gemini_model } = require('../config/gemini.config');
+const { GEMINI_API_KEY, Gemini_model } = require('../config/gemini.config');
 
-const ai = new GoogleGenAI(Gemini_API_KEY);
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 const aiClient = async (prompt) => {
   console.log('----generating..-------');

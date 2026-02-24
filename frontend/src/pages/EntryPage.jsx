@@ -1,2201 +1,1064 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  Heart,
-  Calendar,
-  UserCheck,
-  ClipboardList,
-  Bell,
-  Shield,
-  CreditCard,
-  Phone,
-  Sparkles,
-  Activity,
-  Users,
-  Zap,
-  Clock,
-  Lock,
-  Check,
-  AlertTriangle,
-  MessageCircle,
-  Target,
-  ChevronRight,
-  Star,
-  Eye,
-  FileText,
-  Home,
-  Brain,
-  RefreshCw,
-  TrendingUp,
-  DoorOpen,
-  ArrowRight,
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const GlobalBackground = () => (
-  <div className="fixed inset-0 -z-50 overflow-hidden">
-    {/* Base Gradient */}
-    <div className="absolute inset-0 bg-linear-to-b from-gray-950 via-black to-gray-950" />
-
-    {/* Grid Pattern */}
-    <div
-      className="absolute inset-0 opacity-[0.02]"
-      style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(16,185,129,0.15) 1px, transparent 1px)`,
-        backgroundSize: '48px 48px',
-      }}
-    />
-
-    {/* Noise */}
-    <div
-      className="absolute inset-0 opacity-[0.02]"
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E")`,
-      }}
-    />
-
-    {/* Central Glow */}
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(16,185,129,0.08),transparent_60%)]" />
-
-    {/* Secondary Glow */}
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(20,184,166,0.06),transparent_60%)]" />
-  </div>
+/* ─── tiny icon wrappers ───────────────────────────────── */
+const Icon = ({ d, size = 20, stroke = 2 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={stroke}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d={d} />
+  </svg>
 );
 
-const SmartHospitalLanding = () => {
-  const [scrollY, setScrollY] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [visibleSections, setVisibleSections] = useState(new Set());
-  const heroRef = useRef(null);
-  const sectionRefs = useRef({
-    precare: null,
-    postcare: null,
-  });
-
+/* ─── Nav ───────────────────────────────────────────────── */
+function Nav({ onBook }) {
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-
-      const sections = document.querySelectorAll('.animate-on-scroll');
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.75) {
-          setVisibleSections((prev) => new Set([...prev, section.id]));
-        }
-      });
-    };
-
-    const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
+    const fn = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', fn);
+    return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  // Particle system for hero
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    delay: Math.random() * 5,
-    duration: 3 + Math.random() * 4,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-  }));
+  return (
+    <nav
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100' : 'bg-transparent'}`}
+    >
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
+              <path d="M12 4v16M4 12h16" />
+            </svg>
+          </div>
+          <span className="text-blue-900 text-xl font-bold tracking-tight">
+            Prio<span className="text-cyan-600">Care</span>
+          </span>
+        </div>
 
-  // Helper function to render background elements
-  const renderBackgroundElements = (sectionKey) => {
-    // Define section-specific elements
-    const sectionElements = {
-      hero: [
-        {
-          type: 'blob',
-          color: 'emerald',
-          position: 'top-1/4 left-1/4',
-          size: 'w-96 h-96',
-          opacity: 0.1,
-        },
-        {
-          type: 'blob',
-          color: 'teal',
-          position: 'bottom-1/4 right-1/4',
-          size: 'w-96 h-96',
-          opacity: 0.1,
-        },
-      ],
-      why: [
-        {
-          type: 'gradient',
-          direction: 'conic',
-          from: 'emerald',
-          to: 'transparent',
-          opacity: 0.05,
-        },
-      ],
-      journey: [
-        { type: 'grid', opacity: 0.03 },
-        { type: 'particles', count: 20 },
-      ],
-      precare: [
-        { type: 'perspective-grid', opacity: 0.05 },
-        { type: 'beam', position: 'center' },
-      ],
-      postcare: [{ type: 'conic', from: 'teal', to: 'emerald', opacity: 0.06 }],
-      for: [
-        {
-          type: 'blob',
-          color: 'emerald',
-          position: 'top-0 left-1/4',
-          size: 'w-64 h-64',
-          opacity: 0.05,
-        },
-        {
-          type: 'blob',
-          color: 'teal',
-          position: 'bottom-0 right-1/4',
-          size: 'w-64 h-64',
-          opacity: 0.05,
-        },
-      ],
-      emergency: [{ type: 'pulse', color: 'red', count: 2 }],
-      trust: [{ type: 'pattern', repeat: 'linear', angle: 45, opacity: 0.02 }],
-      cta: [{ type: 'radial', color: 'emerald', size: '70%', opacity: 0.1 }],
-    };
+        {/* Links */}
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
+          {[
+            ['#why', 'Why PrioCare'],
+            ['#how', 'How It Works'],
+            ['#emergency', 'Emergency'],
+            ['#trust', 'Trust & Safety'],
+          ].map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="hover:text-blue-700 transition-colors"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
 
-    const elements = sectionElements[sectionKey] || [];
+        <button
+          onClick={onBook}
+          className="px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold rounded-xl transition-all active:scale-95 shadow-sm"
+        >
+          Book Visit
+        </button>
+      </div>
+    </nav>
+  );
+}
 
-    return (
-      <>
-        {/* Base Grid Pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '60px 60px',
-          }}
-        />
+/* ─── Hero ──────────────────────────────────────────────── */
+function Hero({ onBook }) {
+  return (
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/40 to-cyan-50/60">
+      {/* Decorative circles — CSS only, no JS */}
+      <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-blue-100/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-[400px] h-[400px] bg-cyan-100/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/30 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Subtle Noise Texture */}
-        <div
-          className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E")`,
-            backgroundSize: '200px 200px',
-          }}
-        />
+      {/* Subtle grid */}
+      <div
+        className="absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle, #1e40af 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
 
-        {/* Primary Glow */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%)',
-          }}
-        />
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-24 pb-16 w-full">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left */}
+          <div>
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-1.5 mb-6">
+              <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
+              <span className="text-blue-700 text-xs font-bold uppercase tracking-widest">
+                AI-Powered Triage System
+              </span>
+            </div>
 
-        {/* Secondary Glow */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.05) 0%, transparent 50%)',
-          }}
-        />
+            <h1 className="text-5xl lg:text-6xl font-black text-gray-900 leading-tight mb-5">
+              Healthcare that{' '}
+              <span className="bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
+                fits your life
+              </span>
+            </h1>
 
-        {/* Section-specific elements */}
-        {elements.map((element, index) => {
-          switch (element.type) {
-            case 'blob':
-              return (
-                <div
-                  key={index}
-                  className={`absolute ${element.position} ${element.size} bg-${element.color}-500/10 rounded-full blur-3xl`}
-                  style={{ opacity: element.opacity }}
-                />
-              );
+            <p className="text-lg text-gray-500 leading-relaxed mb-8 max-w-lg">
+              Get the care you need, exactly when you need it. Our AI analyzes
+              your symptoms, assigns your priority, and connects you with the
+              right doctor — without the confusion or long waits.
+            </p>
 
-            case 'gradient':
-              if (element.direction === 'conic') {
-                return (
+            {/* Feature checks */}
+            <div className="grid grid-cols-2 gap-2.5 mb-8">
+              {[
+                'Quick access to care',
+                'AI priority matching',
+                'Always-on support',
+                'Clear, simple guidance',
+              ].map((f) => (
+                <div key={f} className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-gray-600 font-medium">{f}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                onClick={onBook}
+                className="flex items-center gap-2 px-7 py-3.5 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-200"
+              >
+                Book a Visit
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M13 7l5 5-5 5M6 12h12" />
+                </svg>
+              </button>
+              <a
+                href="#how"
+                className="flex items-center gap-2 px-5 py-3.5 border-2 border-gray-200 hover:border-blue-300 text-gray-600 hover:text-blue-700 font-semibold rounded-xl transition-all text-sm"
+              >
+                See How It Works
+              </a>
+            </div>
+          </div>
+
+          {/* Right — stat card cluster */}
+          <div className="relative hidden lg:block">
+            {/* Main card */}
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">
+                    Live System
+                  </p>
+                  <p className="text-sm font-bold text-gray-800">
+                    AI Triage Active
+                  </p>
+                </div>
+                <div className="ml-auto flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-2.5 py-1">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                  <span className="text-green-700 text-xs font-bold">
+                    Online
+                  </span>
+                </div>
+              </div>
+
+              {/* Journey steps */}
+              <div className="space-y-3">
+                {[
+                  {
+                    step: '01',
+                    label: 'Fill intake form',
+                    time: '~2 min',
+                    done: true,
+                  },
+                  {
+                    step: '02',
+                    label: 'AI analyzes symptoms',
+                    time: 'Instant',
+                    done: true,
+                  },
+                  {
+                    step: '03',
+                    label: 'Doctor auto-assigned',
+                    time: '~30 sec',
+                    active: true,
+                  },
+                  {
+                    step: '04',
+                    label: 'Appointment confirmed',
+                    time: 'Done',
+                    done: false,
+                  },
+                ].map((s) => (
                   <div
-                    key={index}
-                    className="absolute inset-0 opacity-20"
-                    style={{
-                      background: `conic-gradient(from 0deg at 50% 50%, rgba(16, 185, 129, ${element.opacity}) 0%, transparent 25%, rgba(20, 184, 166, ${element.opacity}) 50%, transparent 75%, rgba(16, 185, 129, ${element.opacity}) 100%)`,
-                    }}
-                  />
-                );
-              }
-              break;
-
-            case 'grid':
-              return (
-                <svg
-                  key={index}
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  style={{ opacity: element.opacity }}
-                >
-                  <defs>
-                    <pattern
-                      id={`grid-${sectionKey}`}
-                      width="40"
-                      height="40"
-                      patternUnits="userSpaceOnUse"
-                    >
-                      <path
-                        d="M 0 40 L 40 0"
-                        fill="none"
-                        stroke="#10b981"
-                        strokeWidth="0.5"
-                      />
-                    </pattern>
-                  </defs>
-                  <rect
-                    width="100%"
-                    height="100%"
-                    fill={`url(#grid-${sectionKey})`}
-                  />
-                </svg>
-              );
-
-            case 'particles':
-              return (
-                <div key={index} className="absolute inset-0 overflow-hidden">
-                  {Array.from({ length: element.count }).map((_, i) => (
+                    key={s.step}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${s.active ? 'bg-blue-50 border border-blue-100' : s.done ? 'bg-gray-50' : 'bg-gray-50/50'}`}
+                  >
                     <div
-                      key={i}
-                      className="absolute w-0.5 h-0.5 bg-emerald-400/20 rounded-full animate-pulse"
-                      style={{
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
-                        animationDelay: `${i * 0.2}s`,
-                        animationDuration: `${2 + Math.random() * 3}s`,
-                      }}
-                    />
-                  ))}
-                </div>
-              );
-
-            case 'perspective-grid':
-              return (
-                <svg
-                  key={index}
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                  style={{ opacity: element.opacity }}
-                >
-                  <defs>
-                    <pattern
-                      id={`perspective-grid-${sectionKey}`}
-                      width="40"
-                      height="40"
-                      patternUnits="userSpaceOnUse"
+                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black ${s.done ? 'bg-blue-600 text-white' : s.active ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-400'}`}
                     >
-                      <path
-                        d="M 0 40 L 40 0"
-                        fill="none"
-                        stroke="#10b981"
-                        strokeWidth="0.5"
-                      />
-                    </pattern>
-                  </defs>
-                  <rect
-                    width="100%"
-                    height="100%"
-                    fill={`url(#perspective-grid-${sectionKey})`}
-                  />
-                </svg>
-              );
+                      {s.done ? '✓' : s.step}
+                    </div>
+                    <span
+                      className={`text-sm font-semibold flex-1 ${s.active ? 'text-blue-800' : s.done ? 'text-gray-600' : 'text-gray-400'}`}
+                    >
+                      {s.label}
+                    </span>
+                    <span
+                      className={`text-xs font-medium ${s.active ? 'text-blue-500' : 'text-gray-300'}`}
+                    >
+                      {s.time}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            case 'beam':
-              return (
-                <div
-                  key={index}
-                  className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-gradient-to-b from-emerald-400/0 via-emerald-400/10 to-emerald-400/0"
-                />
-              );
+            {/* Floating stat cards */}
+            <div className="absolute -top-6 -right-6 bg-white rounded-2xl shadow-lg border border-gray-100 px-4 py-3">
+              <p className="text-2xl font-black text-blue-700">{'<'}2 min</p>
+              <p className="text-xs text-gray-400 font-medium">
+                Avg. analysis time
+              </p>
+            </div>
 
-            case 'conic':
-              return (
-                <div
-                  key={index}
-                  className="absolute inset-0 opacity-20"
-                  style={{
-                    background: `conic-gradient(from 180deg at 50% 50%, rgba(20, 184, 166, ${element.opacity}) 0%, transparent 30%, rgba(16, 185, 129, ${element.opacity}) 60%, transparent 90%)`,
-                  }}
-                />
-              );
+            <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-lg border border-gray-100 px-4 py-3">
+              <p className="text-2xl font-black text-cyan-600">24/7</p>
+              <p className="text-xs text-gray-400 font-medium">
+                Always available
+              </p>
+            </div>
+          </div>
+        </div>
 
-            case 'pulse':
-              return (
-                <div
-                  key={index}
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px]"
-                >
-                  {Array.from({ length: element.count }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute inset-0 border-2 border-red-400/10 rounded-full animate-emergency-pulse"
-                      style={{
-                        animationDelay: `${i * 0.8}s`,
-                        transform: `scale(${1 + i * 0.2})`,
-                      }}
-                    />
-                  ))}
-                </div>
-              );
+        {/* Stats strip */}
+        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+          {[
+            { value: '24/7', label: 'Care access' },
+            { value: '<2 min', label: 'AI analysis' },
+            { value: '99%', label: 'Positive feedback' },
+            { value: 'HIPAA', label: 'Compliant & secure' },
+          ].map((s) => (
+            <div
+              key={s.value}
+              className="bg-white/80 border border-gray-100 rounded-2xl px-5 py-4 text-center shadow-sm"
+            >
+              <p className="text-xl font-black text-blue-700">{s.value}</p>
+              <p className="text-xs text-gray-400 font-medium mt-0.5">
+                {s.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
 
-            case 'pattern':
-              return (
-                <div
-                  key={index}
-                  className="absolute inset-0 opacity-10"
-                  style={{
-                    background: `repeating-linear-gradient(${element.angle}deg, transparent, transparent 2px, rgba(16, 185, 129, ${element.opacity}) 2px, rgba(16, 185, 129, ${element.opacity}) 4px)`,
-                  }}
-                />
-              );
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+        <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+          Scroll
+        </span>
+        <div className="w-px h-8 bg-gradient-to-b from-gray-400 to-transparent" />
+      </div>
+    </section>
+  );
+}
 
-            case 'radial':
-              return (
-                <div
-                  key={index}
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    background: `radial-gradient(circle at 50% 50%, rgba(16, 185, 129, ${
-                      element.opacity
-                    }) 0%, rgba(20, 184, 166, ${
-                      element.opacity * 0.75
-                    }) 30%, transparent ${element.size || '70%'})`,
-                  }}
-                />
-              );
-
-            default:
-              return null;
-          }
-        })}
-      </>
-    );
-  };
+/* ─── Why PrioCare ──────────────────────────────────────── */
+function WhySection() {
+  const items = [
+    {
+      icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+      title: 'Less Waiting',
+      desc: 'Priority-based scheduling means you get care when you need it most.',
+      color: 'blue',
+    },
+    {
+      icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
+      title: 'Clear Guidance',
+      desc: 'Every step explained in simple terms — no medical jargon, no confusion.',
+      color: 'cyan',
+    },
+    {
+      icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+      title: 'Priority Care',
+      desc: 'Urgent needs get immediate attention. Our AI never misses critical symptoms.',
+      color: 'blue',
+    },
+    {
+      icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+      title: 'One Secure Place',
+      desc: 'Everything you need — booking, records, queue status — in one HIPAA-compliant platform.',
+      color: 'cyan',
+    },
+  ];
 
   return (
-    <div className="min-h-screen text-white overflow-hidden relative">
-      <GlobalBackground />
-
-      <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-black/30 border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <span className="text-xl font-light tracking-wide text-emerald-400">
-            PrioCare
-          </span>
-
-          <div className="hidden md:flex items-center gap-8 text-sm text-gray-300 font-light">
-            <a href="#why" className="hover:text-white transition-colors">
+    <section id="why" className="py-24 px-6 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 mb-4">
+            <span className="text-blue-700 text-xs font-bold uppercase tracking-widest">
               Why PrioCare
-            </a>
-            <a href="#journey" className="hover:text-white transition-colors">
-              How It Works
-            </a>
-            <a href="#emergency" className="hover:text-white transition-colors">
-              Emergency
-            </a>
-            <button className="hover:text-white flex items-center gap-2 transition-colors">
-              <Phone className="w-4 h-4" /> Support
-            </button>
+            </span>
           </div>
-
-          <button className="px-6 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-sm font-light hover:opacity-90 transition-opacity">
-            Book Visit
-          </button>
+          <h2 className="text-4xl font-black text-gray-900 mb-3">
+            Healthcare that{' '}
+            <span className="text-blue-700">actually works</span> for you
+          </h2>
+          <p className="text-gray-400 max-w-xl mx-auto">
+            We've redesigned the hospital experience around what truly matters
+            to patients.
+          </p>
         </div>
-      </nav>
 
-      {/* Hero Section */}
-      <section
-        ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      >
-        {/* Geometric Background - Updated to match image */}
-        <div className="absolute inset-0">
-          {/* Base Gradient - Darker teal/emerald like the image */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-emerald-950" />
-
-          {/* Abstract Geometric Shapes */}
-          <div className="absolute inset-0 overflow-hidden">
-            {/* Triangle Grid Pattern - More subtle */}
-            <svg
-              className="absolute w-full h-full opacity-5"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-            >
-              <defs>
-                <pattern
-                  id="triangles"
-                  width="30"
-                  height="30"
-                  patternUnits="userSpaceOnUse"
-                >
-                  <path
-                    d="M0,0 L30,0 L15,30 Z"
-                    fill="rgba(16, 185, 129, 0.08)"
-                  />
-                  <path
-                    d="M30,0 L60,0 L45,30 Z"
-                    fill="rgba(20, 184, 166, 0.08)"
-                  />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#triangles)" />
-            </svg>
-
-            {/* Animated Circles - Softer, like the image */}
-            <div className="absolute top-1/4 -left-32 w-64 h-64 bg-emerald-500/3 rounded-full blur-3xl animate-pulse-slow" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {items.map((item) => (
             <div
-              className="absolute bottom-1/3 -right-32 w-96 h-96 bg-teal-500/3 rounded-full blur-3xl animate-pulse-slow"
-              style={{ animationDelay: '2s' }}
-            />
-
-            {/* Diagonal Lines - More subtle */}
-            <div className="absolute inset-0 opacity-3">
+              key={item.title}
+              className="group bg-gray-50 hover:bg-white border-2 border-gray-100 hover:border-blue-200 rounded-2xl p-6 transition-all duration-200 hover:shadow-md"
+            >
               <div
-                className="absolute inset-0"
-                style={{
-                  backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(16, 185, 129, 0.05) 3px, rgba(16, 185, 129, 0.05) 6px)`,
-                  backgroundSize: '60px 60px',
-                }}
-              />
-            </div>
-
-            {/* Large Background Blur */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/2 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/2 rounded-full blur-3xl" />
-          </div>
-
-          {/* Interactive Particles - More particles, smaller */}
-          <div className="absolute inset-0">
-            {Array.from({ length: 30 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 rounded-full bg-gradient-to-r from-emerald-400/20 to-teal-400/20 animate-float-slow"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animationDelay: `${i * 0.2}s`,
-                  animationDuration: `${4 + Math.random() * 6}s`,
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Subtle Mesh Gradient Overlay */}
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `
-          radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
-          radial-gradient(circle at 80% 70%, rgba(20, 184, 166, 0.15) 0%, transparent 40%),
-          radial-gradient(circle at 40% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 40%)
-        `,
-            }}
-          />
-        </div>
-
-        {/* Side Panel Decorations */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 hidden lg:block">
-          <div className="h-full flex flex-col items-center justify-center space-y-8">
-            {[
-              { icon: Heart, label: 'Care', delay: 0 },
-              { icon: Shield, label: 'Safety', delay: 1 },
-              { icon: Clock, label: '24/7', delay: 2 },
-              { icon: Users, label: 'Team', delay: 3 },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="group relative flex flex-col items-center"
-                style={{ animationDelay: `${item.delay}s` }}
+                className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${item.color === 'blue' ? 'bg-blue-100 text-blue-600' : 'bg-cyan-100 text-cyan-600'}`}
               >
-                {/* Connecting Line */}
-                <div className="absolute -bottom-12 h-12 w-0.5 bg-gradient-to-b from-emerald-400/20 to-transparent" />
+                <Icon d={item.icon} size={20} />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                {item.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-                {/* Icon Circle */}
-                <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-400/20 flex items-center justify-center transform-gpu transition-all duration-500 group-hover:scale-110 group-hover:bg-emerald-500/20 group-hover:border-emerald-400/40">
-                  <item.icon className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
+/* ─── How It Works ──────────────────────────────────────── */
+function HowSection() {
+  const steps = [
+    {
+      n: '01',
+      title: 'Fill the Intake Form',
+      desc: 'Describe your symptoms, add your age, any pre-existing conditions, and pick a date. Takes about 2 minutes.',
+      icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+    },
+    {
+      n: '02',
+      title: 'AI Analyzes Your Case',
+      desc: 'Our AI cross-references your symptoms with clinical models, calculates a severity level and assigns a priority score to your case.',
+      icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+    },
+    {
+      n: '03',
+      title: 'Doctor is Auto-Assigned',
+      desc: 'The most suitable and available doctor — matched to your department and case — is automatically assigned without any manual steps.',
+      icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+    },
+    {
+      n: '04',
+      title: 'Track Your Queue Live',
+      desc: 'See your token number, queue position, and expected wait time in real time. Stay available — your doctor will call when ready.',
+      icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2m-6 9l2 2 4-4',
+    },
+  ];
+
+  return (
+    <section
+      id="how"
+      className="py-24 px-6 bg-gradient-to-b from-gray-50 to-white"
+    >
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 mb-4">
+            <span className="text-blue-700 text-xs font-bold uppercase tracking-widest">
+              How It Works
+            </span>
+          </div>
+          <h2 className="text-4xl font-black text-gray-900 mb-3">
+            A clear path to better health
+          </h2>
+          <p className="text-gray-400 max-w-xl mx-auto">
+            Each step naturally leads to the next, creating a seamless
+            experience from booking to consultation.
+          </p>
+        </div>
+
+        {/* Steps */}
+        <div className="relative">
+          {/* Connecting line */}
+          <div className="hidden lg:block absolute top-10 left-[calc(12.5%+12px)] right-[calc(12.5%+12px)] h-0.5 bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-200" />
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {steps.map((step, i) => (
+              <div key={step.n} className="relative flex flex-col">
+                {/* Step number + icon */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="relative w-11 h-11 bg-blue-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-200 z-10">
+                    <Icon d={step.icon} size={18} stroke={1.8} />
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="absolute"
+                    >
+                      <path d={step.icon} />
+                    </svg>
+                  </div>
+                  <span className="text-3xl font-black text-gray-100">
+                    {step.n}
+                  </span>
                 </div>
 
-                {/* Label */}
-                <div className="mt-3 text-xs text-emerald-400/70 font-light tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  {item.label}
+                <div className="flex-1 bg-white border-2 border-gray-100 hover:border-blue-200 rounded-2xl p-5 transition-all hover:shadow-md">
+                  <h3 className="font-bold text-gray-900 mb-2">{step.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    {step.desc}
+                  </p>
                 </div>
+
+                {/* Arrow for mobile */}
+                {i < steps.length - 1 && (
+                  <div className="lg:hidden flex justify-center mt-4 mb-2 text-blue-300">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    >
+                      <path d="M12 5v14M5 12l7 7 7-7" />
+                    </svg>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Main Content - Modern Layout */}
-        <div className="relative z-10 max-w-8xl mx-auto px-6 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ml-20">
-            {/* Left Column - Main Content */}
-            <div className="space-y-5 -mr-15">
-              {/* Badge with Count */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center animate-pulse-slow">
-                    <span className="text-white font-medium">1</span>
-                  </div>
-                  <div className="absolute -inset-2 border-2 border-emerald-400/20 rounded-full animate-ping" />
-                </div>
-                <div className="text-left">
-                  <div className="text-emerald-400 text-sm font-medium tracking-widest uppercase">
-                    Step 01
-                  </div>
-                  <div className="text-white text-lg font-light">
-                    Care That Adapts to Your Situation
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Headline - Split Design */}
-              <div className="space-y-3">
-                <div className="relative">
-                  <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-2 h-16 bg-gradient-to-b from-emerald-400 to-teal-400 rounded-full" />
-                  <h1 className="text-5xl md:text-6xl lg:text-6xl font-light leading-tight text-left pl-8">
-                    <span className="text-white">Healthcare</span>
-                    <br />
-                    <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-                      That Fits Your Life
-                    </span>
-                  </h1>
-                </div>
-
-                <div className="pl-8 border-l border-emerald-400/30 space-y-6">
-                  <p className="text-xl text-gray-300 font-light leading-relaxed">
-                    Get the care you need, exactly when you need it — without
-                    confusion or long waits.
-                  </p>
-
-                  {/* Features List */}
-                  <div className="space-y-3">
-                    {[
-                      'Quick access to care when it matters',
-                      'Always-on support',
-                      'Clear, simple guidance',
-                      'Ongoing care and follow-up',
-                    ].map((feature, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div
-                          className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
-                          style={{ animationDelay: `${i * 0.2}s` }}
-                        />
-                        <span className="text-gray-300 font-light">
-                          {feature}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* CTA Buttons - Horizontal Layout */}
-              <div className="pl-2 flex flex-col sm:flex-row gap-4 items-start">
-                <button className="group relative px-12 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg text-white font-medium tracking-wide transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/25">
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg" />
-                  <span className="relative flex items-center gap-3 flex-nowrap whitespace-nowrap">
-                    Begin Your Journey
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                  </span>
-                </button>
-
-                <button className="group relative px-6 py-3.5 backdrop-blur-sm bg-white/5 rounded-lg border border-emerald-400/20 text-gray-300 font-medium transition-all duration-500 hover:bg-emerald-500/10 hover:border-emerald-400/30 hover:text-white">
-                  <span className="flex items-center gap-3 flex-nowrap whitespace-nowrap">
-                    <Phone className="w-4 h-4 group-hover:animate-pulse" />
-                    Speak with Support
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Right Column - Visual Element */}
-            <div className="relative ml-20">
-              {/* Animated Ring */}
-              <div className="relative w-full aspect-square max-w-xl mx-auto">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Outer Ring */}
-                  <div className="absolute w-full h-full border-2 border-emerald-400/10 rounded-full animate-spin-slow" />
-
-                  {/* Middle Ring */}
-                  <div className="absolute w-3/4 h-3/4 border-2 border-teal-400/10 rounded-full animate-pulse" />
-
-                  {/* Inner Ring */}
-                  <div
-                    className="absolute w-1/2 h-1/2 border-2 border-cyan-400/10 rounded-full animate-spin-slow"
-                    style={{ animationDuration: '15s' }}
-                  />
-                </div>
-
-                {/* Center Content */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-48 h-48">
-                    {/* Floating Icon */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-2xl border border-emerald-400/20 backdrop-blur-sm flex items-center justify-center">
-                      <div className="relative group">
-                        {/* Pulsing Glow Ring */}
-                        <div
-                          className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-400/30 to-teal-400/30 blur-lg group-hover:blur-xl transition-all duration-1000 animate-pulse"
-                          style={{ animationDuration: '1s' }}
-                        />
-
-                        {/* Inner Glow */}
-                        <div
-                          className="absolute inset-4 rounded-xl bg-emerald-400/20 blur-md animate-pulse"
-                          style={{
-                            animationDuration: '4s',
-                            animationDelay: '0.5s',
-                          }}
-                        />
-
-                        <Heart
-                          className="relative w-16 h-16 text-emerald-400 animate-heartBeatComplex"
-                          strokeWidth={1.5}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Rotating Elements */}
-                    {[...Array(4)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 "
-                        style={{
-                          transform: `translate(-0%, -0%) rotate(${i * 90}deg)`,
-                        }}
-                      >
-                        <div className="relative -translate-y-34">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 flex items-center justify-center backdrop-blur-sm animate-bounce">
-                            {[Activity, Shield, MessageCircle, Users][i] &&
-                              React.createElement(
-                                [Activity, Shield, MessageCircle, Users][i],
-                                {
-                                  className: 'w-5 h-5 text-emerald-400',
-                                  strokeWidth: 1.5,
-                                }
-                              )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Floating Badges */}
-                <div className="absolute top-0 left-10 transform -translate-x-1/2 -translate-y-1/2">
-                  <div className="px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-sm rounded-full border border-emerald-400/20">
-                    <span className="text-emerald-400 text-sm font-light">
-                      Priority
-                    </span>
-                  </div>
-                </div>
-
-                <div className="absolute bottom-0 right-0 transform translate-x-1/2 translate-y-1/2">
-                  <div className="px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-sm rounded-full border border-emerald-400/20">
-                    <span className="text-emerald-400 text-sm font-light">
-                      Care
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stats Overlay */}
-              <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-full max-w-sm">
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { value: '24/7', label: 'Care Access' },
-                    { value: '99%', label: 'Positive Feedback' },
-                    { value: '15min', label: 'Average Response' },
-                  ].map((stat, i) => (
-                    <div
-                      key={i}
-                      className="text-center backdrop-blur-sm bg-black/30 rounded-lg p-3 border border-emerald-400/10"
-                    >
-                      <div className="text-2xl font-light text-emerald-400 mb-1">
-                        {stat.value}
-                      </div>
-                      <div className="text-xs text-emerald-300/70 font-light">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+/* ─── Pre & Post Care ───────────────────────────────────── */
+function CareSection() {
+  return (
+    <section className="py-24 px-6 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 mb-4">
+            <span className="text-blue-700 text-xs font-bold uppercase tracking-widest">
+              Care Journey
+            </span>
           </div>
-
-          {/* Scroll Indicator - Modern */}
-          <div className="absolute -bottom-25 left-1/2 -translate-x-1/2 hidden lg:block">
-            <div className="flex flex-col items-center">
-              <span className="text-emerald-400/50 text-sm font-light tracking-widest mb-2">
-                SCROLL
-              </span>
-              <div className="w-0.5 h-12 bg-gradient-to-b from-emerald-400/20 via-teal-400/30 to-transparent rounded-full">
-                <div className="w-full h-4 bg-gradient-to-b from-emerald-400 to-teal-400 rounded-full animate-scroll" />
-              </div>
-            </div>
-          </div>
+          <h2 className="text-4xl font-black text-gray-900 mb-3">
+            Care that{' '}
+            <span className="text-blue-700">continues beyond the visit</span>
+          </h2>
+          <p className="text-gray-400 max-w-xl mx-auto">
+            We support you before your visit and keep you on track long after
+            it.
+          </p>
         </div>
 
-        {/* Hero → Next Section Fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-gray-950 to-transparent pointer-events-none" />
-      </section>
-
-      {/* Why PrioCare Section */}
-      <section id="why" className="relative py-24 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-          {renderBackgroundElements('why')}
-        </div>
-        <div className="max-w-7xl mx-auto relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-500/10 backdrop-blur-lg rounded-full border border-emerald-400/20 mb-6">
-              <Check className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-light tracking-wide">
-                WHY CHOOSE PRIOCARE
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Before */}
+          <div className="bg-gradient-to-br from-blue-700 to-cyan-600 rounded-2xl p-8 text-white">
+            <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-3 py-1 mb-5">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M13 12H3" />
+              </svg>
+              <span className="text-xs font-bold uppercase tracking-wider">
+                Before Your Visit
               </span>
             </div>
-
-            <h2 className="text-5xl md:text-6xl font-light mb-8">
-              Healthcare That{' '}
-              <span className="text-emerald-400">Actually Works</span> For You
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto text-lg font-light">
-              We've redesigned the healthcare experience around what truly
-              matters to patients
+            <h3 className="text-2xl font-bold mb-3">
+              Preparing you for better care
+            </h3>
+            <p className="text-blue-100 text-sm leading-relaxed mb-6">
+              Everything you need to feel prepared, informed, and confident
+              before stepping into the hospital.
             </p>
-          </div>
-
-          {/* Circular Feature Grid */}
-          <div className="relative">
-            {/* Background Circles */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full max-w-4xl h-64 border-2 border-emerald-400/10 rounded-full" />
-            </div>
-
-            {/* Features in Circular Layout */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+            <div className="space-y-3">
               {[
                 {
-                  icon: Clock,
-                  title: 'Less Waiting',
-                  description:
-                    'Priority-based scheduling means you get care when you need it',
+                  icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2',
+                  label: 'Clear step-by-step instructions',
                 },
                 {
-                  icon: MessageCircle,
-                  title: 'Clear Guidance',
-                  description:
-                    'Every step explained in simple terms, no confusion',
+                  icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+                  label: 'Home preparation tips for recovery',
                 },
                 {
-                  icon: Target,
-                  title: 'Priority Care',
-                  description: 'Urgent needs get immediate attention, always',
+                  icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+                  label: 'Know exactly what will happen',
                 },
-                {
-                  icon: Shield,
-                  title: 'One Place',
-                  description:
-                    'Everything you need in a single, secure platform',
-                },
-              ].map((benefit, i) => (
-                <div key={i} className="group relative">
-                  {/* Animated Border */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                  {/* Circular Card */}
-                  <div className="relative aspect-square rounded-full bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-400/20 p-8 flex flex-col items-center justify-center text-center backdrop-blur-sm transition-all duration-500 group-hover:scale-105 group-hover:border-emerald-400/40">
-                    {/* Icon */}
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                      <benefit.icon
-                        className="w-10 h-10 text-emerald-400"
-                        strokeWidth={1.5}
-                      />
-                    </div>
-
-                    {/* Content */}
-                    <h3 className="text-xl font-light text-white mb-3">
-                      {benefit.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm font-light leading-relaxed">
-                      {benefit.description}
-                    </p>
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-3">
+                  <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Icon d={item.icon} size={14} stroke={2} />
                   </div>
+                  <span className="text-sm font-medium text-white/90">
+                    {item.label}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Journey Section */}
-      <section id="journey" className="relative py-32 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-          {renderBackgroundElements('journey')}
-        </div>
-
-        <div className="max-w-6xl mx-auto relative z-10">
-          {/* Section Header - Compact */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-emerald-500/5 backdrop-blur-sm rounded-2xl border border-emerald-400/10 mb-6">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              <span className="text-emerald-400 text-sm font-medium tracking-wider">
-                Your Care Pathway
+          {/* After */}
+          <div className="bg-gray-50 border-2 border-gray-100 rounded-2xl p-8">
+            <div className="inline-flex items-center gap-2 bg-cyan-50 border border-cyan-200 rounded-full px-3 py-1 mb-5">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#0891b2"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span className="text-xs font-bold uppercase tracking-wider text-cyan-700">
+                After Your Visit
               </span>
             </div>
-
-            <h2 className="text-4xl md:text-6xl font-light mb-5">
-              A Clear Path to
-              <span className="block text-emerald-400 mt-2">Better Health</span>
-            </h2>
-            <p className="text-gray-400 max-w-xl mx-auto text-base">
-              Follow a guided journey where each step naturally leads to the
-              next
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              Ongoing support & monitoring
+            </h3>
+            <p className="text-gray-500 text-sm leading-relaxed mb-6">
+              Regular follow-ups, progress tracking, and 24/7 support to make
+              sure your recovery stays on track.
             </p>
-          </div>
-
-          {/* Spiral Timeline Layout */}
-          <div className="relative">
-            {/* Central Progress Indicator */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block">
-              <div className="relative w-48 h-48">
-                <div className="absolute inset-0 border-2 border-emerald-400/10 rounded-full animate-spin-slow" />
-                <div className="absolute inset-8 border-2 border-emerald-400/5 rounded-full animate-spin-slow-reverse" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-4xl text-emerald-400 font-light mb-2">
-                      4
-                    </div>
-                    <div className="text-sm text-gray-400 font-light">
-                      Connected Steps
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Spiral Steps */}
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 max-w-5xl mx-auto">
+            <div className="space-y-3">
               {[
                 {
-                  step: '01',
-                  icon: Calendar,
-                  title: 'Smart Scheduling',
-                  description:
-                    'AI-powered booking that prioritizes your needs and availability',
-                  highlights: [
-                    'Same-day options',
-                    'Priority matching',
-                    'Flexible timing',
-                  ],
-                  color: 'emerald',
-                },
-                {
-                  step: '02',
-                  icon: UserCheck,
-                  title: 'Team Introduction',
-                  description:
-                    'Meet your dedicated care team with matched expertise',
-                  highlights: [
-                    'Expert matching',
-                    'Clear roles',
-                    'Direct contact',
-                  ],
-                  color: 'teal',
-                },
-                {
-                  step: '03',
-                  icon: Heart,
-                  title: 'Personalized Care',
-                  description:
-                    'Tailored treatment with continuous communication',
-                  highlights: [
-                    'Custom plans',
-                    'Clear explanations',
-                    'Active involvement',
-                  ],
-                  color: 'cyan',
-                },
-                {
-                  step: '04',
-                  icon: Bell,
-                  title: 'Ongoing Support',
-                  description: 'Continuous follow-up and progress monitoring',
-                  highlights: [
-                    'Regular check-ins',
-                    'Progress tracking',
-                    '24/7 support',
-                  ],
+                  icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+                  label: 'Follow-up check-in calls & messages',
                   color: 'blue',
                 },
-              ].map((item, index) => (
+                {
+                  icon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
+                  label: '24/7 support for any questions',
+                  color: 'cyan',
+                },
+                {
+                  icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
+                  label: 'Visual recovery milestone tracking',
+                  color: 'blue',
+                },
+              ].map((item) => (
                 <div
-                  key={index}
-                  className={`relative group ${
-                    index % 2 === 0 ? 'lg:mt-12' : 'lg:mb-12'
-                  }`}
+                  key={item.label}
+                  className="flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-4 py-3"
                 >
-                  {/* Connection Arc (Visible on desktop) */}
                   <div
-                    className="hidden lg:block absolute top-1/2 -translate-y-1/2 w-24 h-24 border-2 border-emerald-400/10 rounded-full -z-10"
-                    style={{
-                      left: index % 2 === 0 ? 'calc(100% + 20px)' : 'auto',
-                      right: index % 2 === 1 ? 'calc(100% + 20px)' : 'auto',
-                      borderTopColor:
-                        index % 2 === 0 ? 'transparent' : undefined,
-                      borderRightColor:
-                        index % 2 === 0 ? 'transparent' : undefined,
-                      borderBottomColor:
-                        index % 2 === 1 ? 'transparent' : undefined,
-                      borderLeftColor:
-                        index % 2 === 1 ? 'transparent' : undefined,
-                    }}
-                  />
-
-                  {/* Step Card */}
-                  <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-sm border border-gray-800/30 rounded-2xl p-8 group-hover:border-emerald-400/20 transition-all duration-500 group-hover:scale-[1.02] overflow-hidden">
-                    {/* Background Glow */}
-                    <div
-                      className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-${item.color}-500/5 to-transparent rounded-full blur-xl`}
-                    />
-
-                    {/* Step Number */}
-                    <div className="absolute top-6 left-6">
-                      <div
-                        className={`text-4xl font-light text-${item.color}-400/20`}
-                      >
-                        {item.step}
-                      </div>
-                    </div>
-
-                    <div className="relative z-10">
-                      {/* Header */}
-                      <div className="flex items-start justify-between mb-8">
-                        <div className="flex items-center gap-4">
-                          <div
-                            className={`w-14 h-14 rounded-xl bg-gradient-to-br from-${item.color}-500/10 to-${item.color}-600/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}
-                          >
-                            <item.icon
-                              className={`w-7 h-7 text-${item.color}-400`}
-                              strokeWidth={1.5}
-                            />
-                          </div>
-                          <div>
-                            <div className="text-xs text-gray-400 font-light tracking-wider uppercase mb-1">
-                              Step {item.step.slice(1)}
-                            </div>
-                            <h3 className="text-2xl font-light text-white">
-                              {item.title}
-                            </h3>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Description */}
-                      <p className="text-gray-300 mb-8 font-light leading-relaxed">
-                        {item.description}
-                      </p>
-
-                      {/* Highlights */}
-                      <div className="space-y-3">
-                        {item.highlights.map((highlight, i) => (
-                          <div key={i} className="flex items-center gap-3">
-                            <div
-                              className={`w-1.5 h-1.5 rounded-full bg-${item.color}-400`}
-                            />
-                            <span className="text-sm text-gray-400 font-light">
-                              {highlight}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Progress Indicator */}
-                      <div className="mt-10 pt-6 border-t border-gray-800/30">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-400 font-light">
-                            Progress
-                          </span>
-                          <span className={`text-${item.color}-400 font-light`}>
-                            {index === 3
-                              ? 'Complete'
-                              : `Step ${parseInt(item.step)}/4`}
-                          </span>
-                        </div>
-                        <div className="h-1 bg-gray-800/50 rounded-full mt-2 overflow-hidden">
-                          <div
-                            className={`h-full bg-gradient-to-r from-${item.color}-500 to-${item.color}-600 rounded-full transition-all duration-1000`}
-                            style={{
-                              width: `${(parseInt(item.step) / 4) * 100}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Corner Accents */}
-                    <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-emerald-400/20 rounded-tl-2xl" />
-                    <div className="absolute bottom-0 right-0 w-6 h-6 border-r border-b border-emerald-400/20 rounded-br-2xl" />
-                  </div>
-
-                  {/* Floating Indicator */}
-                  <div
-                    className={`absolute -top-3 -right-3 w-6 h-6 rounded-full bg-gradient-to-br from-${item.color}-500 to-${item.color}-600 flex items-center justify-center shadow-lg`}
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${item.color === 'blue' ? 'bg-blue-100 text-blue-600' : 'bg-cyan-100 text-cyan-600'}`}
                   >
-                    <div className="w-2 h-2 bg-white rounded-full" />
+                    <Icon d={item.icon} size={14} stroke={2} />
                   </div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    {item.label}
+                  </span>
                 </div>
               ))}
             </div>
-
-            {/* Mobile Connection Lines */}
-            <div className="lg:hidden relative h-12 mx-auto max-w-md">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-full h-0.5 bg-gradient-to-r from-emerald-400/10 via-teal-400/10 to-cyan-400/10" />
-                {[0, 1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="absolute w-3 h-3 bg-emerald-400/30 rounded-full animate-pulse"
-                    style={{
-                      left: `${(i + 1) * 25}%`,
-                      animationDelay: `${i * 0.2}s`,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-          {/* Journey Summary */}
-          <div className="mt-24 max-w-3xl mx-auto">
-            <div className="bg-gradient-to-b from-emerald-500/5 to-transparent backdrop-blur-sm border border-emerald-400/10 rounded-2xl p-8">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
-                  <h4 className="text-xl font-light text-white mb-3">
-                    Ready to Begin Your Journey?
-                  </h4>
-                  <p className="text-gray-400 text-sm font-light">
-                    Each step builds upon the last, creating a seamless
-                    continuum of care
-                  </p>
-                </div>
-                <button className="group relative px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-light hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative flex items-center gap-3">
-                    Start Your Journey
-                    <svg
-                      className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
+/* ─── Who It's For ──────────────────────────────────────── */
+function ForSection() {
+  const roles = [
+    {
+      title: 'Patients',
+      desc: 'Get care that adapts to your urgency and schedule. See your queue, track your case, and know exactly what happens next.',
+      icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+      features: [
+        'Priority scheduling',
+        'Real-time queue tracking',
+        'Clear instructions',
+      ],
+      accent: 'blue',
+    },
+    {
+      title: 'Families',
+      desc: "Stay informed and connected with your loved one's care journey. No more waiting in the dark.",
+      icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',
+      features: ['Shared status updates', 'Care coordination', 'Peace of mind'],
+      accent: 'cyan',
+    },
+    {
+      title: 'Care Teams',
+      desc: 'Deliver better care with streamlined coordination, AI-assisted triage, and efficient patient workflows.',
+      icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+      features: [
+        'Patient insights',
+        'Team coordination',
+        'Efficient workflows',
+      ],
+      accent: 'blue',
+    },
+  ];
+
+  return (
+    <section className="py-24 px-6 bg-gradient-to-b from-white to-gray-50">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 mb-4">
+            <span className="text-blue-700 text-xs font-bold uppercase tracking-widest">
+              Designed For You
+            </span>
+          </div>
+          <h2 className="text-4xl font-black text-gray-900 mb-3">
+            For everyone who{' '}
+            <span className="text-blue-700">cares about health</span>
+          </h2>
+          <p className="text-gray-400 max-w-xl mx-auto">
+            Whether you're managing a chronic condition or seeking care once,
+            PrioCare works for you.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-3 gap-6">
+          {roles.map((role, i) => (
+            <div
+              key={role.title}
+              className="bg-white border-2 border-gray-100 hover:border-blue-200 rounded-2xl p-7 transition-all hover:shadow-md group"
+            >
+              <div
+                className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${role.accent === 'blue' ? 'bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' : 'bg-cyan-100 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white'} transition-all`}
+              >
+                <Icon d={role.icon} size={22} />
+              </div>
+              <div
+                className={`text-xs font-black uppercase tracking-widest mb-2 ${role.accent === 'blue' ? 'text-blue-600' : 'text-cyan-600'}`}
+              >
+                0{i + 1}
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                {role.title}
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed mb-5">
+                {role.desc}
+              </p>
+              <div className="space-y-2">
+                {role.features.map((f) => (
+                  <div key={f} className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-blue-50 border border-blue-200 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg
+                        width="8"
+                        height="8"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#2563eb"
+                        strokeWidth="3"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7l5 5m0 0l-5 5m5-5H6"
-                      />
-                    </svg>
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pre-Care Section */}
-      <section
-        ref={(el) => (sectionRefs.current.precare = el)}
-        id="precare"
-        className="relative py-40 px-6 overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-          {renderBackgroundElements('precare')}
-        </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-32">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-12 transform-gpu transition-all duration-500 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/10">
-              <Eye className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-medium tracking-wider">
-                BEFORE YOUR VISIT
-              </span>
-            </div>
-
-            <h2 className="text-5xl md:text-7xl font-light mb-10 leading-tight">
-              Preparing You For
-              <span className="block mt-6">
-                <span className="relative inline-block">
-                  <span className="text-transparent bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text animate-gradient">
-                    Better Care
-                  </span>
-                  <span className="absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-emerald-400/0 via-emerald-400/50 to-emerald-400/0" />
-                </span>
-              </span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto font-light">
-              Everything you need to feel prepared, informed, and confident
-              before your visit
-            </p>
-          </div>
-
-          {/* Gateway Steps - Doorway Perspective */}
-          <div className="relative">
-            {/* Central Doorway */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 pointer-events-none">
-              {/* Door Frame */}
-              <div className="absolute inset-0 border-4 border-emerald-400/20 rounded-2xl" />
-
-              {/* Door Opening */}
-              <div className="absolute inset-8 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 backdrop-blur-sm rounded-lg border-2 border-emerald-400/30" />
-
-              {/* Door Handle */}
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <div className="w-4 h-12 bg-gradient-to-b from-emerald-400 to-teal-400 rounded-full shadow-lg" />
-              </div>
-            </div>
-
-            {/* Preparation Steps in Perspective */}
-            <div className="relative grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-              {[
-                {
-                  icon: FileText,
-                  title: 'Clear Instructions',
-                  description:
-                    'Simple, step-by-step guidance on what to expect and how to prepare',
-                  position: 'md:col-start-1 md:row-start-1',
-                  perspective:
-                    'perspective-1000 transform-gpu rotate-y-[-20deg]',
-                  color: 'emerald',
-                  step: '01',
-                },
-                {
-                  icon: Home,
-                  title: 'Home Preparation',
-                  description:
-                    'Tips to get your home ready for recovery and ongoing care',
-                  position: 'md:col-start-2 md:row-start-1 md:mt-24',
-                  perspective: 'perspective-1000 transform-gpu',
-                  color: 'teal',
-                  step: '02',
-                },
-                {
-                  icon: Brain,
-                  title: 'Peace of Mind',
-                  description:
-                    'Know exactly what will happen, reducing anxiety and uncertainty',
-                  position: 'md:col-start-3 md:row-start-1',
-                  perspective:
-                    'perspective-1000 transform-gpu rotate-y-[20deg]',
-                  color: 'cyan',
-                  step: '03',
-                },
-              ].map((step, i) => (
-                <div
-                  key={i}
-                  className={`${step.position} ${step.perspective} group`}
-                >
-                  {/* Step Pathway Line */}
-                  <div className="hidden md:block absolute top-1/2 left-1/2 w-32 h-0.5 bg-gradient-to-r from-emerald-400/20 to-transparent origin-left rotate-[60deg]" />
-
-                  {/* Step Container */}
-                  <div className="relative">
-                    {/* Step Badge on Pathway */}
-                    <div className="absolute -top-6 left-1/2 -translate-x-1/2">
-                      <div
-                        className={`w-10 h-10 rounded-full bg-gradient-to-br from-${step.color}-500 to-${step.color}-600 border-2 border-${step.color}-400/30 flex items-center justify-center shadow-lg`}
                       >
-                        <span className="text-white text-xs font-medium">
-                          {step.step}
-                        </span>
-                      </div>
+                        <path d="M5 13l4 4L19 7" />
+                      </svg>
                     </div>
-
-                    {/* Step Card */}
-                    <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-8 transform-gpu transition-all duration-700 group-hover:scale-110 group-hover:border-emerald-400/40 group-hover:shadow-2xl group-hover:shadow-emerald-500/20 overflow-hidden">
-                      {/* Animated Glow */}
-                      <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                      {/* Icon Container */}
-                      <div className="relative w-16 h-16 mx-auto mb-6">
-                        {/* Icon Background */}
-                        <div
-                          className={`absolute inset-0 bg-gradient-to-br from-${step.color}-500/20 to-${step.color}-600/20 rounded-xl border border-${step.color}-400/20`}
-                        />
-
-                        {/* Icon */}
-                        <div className="relative w-full h-full flex items-center justify-center">
-                          <step.icon
-                            className={`w-10 h-10 text-${step.color}-400 group-hover:scale-110 transition-transform duration-500`}
-                            strokeWidth={1.5}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="relative text-center space-y-4">
-                        <h3 className="text-2xl font-light text-white">
-                          {step.title}
-                        </h3>
-                        <p className="text-gray-300 font-light leading-relaxed">
-                          {step.description}
-                        </p>
-                      </div>
-
-                      {/* Pathway Indicator */}
-                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3].map((dot) => (
-                            <div
-                              key={dot}
-                              className={`w-1.5 h-1.5 bg-${step.color}-400/30 rounded-full group-hover:bg-${step.color}-400 transition-colors duration-300`}
-                              style={{ animationDelay: `${dot * 0.1}s` }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Direction Arrow */}
-                    <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 opacity-30 group-hover:opacity-100 transition-opacity duration-300">
-                      <ArrowRight className="w-6 h-6 text-emerald-400" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Entry Pathway */}
-            <div className="mt-24 text-center">
-              <div className="inline-flex items-center gap-6">
-                {/* Preparation Start */}
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-400/20 flex items-center justify-center">
-                    <span className="text-emerald-400 text-sm font-light">
-                      Start
+                    <span className="text-xs font-semibold text-gray-500">
+                      {f}
                     </span>
-                  </div>
-                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-500 font-light">
-                    Preparation
-                  </div>
-                </div>
-
-                {/* Pathway Line */}
-                <div className="w-24 h-1 bg-gradient-to-r from-emerald-400/20 to-teal-400/20 rounded-full" />
-
-                {/* Care Doorway */}
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/30 to-cyan-500/30 border-2 border-emerald-400/30 flex items-center justify-center shadow-lg">
-                    <DoorOpen className="w-8 h-8 text-emerald-400" />
-                  </div>
-                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-emerald-400 font-light">
-                    Care Access
-                  </div>
-                </div>
-              </div>
-
-              {/* Pathway Description */}
-              <p className="mt-12 text-gray-500 text-sm font-light max-w-2xl mx-auto">
-                Each preparation step guides you toward the door of better care,
-                ensuring you're fully ready for your healthcare journey
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Post-Care Section */}
-      <section
-        ref={(el) => (sectionRefs.current.postcare = el)}
-        id="postcare"
-        className="relative py-32 px-6"
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-          {renderBackgroundElements('postcare')}
-        </div>
-        <div className="max-w-6xl mx-auto relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
-              <RefreshCw className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-medium tracking-wider">
-                AFTER YOUR VISIT
-              </span>
-            </div>
-
-            <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
-              Care That Continues
-              <span className="block mt-4 text-transparent bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text">
-                Beyond The Visit
-              </span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto font-light">
-              Ongoing support, monitoring, and guidance for lasting wellness
-            </p>
-          </div>
-
-          {/* Post-Care Support */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Features */}
-            <div className="space-y-8">
-              {[
-                {
-                  icon: Bell,
-                  title: 'Follow-up Check-ins',
-                  description:
-                    'Regular calls and messages to monitor your recovery progress',
-                  color: 'emerald',
-                },
-                {
-                  icon: MessageCircle,
-                  title: '24/7 Support',
-                  description:
-                    'Always available to answer questions and provide guidance',
-                  color: 'teal',
-                },
-                {
-                  icon: TrendingUp,
-                  title: 'Progress Tracking',
-                  description:
-                    'Visual tracking of your recovery milestones and improvements',
-                  color: 'cyan',
-                },
-              ].map((feature, i) => (
-                <div key={i} className="group relative">
-                  <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-6 transform-gpu transition-all duration-500 hover:border-emerald-400/30">
-                    <div className="flex items-start gap-6">
-                      <div
-                        className={`w-14 h-14 rounded-xl bg-gradient-to-br from-${feature.color}-500/10 to-${feature.color}-600/10 border border-${feature.color}-400/20 flex items-center justify-center flex-shrink-0`}
-                      >
-                        <feature.icon
-                          className={`w-7 h-7 text-${feature.color}-400`}
-                          strokeWidth={1.5}
-                        />
-                      </div>
-                      <div>
-                        <h4 className="text-xl font-light text-white mb-2">
-                          {feature.title}
-                        </h4>
-                        <p className="text-gray-300 font-light">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Right Column - Visual */}
-            <div className="relative">
-              <div className="relative w-full aspect-square">
-                {/* Animated Recovery Circle */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-64 h-64">
-                    {/* Outer Ring */}
-                    <div className="absolute inset-0 border-4 border-emerald-400/10 rounded-full animate-pulse" />
-
-                    {/* Progress Ring */}
-                    <div
-                      className="absolute inset-8 border-4 border-transparent rounded-full"
-                      style={{
-                        background: `conic-gradient(from 0deg, #10b981 0% 75%, transparent 75% 100%)`,
-                        WebkitMask:
-                          'radial-gradient(circle, transparent 60%, black 61%)',
-                        mask: 'radial-gradient(circle, transparent 60%, black 61%)',
-                      }}
-                    />
-
-                    {/* Center Content */}
-                    <div className="absolute inset-16 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="text-4xl text-emerald-400 font-light mb-2">
-                          75%
-                        </div>
-                        <div className="text-sm text-gray-400 font-light">
-                          Recovery Progress
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating Elements */}
-                <div className="absolute top-1/4 left-1/4 w-12 h-12 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-teal-400/20 animate-float-slow" />
-                <div
-                  className="absolute bottom-1/4 right-1/4 w-16 h-16 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 animate-float-slow"
-                  style={{ animationDelay: '1s' }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Who It's For - Interactive Cards */}
-      <section className="relative py-32 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-          {renderBackgroundElements('for')}
-        </div>
-
-        <div className="max-w-6xl mx-auto relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-emerald-500/5 backdrop-blur-sm rounded-full border border-emerald-400/10 mb-8">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full" />
-              <span className="text-emerald-400 text-sm font-medium tracking-wider">
-                DESIGNED FOR YOU
-              </span>
-            </div>
-
-            <h2 className="text-4xl md:text-6xl font-light mb-6">
-              For Everyone Who
-              <span className="block mt-4 text-emerald-400">
-                Cares About Health
-              </span>
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto text-lg font-light">
-              Whether you're managing chronic conditions or seeking occasional
-              care
-            </p>
-          </div>
-
-          {/* Accordion Stack Layout - Performance Optimized */}
-          <div className="relative">
-            {/* Stacking lines indicator */}
-            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-400/20 via-transparent to-emerald-400/20" />
-
-            {/* Card Stack Container */}
-            <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
-              {[
-                {
-                  title: 'Patients',
-                  description:
-                    'Get care that adapts to your urgency and schedule',
-                  icon: Heart,
-                  features: [
-                    'Priority scheduling',
-                    'Clear instructions',
-                    'Follow-up support',
-                  ],
-                  color: 'emerald',
-                },
-                {
-                  title: 'Families',
-                  description:
-                    "Stay informed and connected with loved ones' care",
-                  icon: Users,
-                  features: [
-                    'Shared updates',
-                    'Care coordination',
-                    'Peace of mind',
-                  ],
-                  color: 'teal',
-                },
-                {
-                  title: 'Care Teams',
-                  description:
-                    'Deliver better care with streamlined coordination',
-                  icon: UserCheck,
-                  features: [
-                    'Patient insights',
-                    'Team coordination',
-                    'Efficient workflows',
-                  ],
-                  color: 'cyan',
-                },
-              ].map((role, i) => (
-                <div key={i} className="group">
-                  {/* Stack Card */}
-                  <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-400/30 hover:translate-y-[-4px]">
-                    {/* Stack layer indicators */}
-                    <div className="absolute -top-2 left-6 right-6 h-2 bg-gradient-to-r from-emerald-400/10 via-teal-400/10 to-transparent rounded-t-lg" />
-                    <div className="absolute -bottom-2 left-6 right-6 h-2 bg-gradient-to-r from-transparent via-teal-400/10 to-emerald-400/10 rounded-b-lg" />
-
-                    {/* Number indicator */}
-                    <div className="absolute -left-3 top-8 w-8 h-8 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-light shadow-lg">
-                      {i + 1}
-                    </div>
-
-                    {/* Icon */}
-                    <div className="flex justify-center mb-8">
-                      <div
-                        className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-${role.color}-500/10 to-${role.color}-600/10 border border-${role.color}-400/20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
-                      >
-                        <role.icon
-                          className={`w-10 h-10 text-${role.color}-400`}
-                          strokeWidth={1.5}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="text-center">
-                      <h3 className="text-2xl font-light text-white mb-4">
-                        {role.title}
-                      </h3>
-                      <p className="text-gray-300 mb-6 font-light leading-relaxed">
-                        {role.description}
-                      </p>
-
-                      {/* Feature List */}
-                      <div className="space-y-3">
-                        {role.features.map((feature, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center gap-3 text-gray-400"
-                          >
-                            <div
-                              className={`w-1.5 h-1.5 rounded-full bg-${role.color}-400`}
-                            />
-                            <span className="font-light text-sm">
-                              {feature}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Hover indicator */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-
-                  {/* Desktop connection lines */}
-                  {i < 2 && (
-                    <div className="hidden lg:block absolute top-1/2 right-[-32px] w-8 h-0.5 bg-gradient-to-r from-emerald-400/20 to-transparent" />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Stack visualization for desktop */}
-            <div className="hidden lg:block">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%+4rem)] h-[calc(100%+4rem)]">
-                {/* Stack shadow effects */}
-                <div className="absolute top-[-20px] left-[-20px] right-[-20px] bottom-[-20px] bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
-              </div>
-            </div>
-          </div>
-
-          {/* Unifying description */}
-          <div className="mt-16 text-center">
-            <div className="inline-flex items-center gap-4 px-6 py-3 bg-emerald-500/5 backdrop-blur-sm rounded-full border border-emerald-400/10">
-              <div className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-                <div className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full" />
-                <div className="w-1.5 h-1.5 bg-emerald-400/40 rounded-full" />
-              </div>
-              <span className="text-gray-400 text-sm font-light">
-                Each role plays a vital part in the healthcare journey
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Emergency Response System */}
-      <section id="emergency" className="relative py-32 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-          {renderBackgroundElements('emergency')}
-        </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          {/* Header */}
-          <div className="flex items-center justify-center gap-3 mb-12">
-            <div className="relative">
-              <div
-                className="absolute inset-0 bg-red-500 rounded-full blur-lg animate-ping"
-                style={{ animationDuration: '1.5s' }}
-              />
-              <div className="relative w-5 h-5 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
-            </div>
-
-            <span className="text-red-400 text-sm font-light tracking-widest uppercase">
-              PRIORITY EMERGENCY CARE
-            </span>
-
-            <div className="relative">
-              <div
-                className="absolute inset-0 bg-red-500 rounded-full blur-lg animate-ping"
-                style={{ animationDuration: '1.5s', animationDelay: '0.5s' }}
-              />
-              <div className="relative w-5 h-5 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left Content */}
-            <div className="space-y-8">
-              <h2 className="text-5xl md:text-6xl font-light leading-tight">
-                When Every Second
-                <span className="block text-red-400 mt-2">Matters</span>
-              </h2>
-
-              <p className="text-xl text-gray-300 font-light leading-relaxed">
-                Our system ensures urgent cases get immediate attention while
-                keeping you informed every step of the way.
-              </p>
-
-              <div className="space-y-6 mt-12">
-                {[
-                  {
-                    icon: Activity,
-                    title: 'Immediate Response',
-                    description:
-                      'Urgent cases get priority attention instantly',
-                  },
-                  {
-                    icon: MessageCircle,
-                    title: 'Clear Communication',
-                    description: 'Real-time updates about your care status',
-                  },
-                  {
-                    icon: Users,
-                    title: 'Family Notified',
-                    description: 'Loved ones stay informed automatically',
-                  },
-                ].map((feature, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-red-500/5 to-transparent border border-red-400/10 hover:border-red-400/30 transition-all"
-                  >
-                    <div className="w-12 h-12 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <feature.icon className="w-6 h-6 text-red-400" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-light text-white mb-1">
-                        {feature.title}
-                      </h4>
-                      <p className="text-gray-400 font-light">
-                        {feature.description}
-                      </p>
-                    </div>
                   </div>
                 ))}
               </div>
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-            {/* Right Visual */}
-            <div className="relative">
-              <div className="relative mx-auto w-64 h-64">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-red-500 rounded-full blur-xl opacity-30 animate-pulse" />
-                    <div className="relative w-32 h-32 bg-gradient-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center border-4 border-red-400/40">
-                      <Heart
-                        className="w-16 h-16 text-white"
-                        fill="white"
-                        strokeWidth={1}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+/* ─── Emergency ─────────────────────────────────────────── */
+function EmergencySection() {
+  return (
+    <section id="emergency" className="py-20 px-6 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-red-50 border-2 border-red-100 rounded-2xl px-8 py-10 flex flex-col lg:flex-row items-center gap-8">
+          {/* Icon */}
+          <div className="w-20 h-20 bg-red-100 border-2 border-red-200 rounded-2xl flex items-center justify-center flex-shrink-0">
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#dc2626"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
           </div>
 
-          {/* CTA */}
-          <div className="text-center mt-20">
-            <button className="group relative px-10 py-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-white font-light tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-red-500/30">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <span className="relative flex items-center justify-center gap-3">
-                <AlertTriangle className="w-5 h-5" />
-                Emergency Assistance
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-              </span>
-            </button>
-
-            <p className="text-gray-500 text-sm mt-6 font-light">
-              For immediate medical emergencies, call 911 first
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-2xl font-black text-gray-900 mb-2">
+              Experiencing a medical emergency?
+            </h2>
+            <p className="text-gray-600 leading-relaxed max-w-xl">
+              Do <strong>not</strong> use this system for emergencies. PrioCare
+              is for scheduled and non-emergency consultations only. If you are
+              in immediate danger or experiencing a life-threatening condition,
+              please act immediately.
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* Trust Section */}
-      <section className="relative py-32 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-          {renderBackgroundElements('trust')}
-        </div>
-        <div className="max-w-5xl mx-auto relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-500/10 backdrop-blur-lg rounded-full border border-emerald-400/20 mb-6">
-              <Shield className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-light tracking-wide">
-                YOUR TRUST, OUR PRIORITY
-              </span>
-            </div>
-
-            <h2 className="text-5xl md:text-6xl font-light mb-8">
-              Built on{' '}
-              <span className="text-emerald-400">Trust & Security</span>
-            </h2>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            {[
-              {
-                title: 'Your Privacy First',
-                description:
-                  'Industry-leading encryption keeps your health data secure and private',
-                stats: '256-bit Encryption',
-              },
-              {
-                title: 'Clear Communication',
-                description:
-                  'No surprises. Always know what to expect and when',
-                stats: 'Real-time Updates',
-              },
-              {
-                title: 'Proven Reliability',
-                description: 'Built on healthcare standards with 99.9% uptime',
-                stats: '24/7 Monitoring',
-              },
-            ].map((item, i) => (
-              <div key={i} className="relative group">
-                {/* Hover Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                {/* Content */}
-                <div className="relative p-8 border border-gray-800/50 rounded-3xl backdrop-blur-sm transition-all duration-500 group-hover:border-emerald-400/30">
-                  {/* Stats Badge */}
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full mb-6">
-                    {i === 0 && <Lock className="w-4 h-4 text-emerald-400" />}
-                    {i === 1 && <Bell className="w-4 h-4 text-emerald-400" />}
-                    {i === 2 && <Zap className="w-4 h-4 text-emerald-400" />}
-                    <span className="text-emerald-400 text-sm font-light">
-                      {item.stats}
-                    </span>
-                  </div>
-
-                  <h3 className="text-2xl font-light text-white mb-4">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-400 font-light leading-relaxed">
-                    {item.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Security Badges */}
-          <div className="flex flex-wrap justify-center gap-8 items-center">
-            {[
-              { icon: Lock, label: 'HIPAA Compliant' },
-              { icon: Shield, label: 'Data Protected' },
-              { icon: Zap, label: 'Always Available' },
-              { icon: Check, label: 'Audited Regularly' },
-            ].map((badge, i) => (
-              <div
-                key={i}
-                className="flex flex-col items-center gap-3 group cursor-pointer"
+          <div className="flex flex-col gap-3 flex-shrink-0">
+            <div className="flex items-center gap-3 bg-white border-2 border-red-200 rounded-xl px-5 py-3">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#dc2626"
+                strokeWidth="2.5"
+                strokeLinecap="round"
               >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-400/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <badge.icon className="w-8 h-8 text-emerald-400" />
-                </div>
-                <span className="text-gray-500 text-sm font-light group-hover:text-emerald-400 transition-colors">
-                  {badge.label}
-                </span>
+                <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <div>
+                <p className="text-xs text-gray-400 font-medium">
+                  Call immediately
+                </p>
+                <p className="text-lg font-black text-red-600">911</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="relative py-40 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-          {renderBackgroundElements('cta')}
-        </div>
-
-        <div className="relative max-w-4xl mx-auto text-center">
-          {/* Floating Elements */}
-          <div className="absolute top-10 left-10 w-8 h-8 bg-emerald-400/20 rounded-full blur-sm" />
-          <div className="absolute bottom-10 right-10 w-12 h-12 bg-teal-400/20 rounded-full blur-sm" />
-          <div className="absolute top-20 right-20 w-6 h-6 bg-blue-400/20 rounded-full blur-sm" />
-
-          {/* Content */}
-          <div className="relative backdrop-blur-sm bg-white/5 rounded-3xl border border-white/10 p-12 shadow-2xl">
-            <h2 className="text-5xl md:text-6xl font-light mb-8 leading-tight">
-              Ready for Healthcare
-              <span className="block mt-4 font-light text-white">
-                That Puts You First?
-              </span>
-            </h2>
-
-            <p className="text-emerald-100 text-xl mb-12 max-w-2xl mx-auto font-light">
-              Join thousands who experience healthcare differently
-            </p>
-
-            <button className="group relative px-12 py-6 bg-gradient-to-r from-white to-gray-100 text-emerald-600 rounded-full text-lg font-light tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 mb-8">
-              <span className="relative z-10 flex items-center gap-3">
-                Start Your Journey
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-100 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </button>
-
-            <p className="text-emerald-200 text-sm font-light">
-              No commitment required. See how it works first.
+            </div>
+            <p className="text-xs text-gray-400 text-center font-medium">
+              Or visit the emergency desk
             </p>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* Minimal Footer */}
-      <footer className="relative py-16 px-6 bg-gradient-to-t from-gray-950 to-black">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            {/* Brand */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-white" fill="white" />
-                </div>
-                <span className="text-xl font-light tracking-wide text-emerald-300">
-                  PrioCare
-                </span>
+/* ─── Trust ─────────────────────────────────────────────── */
+function TrustSection() {
+  const items = [
+    {
+      icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+      stat: '256-bit',
+      title: 'Encryption',
+      desc: 'Your health data is encrypted end-to-end and never sold or shared without consent.',
+    },
+    {
+      icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+      stat: 'Real-time',
+      title: 'Updates',
+      desc: 'No surprises. Always know what to expect, when to expect it, and who your doctor is.',
+    },
+    {
+      icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+      stat: 'HIPAA',
+      title: 'Compliant',
+      desc: 'Built on healthcare compliance standards. Regularly audited for data security and privacy.',
+    },
+    {
+      icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+      stat: '99.9%',
+      title: 'Uptime',
+      desc: '24/7 system availability with 99.9% uptime. Care whenever you need it, without interruption.',
+    },
+  ];
+
+  return (
+    <section id="trust" className="py-24 px-6 bg-gray-50">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 mb-4">
+            <span className="text-blue-700 text-xs font-bold uppercase tracking-widest">
+              Trust & Security
+            </span>
+          </div>
+          <h2 className="text-4xl font-black text-gray-900 mb-3">
+            Built on <span className="text-blue-700">trust & security</span>
+          </h2>
+          <p className="text-gray-400 max-w-xl mx-auto">
+            Your privacy and security are not features — they are the
+            foundation.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {items.map((item) => (
+            <div
+              key={item.title}
+              className="bg-white border-2 border-gray-100 hover:border-blue-200 rounded-2xl p-6 transition-all hover:shadow-md text-center"
+            >
+              <div className="w-11 h-11 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Icon d={item.icon} size={20} />
               </div>
-              <p className="text-gray-500 text-sm font-light">
-                Healthcare that understands what comes first in your life
+              <p className="text-2xl font-black text-blue-700 mb-0.5">
+                {item.stat}
+              </p>
+              <p className="text-sm font-bold text-gray-800 mb-2">
+                {item.title}
+              </p>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                {item.desc}
               </p>
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-white font-light mb-6">Quick Links</h4>
-              <div className="space-y-3">
-                {[
-                  'Book Visit',
-                  'How It Works',
-                  'Pre & Post Care',
-                  'Emergency',
-                  'Support',
-                ].map((link) => (
-                  <a
-                    key={link}
-                    href="#"
-                    className="block text-gray-500 hover:text-emerald-400 text-sm font-light transition-colors"
-                  >
-                    {link}
-                  </a>
-                ))}
-              </div>
+/* ─── CTA ───────────────────────────────────────────────── */
+function CTASection({ onBook }) {
+  return (
+    <section className="py-24 px-6 bg-white">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-cyan-700 rounded-3xl px-8 py-14 text-center relative overflow-hidden">
+          <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/5 rounded-full" />
+          <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-white/5 rounded-full" />
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-4 py-1.5 mb-6">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+              <span className="text-white/80 text-xs font-bold uppercase tracking-widest">
+                Doctors Available Now
+              </span>
             </div>
-
-            {/* Contact */}
-            <div>
-              <h4 className="text-white font-light mb-6">Contact</h4>
-              <div className="space-y-3 text-sm text-gray-500 font-light">
-                <p>24/7 Support Available</p>
-                <p>help@priocare.com</p>
-                <p>1-800-PRIO-CARE</p>
-              </div>
-            </div>
-
-            {/* Newsletter */}
-            <div>
-              <h4 className="text-white font-light mb-6">Stay Updated</h4>
-              <div className="space-y-4">
-                <p className="text-sm text-gray-500 font-light">
-                  Get healthcare tips and updates
-                </p>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    placeholder="Your email"
-                    className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-800 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50"
-                  />
-                  <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg text-sm text-white hover:opacity-90 transition-opacity">
-                    Join
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent mb-8" />
-
-          {/* Copyright */}
-          <div className="text-center">
-            <p className="text-gray-600 text-sm font-light">
-              © {new Date().getFullYear()} PrioCare. All rights reserved.
+            <h2 className="text-4xl font-black text-white mb-4">
+              Ready for healthcare that puts you first?
+            </h2>
+            <p className="text-blue-100 text-lg mb-8 max-w-xl mx-auto">
+              Join thousands of patients who experience healthcare differently —
+              faster, clearer, and built around you.
             </p>
-            <p className="text-gray-700 text-xs mt-2 font-light">
-              PrioCare does not provide emergency services. In case of
-              emergency, call 911 immediately.
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <button
+                onClick={onBook}
+                className="flex items-center gap-2 px-8 py-4 bg-white text-blue-700 font-black rounded-2xl hover:bg-blue-50 transition-all active:scale-95 shadow-lg"
+              >
+                Book Your First Visit
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M13 7l5 5-5 5M6 12h12" />
+                </svg>
+              </button>
+              <a
+                href="#how"
+                className="px-6 py-4 border-2 border-white/30 text-white font-semibold rounded-2xl hover:bg-white/10 transition-all text-sm"
+              >
+                See How It Works
+              </a>
+            </div>
+            <p className="text-white/40 text-xs mt-5">
+              No commitment required · HIPAA compliant · Free to use
             </p>
           </div>
         </div>
-      </footer>
+      </div>
+    </section>
+  );
+}
 
-      <style jsx>{`
-        @keyframes float-particle {
-          0%,
-          100% {
-            transform: translate(0, 0) scale(1);
-            opacity: 0.3;
-          }
-          50% {
-            transform: translate(10px, -10px) scale(1.2);
-            opacity: 0.6;
-          }
-        }
+/* ─── Footer ────────────────────────────────────────────── */
+function Footer() {
+  return (
+    <footer className="bg-gray-50 border-t border-gray-100 py-14 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-4 gap-10 mb-10">
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                >
+                  <path d="M12 4v16M4 12h16" />
+                </svg>
+              </div>
+              <span className="text-blue-900 text-xl font-bold">
+                Prio<span className="text-cyan-600">Care</span>
+              </span>
+            </div>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              Healthcare that understands what comes first in your life.
+            </p>
+          </div>
 
-        @keyframes float-gentle {
-          0%,
-          100% {
-            transform: translateY(0) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(5deg);
-          }
-        }
+          {/* Links */}
+          <div>
+            <p className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">
+              Quick Links
+            </p>
+            <div className="space-y-2.5">
+              {[
+                'Book Visit',
+                'How It Works',
+                'Pre & Post Care',
+                'Emergency',
+                'Support',
+              ].map((l) => (
+                <a
+                  key={l}
+                  href="#"
+                  className="block text-sm text-gray-400 hover:text-blue-700 transition-colors"
+                >
+                  {l}
+                </a>
+              ))}
+            </div>
+          </div>
 
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
+          {/* Contact */}
+          <div>
+            <p className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">
+              Contact
+            </p>
+            <div className="space-y-2.5 text-sm text-gray-400">
+              <p>24/7 Support Available</p>
+              <p>help@priocare.com</p>
+              <p>1-800-PRIO-CARE</p>
+            </div>
+          </div>
 
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+          {/* Newsletter */}
+          <div>
+            <p className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-4">
+              Stay Updated
+            </p>
+            <p className="text-sm text-gray-400 mb-3">
+              Get healthcare tips and updates.
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                placeholder="Your email"
+                className="flex-1 px-3 py-2 text-sm border-2 border-gray-200 focus:border-blue-400 rounded-xl outline-none transition-colors bg-white"
+              />
+              <button className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold rounded-xl transition-all">
+                Go
+              </button>
+            </div>
+          </div>
+        </div>
 
-        @keyframes gradient {
-          0%,
-          100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
+        <div className="pt-8 border-t border-gray-200 text-center space-y-1">
+          <p className="text-sm text-gray-400">
+            © {new Date().getFullYear()} PrioCare. All rights reserved.
+          </p>
+          <p className="text-xs text-gray-300">
+            PrioCare does not provide emergency services. In case of emergency,
+            call 911 immediately.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
 
-        @keyframes emergency-pulse {
-          0% {
-            transform: scale(1);
-            opacity: 1;
-          }
-          100% {
-            transform: scale(1.5);
-            opacity: 0;
-          }
-        }
+/* ─── Root ──────────────────────────────────────────────── */
+export default function LandingPage() {
+  const navigate = useNavigate();
+  const onBook = () => navigate('/login ');
 
-        @keyframes spin-slow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes spin-slow-reverse {
-          from {
-            transform: rotate(360deg);
-          }
-          to {
-            transform: rotate(0deg);
-          }
-        }
-
-        @keyframes float-slow {
-          0%,
-          100% {
-            transform: translateY(0) scale(1);
-          }
-          50% {
-            transform: translateY(-20px) scale(1.05);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 1s ease-out;
-        }
-
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out forwards;
-        }
-
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
-        }
-
-        .animate-emergency-pulse {
-          animation: emergency-pulse 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        .animate-spin-slow {
-          animation: spin-slow 20s linear infinite;
-        }
-
-        .animate-spin-slow-reverse {
-          animation: spin-slow-reverse 25s linear infinite;
-        }
-
-        .animate-float-slow {
-          animation: float-slow 6s ease-in-out infinite;
-        }
-
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-
-        .rotate-y-[-20deg] {
-          transform: rotateY(-20deg);
-        }
-
-        .rotate-y-[20deg] {
-          transform: rotateY(20deg);
-        }
-
-        .transform-gpu {
-          transform: translate3d(0, 0, 0);
-          backface-visibility: hidden;
-        }
-
-        @keyframes wave {
-          0% {
-            transform: translateX(0);
-          }
-          50% {
-            transform: translateX(-30px);
-          }
-          100% {
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes scroll {
-          0% {
-            transform: translateY(-20px);
-            opacity: 0;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(20px);
-            opacity: 0;
-          }
-        }
-
-        .animate-wave {
-          animation: wave 20s ease-in-out infinite;
-        }
-
-        .animate-scroll {
-          animation: scroll 2s ease-in-out infinite;
-        }
-
-        @keyframes float-slow {
-          0%,
-          100% {
-            transform: translateY(0) scale(1);
-          }
-          50% {
-            transform: translateY(-15px) scale(1.05);
-          }
-        }
-
-        @keyframes pulse-slow {
-          0%,
-          100% {
-            opacity: 0.5;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.1);
-          }
-        }
-
-        @keyframes spin-slow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes spin-slow-reverse {
-          from {
-            transform: rotate(360deg);
-          }
-          to {
-            transform: rotate(0deg);
-          }
-        }
-
-        .animate-float-slow {
-          animation: float-slow 6s ease-in-out infinite;
-        }
-
-        .animate-pulse-slow {
-          animation: pulse-slow 3s ease-in-out infinite;
-        }
-
-        .animate-spin-slow {
-          animation: spin-slow 30s linear infinite;
-        }
-
-        .animate-spin-slow-reverse {
-          animation: spin-slow-reverse 40s linear infinite;
-        }
-
-        @keyframes heartBeatComplex {
-          0%,
-          100% {
-            transform: scale(1) rotate(0deg);
-            filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.5));
-          }
-          15% {
-            transform: scale(1.2) rotate(-2deg);
-            filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.8));
-          }
-          30% {
-            transform: scale(1) rotate(0deg);
-            filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.5));
-          }
-          45% {
-            transform: scale(1.15) rotate(2deg);
-            filter: drop-shadow(0 0 15px rgba(45, 212, 191, 0.7));
-          }
-          60% {
-            transform: scale(1) rotate(0deg);
-            filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.5));
-          }
-        }
-      `}</style>
+  return (
+    <div className="min-h-screen bg-white text-gray-900">
+      <Nav onBook={onBook} />
+      <Hero onBook={onBook} />
+      <WhySection />
+      <HowSection />
+      <CareSection />
+      <ForSection />
+      <EmergencySection />
+      <TrustSection />
+      <CTASection onBook={onBook} />
+      <Footer />
     </div>
   );
-};
-
-export default SmartHospitalLanding;
+}

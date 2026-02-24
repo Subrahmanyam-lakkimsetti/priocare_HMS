@@ -14,7 +14,6 @@ const authMiddleware = catchAsync((req, res, next) => {
 
   // verify and decode the token
   const decode = verifyToken(token);
-
   // add the payold data tot the req obj
   req.data = {
     id: decode.userId,

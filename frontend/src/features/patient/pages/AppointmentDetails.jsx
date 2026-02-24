@@ -28,8 +28,13 @@ const SEVERITY_CONFIG = {
 const STATUS_LABEL = {
   waiting: { label: 'Waiting', color: 'bg-yellow-100 text-yellow-700' },
   checked_in: { label: 'Checked In', color: 'bg-blue-100 text-blue-700' },
+  called: { label: 'Called', color: 'bg-purple-100 text-purple-700' },
   'in-progress': {
     label: 'In Progress',
+    color: 'bg-indigo-100 text-indigo-700',
+  },
+  in_consultation: {
+    label: 'In Consultation',
     color: 'bg-indigo-100 text-indigo-700',
   },
   completed: { label: 'Completed', color: 'bg-green-100 text-green-700' },
@@ -91,6 +96,13 @@ export default function AppointmentDetails() {
 
   const patientsAhead = a?.queuePosition ? a.queuePosition - 1 : 0;
 
+  // Derive which "mode" the Live Queue card should show
+  const isCalled = a?.status === 'called';
+  const isInConsultation =
+    a?.status === 'in_consultation' || a?.status === 'in-progress';
+  const isCheckedIn = a?.status === 'checked_in';
+  const isCompleted = a?.status === 'completed';
+
   /* ── Loading / Empty ─────────────────────────────────── */
   if (loadingAppointment)
     return (
@@ -128,12 +140,12 @@ export default function AppointmentDetails() {
 
   /* ── Main ────────────────────────────────────────────── */
   return (
-    <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50">
+    <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50 pt-20">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-3 shrink-0">
+      <header className="fixed top-0 left-0 lg:left-64 right-0 z-20 bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4 shadow-sm">
         <button
           onClick={() => nav('/patient')}
-          className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+          className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
         >
           <svg
             className="w-5 h-5"
@@ -149,16 +161,20 @@ export default function AppointmentDetails() {
             />
           </svg>
         </button>
-        <div className="flex-1">
-          <h1 className="text-lg font-semibold text-gray-900">
+
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl font-bold text-gray-900">
             Appointment Details
           </h1>
-          <p className="text-xs text-gray-400">Token #{a.token}</p>
+          <p className="text-sm text-gray-500">
+            Token <span className="font-medium text-gray-700">#{a.token}</span>
+          </p>
         </div>
+
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${statusCfg.color}`}
+          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${statusCfg.color}`}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
+          <span className="w-2 h-2 rounded-full bg-current opacity-70" />
           {statusCfg.label}
         </span>
       </header>
@@ -166,13 +182,78 @@ export default function AppointmentDetails() {
       {/* Scrollable content */}
       <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8 lg:py-8">
         <div className="max-w-7xl mx-auto space-y-6">
+          {/* ── Called Banner ─────────────────────────────── */}
+          {isCalled && (
+            <div className="bg-purple-600 rounded-2xl px-6 py-4 flex items-center gap-4 shadow-lg animate-pulse-once">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-bold text-base">
+                  🔔 Your token has been called!
+                </p>
+                <p className="text-white/75 text-sm mt-0.5">
+                  Please proceed to Dr. {a.doctorId?.firstName}{' '}
+                  {a.doctorId?.lastName}'s room in the {a.doctorId?.department}{' '}
+                  department now.
+                </p>
+              </div>
+              <p className="text-white/60 text-xs shrink-0">
+                Called at {formatTime(a.calledAt)}
+              </p>
+            </div>
+          )}
+
+          {/* ── In Consultation Banner ────────────────────── */}
+          {isInConsultation && (
+            <div className="bg-indigo-600 rounded-2xl px-6 py-4 flex items-center gap-4 shadow-lg">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-bold text-base">
+                  ✅ Consultation in progress
+                </p>
+                <p className="text-white/75 text-sm mt-0.5">
+                  You are currently with Dr. {a.doctorId?.firstName}{' '}
+                  {a.doctorId?.lastName}. Started at{' '}
+                  {formatTime(a.consulationStartsAt)}.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Hero Section */}
           <div
-            className={`bg-linear-to-br ${sevCfg.gradient} rounded-2xl p-6 text-white shadow-lg`}
+            className={`bg-gradient-to-br ${sevCfg.gradient} rounded-2xl p-6 text-white shadow-lg`}
           >
             <div className="flex flex-wrap items-start justify-between gap-4">
               {/* Token */}
-              <div className="flex-1 min-w-50">
+              <div className="flex-1 min-w-[12rem]">
                 <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">
                   Your Token
                 </p>
@@ -186,17 +267,50 @@ export default function AppointmentDetails() {
                 <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">
                   Queue Position
                 </p>
-                <p className="text-4xl lg:text-5xl font-black">
-                  #{a.queuePosition || '—'}
-                </p>
-                <p className="text-white/60 text-sm mt-1">
-                  {patientsAhead} {patientsAhead === 1 ? 'patient' : 'patients'}{' '}
-                  ahead
-                </p>
+                {/* Show position only when it makes sense */}
+                {a.queuePosition ? (
+                  <>
+                    <p className="text-4xl lg:text-5xl font-black">
+                      #{a.queuePosition}
+                    </p>
+                    <p className="text-white/60 text-sm mt-1">
+                      {patientsAhead}{' '}
+                      {patientsAhead === 1 ? 'patient' : 'patients'} ahead
+                    </p>
+                  </>
+                ) : isCalled ? (
+                  <>
+                    <p className="text-2xl font-black">Called</p>
+                    <p className="text-white/60 text-sm mt-1">
+                      Head to the doctor's room
+                    </p>
+                  </>
+                ) : isInConsultation ? (
+                  <>
+                    <p className="text-2xl font-black">With Doctor</p>
+                    <p className="text-white/60 text-sm mt-1">
+                      Consultation ongoing
+                    </p>
+                  </>
+                ) : isCompleted ? (
+                  <>
+                    <p className="text-2xl font-black">Done</p>
+                    <p className="text-white/60 text-sm mt-1">
+                      Visit completed
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-4xl lg:text-5xl font-black">—</p>
+                    <p className="text-white/60 text-sm mt-1">
+                      Awaiting check-in
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Doctor Info */}
-              <div className="text-right min-w-62.5">
+              <div className="text-right min-w-[15rem]">
                 <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-2">
                   Assigned Doctor
                 </p>
@@ -242,11 +356,29 @@ export default function AppointmentDetails() {
             <div className="space-y-6">
               {/* Queue Status */}
               <div className="bg-white rounded-2xl border-2 border-blue-200 shadow-sm overflow-hidden">
-                <div className="bg-blue-600 px-5 py-3 flex items-center justify-between">
+                <div
+                  className={`px-5 py-3 flex items-center justify-between ${
+                    isCalled
+                      ? 'bg-purple-600'
+                      : isInConsultation
+                        ? 'bg-indigo-600'
+                        : isCompleted
+                          ? 'bg-green-600'
+                          : 'bg-blue-600'
+                  }`}
+                >
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    {!isCompleted && (
+                      <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    )}
                     <h2 className="text-white font-bold text-sm tracking-wide uppercase">
-                      Live Queue Status
+                      {isCalled
+                        ? 'You Have Been Called'
+                        : isInConsultation
+                          ? 'Consultation Status'
+                          : isCompleted
+                            ? 'Visit Complete'
+                            : 'Live Queue Status'}
                     </h2>
                   </div>
                   <span className="text-white/70 text-xs">
@@ -254,14 +386,14 @@ export default function AppointmentDetails() {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}{' '}
-                    · Live
+                    · {isCompleted ? 'Done' : 'Live'}
                   </span>
                 </div>
 
-                {a.status === 'checked_in' ? (
+                {/* ── checked_in: show queue info ── */}
+                {isCheckedIn && (
                   <div className="p-5">
                     <div className="grid grid-cols-2 gap-4 mb-4">
-                      {/* Expected Start */}
                       <div className="rounded-xl border-2 border-blue-100 bg-blue-50 px-4 py-3">
                         <div className="flex items-center gap-1.5 mb-1">
                           <svg
@@ -282,11 +414,9 @@ export default function AppointmentDetails() {
                           </p>
                         </div>
                         <p className="text-2xl font-black text-blue-700">
-                          {a.exceptedStartTime}
+                          {a.exceptedStartTime || '—'}
                         </p>
                       </div>
-
-                      {/* Expected End */}
                       <div className="rounded-xl border-2 border-cyan-100 bg-cyan-50 px-4 py-3">
                         <div className="flex items-center gap-1.5 mb-1">
                           <svg
@@ -307,12 +437,10 @@ export default function AppointmentDetails() {
                           </p>
                         </div>
                         <p className="text-2xl font-black text-cyan-700">
-                          {a.exceptedEndTime}
+                          {a.exceptedEndTime || '—'}
                         </p>
                       </div>
                     </div>
-
-                    {/* Progress Bar */}
                     <div className="mb-4">
                       <div className="flex justify-between text-xs text-gray-500 mb-1">
                         <span>Queue Progress</span>
@@ -323,13 +451,15 @@ export default function AppointmentDetails() {
                           className="bg-blue-600 h-2 rounded-full"
                           style={{
                             width: a.queuePosition
-                              ? `${Math.min(100, ((20 - a.queuePosition) / 20) * 100)}%`
+                              ? `${Math.min(
+                                  100,
+                                  ((20 - a.queuePosition) / 20) * 100,
+                                )}%`
                               : '0%',
                           }}
                         />
                       </div>
                     </div>
-
                     <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
                       <svg
                         className="w-4 h-4 text-amber-500 shrink-0"
@@ -348,11 +478,113 @@ export default function AppointmentDetails() {
                       </p>
                     </div>
                   </div>
-                ) : (
+                )}
+
+                {/* ── called: proceed to doctor ── */}
+                {isCalled && (
+                  <div className="p-5">
+                    <div className="flex items-start gap-4 bg-purple-50 border border-purple-200 rounded-xl p-4 mb-4">
+                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center shrink-0">
+                        <svg
+                          className="w-5 h-5 text-purple-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-purple-800">
+                          Please proceed to the doctor's room
+                        </p>
+                        <p className="text-xs text-purple-600 mt-1">
+                          Head to {a.doctorId?.department}, 2nd Floor for your
+                          consultation with Dr. {a.doctorId?.firstName}{' '}
+                          {a.doctorId?.lastName}.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+                        <p className="text-xs text-gray-400 mb-0.5">
+                          Called at
+                        </p>
+                        <p className="text-lg font-black text-gray-800">
+                          {formatTime(a.calledAt)}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+                        <p className="text-xs text-gray-400 mb-0.5">
+                          Checked in at
+                        </p>
+                        <p className="text-lg font-black text-gray-800">
+                          {formatTime(a.checkedInAt)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── in_consultation: currently with doctor ── */}
+                {isInConsultation && (
+                  <div className="p-5">
+                    <div className="flex items-center gap-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-4">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center shrink-0">
+                        <svg
+                          className="w-5 h-5 text-indigo-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-indigo-800">
+                          Consultation in progress
+                        </p>
+                        <p className="text-xs text-indigo-600 mt-1">
+                          You are currently being seen by Dr.{' '}
+                          {a.doctorId?.firstName} {a.doctorId?.lastName}.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+                        <p className="text-xs text-gray-400 mb-0.5">
+                          Started at
+                        </p>
+                        <p className="text-lg font-black text-gray-800">
+                          {formatTime(a.consulationStartsAt) || '—'}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+                        <p className="text-xs text-gray-400 mb-0.5">Est. End</p>
+                        <p className="text-lg font-black text-gray-800">
+                          {a.exceptedEndTime || '—'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── completed ── */}
+                {isCompleted && (
                   <div className="p-5 flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
+                    <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
                       <svg
-                        className="w-7 h-7 text-gray-400"
+                        className="w-7 h-7 text-green-600"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -361,20 +593,53 @@ export default function AppointmentDetails() {
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          d="M5 13l4 4L19 7"
                         />
                       </svg>
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-gray-700">
-                        Queue info will appear once you check in
+                        Your visit has been completed
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        Please proceed to the check-in counter
+                        Consultation ended at {formatTime(a.consulationEndsAt)}.
+                        Thank you for visiting.
                       </p>
                     </div>
                   </div>
                 )}
+
+                {/* ── waiting / not yet checked in ── */}
+                {!isCheckedIn &&
+                  !isCalled &&
+                  !isInConsultation &&
+                  !isCompleted && (
+                    <div className="p-5 flex items-center gap-4">
+                      <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
+                        <svg
+                          className="w-7 h-7 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-700">
+                          Queue info will appear once you check in
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          Please proceed to the check-in counter
+                        </p>
+                      </div>
+                    </div>
+                  )}
               </div>
 
               {/* Visit Info & Medical Info Combined */}
@@ -533,7 +798,13 @@ export default function AppointmentDetails() {
                       </div>
                       <div className="flex-1">
                         <p
-                          className={`text-sm font-semibold ${s.done ? 'text-gray-800' : i === currentStep ? 'text-blue-600' : 'text-gray-400'}`}
+                          className={`text-sm font-semibold ${
+                            s.done
+                              ? 'text-gray-800'
+                              : i === currentStep
+                                ? 'text-blue-600'
+                                : 'text-gray-400'
+                          }`}
                         >
                           {s.label}
                         </p>
@@ -548,29 +819,48 @@ export default function AppointmentDetails() {
 
               {/* Action Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Stay Available */}
-                <div className="bg-blue-600 rounded-2xl p-5 text-white">
-                  <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center mb-3">
-                    <svg
-                      className="w-5 h-5 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                      />
-                    </svg>
+                {/* Stay Available — hidden once consultation is done */}
+                {!isCompleted && (
+                  <div
+                    className={`rounded-2xl p-5 text-white ${
+                      isCalled
+                        ? 'bg-purple-600'
+                        : isInConsultation
+                          ? 'bg-indigo-600'
+                          : 'bg-blue-600'
+                    }`}
+                  >
+                    <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center mb-3">
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="font-bold text-sm mb-1">
+                      {isCalled
+                        ? 'Proceed Now'
+                        : isInConsultation
+                          ? 'In Session'
+                          : 'Stay Available'}
+                    </h3>
+                    <p className="text-white/75 text-xs leading-relaxed">
+                      {isCalled
+                        ? "Your token has been called. Head to the doctor's room immediately."
+                        : isInConsultation
+                          ? 'Your consultation is underway. Please stay with your doctor.'
+                          : "Keep your phone with you. You'll be notified when your doctor is ready."}
+                    </p>
                   </div>
-                  <h3 className="font-bold text-sm mb-1">Stay Available</h3>
-                  <p className="text-white/75 text-xs leading-relaxed">
-                    Keep your phone with you. You'll be notified when your
-                    doctor is ready.
-                  </p>
-                </div>
+                )}
 
                 {/* Need help? */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">

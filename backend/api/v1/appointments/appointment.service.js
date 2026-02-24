@@ -112,21 +112,31 @@ const getActiveAppointment = async (userId) => {
     appointment.scheduledDate,
   );
 
+  console.log('patientDetails', patientDetails);
+
+  let exceptedStartTime = null;
+  let exceptedEndTime = null;
+  let queuePosition = null;
+
   console.log(patientDetails);
 
-  if (!patientDetails) {
-    return null;
+  if (patientDetails?.length > 0) {
+    const details = patientDetails.filter((pat) =>
+      pat.patientId.equals(patient._id),
+    );
+
+    exceptedStartTime = details[0].exceptedStartTime;
+    exceptedEndTime = details[0].exceptedEndTime;
+    queuePosition = details[0].queuePosition;
   }
 
-  const patientWaitingDetails = patientDetails.filter((pat) =>
-    pat.patientId.equals(patient._id),
-  );
+  console.log('final appoinment details:', appointment);
 
   return {
     ...appointment.toObject(),
-    exceptedStartTime: patientWaitingDetails[0].exceptedStartTime,
-    exceptedEndTime: patientWaitingDetails[0].exceptedEndTime,
-    queuePosition: patientWaitingDetails[0].queuePosition,
+    exceptedStartTime,
+    exceptedEndTime,
+    queuePosition,
   };
 };
 

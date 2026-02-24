@@ -20,6 +20,7 @@ const getAppointmentsForUser = catchAsync(async (req, res) => {
 
   res.status(200).json({
     isSuccess: true,
+    totlaDocuments: appointments.length,
     message: 'your appointments',
     data: appointments,
   });
@@ -29,6 +30,8 @@ const getActiveAppointment = catchAsync(async (req, res) => {
   const appointment = await appointmentService.getActiveAppointment(
     req.data.id,
   );
+
+  console.log('appointment in controller:', appointment);
 
   res.status(200).json({
     isSuccess: true,

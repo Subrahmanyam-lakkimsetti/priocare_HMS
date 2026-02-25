@@ -9,10 +9,12 @@ const generateToken = (payload) => {
 };
 
 const verifyToken = (token) => {
+  if (!token) {
+    throw new AppError('Unauthrozied', 401);
+  }
+
   return jwt.verify(token, process.env.JWT_SECRET_KEY);
 };
-
-
 
 module.exports = {
   generateToken,

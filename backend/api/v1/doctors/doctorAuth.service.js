@@ -32,7 +32,7 @@ const getDoctor = async ({ id }) => {
 };
 
 const updateDoctor = async (id, updateData) => {
-  console.log(updateData);
+
   const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
     new: true,
   });

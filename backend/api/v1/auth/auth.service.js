@@ -49,7 +49,7 @@ const loginUser = async ({ email, password }) => {
 };
 
 const getUser = async ({ id }) => {
-  console.log(id);
+
   const user = await User.findById(id).select('email role isActive');
 
   if (!user) {

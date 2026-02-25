@@ -70,9 +70,9 @@ export const fetchAllAppointments = createAsyncThunk(
 
 export const cancelAppointment = createAsyncThunk(
   'patient/cancelAppointment',
-  async (id, { rejectWithValue }) => {
+  async (token, { rejectWithValue }) => {
     try {
-      await cancelAppointmentRequest(id);
+      await cancelAppointmentRequest(token);
       return id;
     } catch (err) {
       return rejectWithValue(

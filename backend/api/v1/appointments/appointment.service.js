@@ -24,8 +24,7 @@ const generateToken = async () => {
 
 const getAppointmentsForUser = async (userId) => {
   const patient = await Patient.findOne({ userId });
-  console.log('userId', userId);
-  console.log('patient', patient);
+
 
   if (!patient) {
     throw new AppError('No patient found!', 404);
@@ -53,7 +52,7 @@ const createAppointment = async (userId, triageData) => {
     throw new AppError('failed', 401);
   }
 
-  console.log('triage', triage);
+
 
   // const triage = {};
 
@@ -67,7 +66,6 @@ const createAppointment = async (userId, triageData) => {
   triageData.triage.severityLevel = triage.severityLevel || 'low';
   triageData.triage.source = 'Gemini AI';
 
-  console.log(triageData);
 
   const appointmentdoc = await Appointment.create({
     patientId: isPatientExists?._id,
@@ -104,21 +102,19 @@ const getActiveAppointment = async (userId) => {
     return null;
   }
 
-  console.log('appointment', appointment);
-  console.log(appointment.doctorId._id);
+
 
   const { patients: patientDetails } = await getDoctorQueue(
     appointment.doctorId._id,
     appointment.scheduledDate,
   );
 
-  console.log('patientDetails', patientDetails);
 
   let exceptedStartTime = null;
   let exceptedEndTime = null;
   let queuePosition = null;
 
-  console.log(patientDetails);
+
 
   if (patientDetails?.length > 0) {
     const details = patientDetails.filter((pat) =>
@@ -130,7 +126,6 @@ const getActiveAppointment = async (userId) => {
     queuePosition = details[0].queuePosition;
   }
 
-  console.log('final appoinment details:', appointment);
 
   return {
     ...appointment.toObject(),
@@ -161,9 +156,27 @@ const getAppointmentByToken = async ({ token }, id) => {
   };
 };
 
+const cancelAppointment = async ({ token }) => {
+  const appointment = await Appointment.findOneAndUpdate(
+    {
+      token,
+    },
+    {
+      status: 'cancelled',
+    },
+  );
+
+  if (!appointment) {
+    throw new AppError('Appointment not found!', 404);
+  }
+
+  return appointment;
+};
+
 module.exports = {
   createAppointment,
   getActiveAppointment,
   getAppointmentByToken,
   getAppointmentsForUser,
+  cancelAppointment,
 };

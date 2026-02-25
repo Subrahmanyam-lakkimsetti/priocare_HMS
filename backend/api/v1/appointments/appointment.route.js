@@ -8,6 +8,7 @@ const {
   getActiveAppointment,
   getAppointmnetByToken,
   getAppointmentsForUser,
+  cancelAppointment,
 } = require('./appointment.controller');
 
 const appointementRouter = express.Router();
@@ -25,6 +26,12 @@ appointementRouter.get(
 appointementRouter.get('/token/:token', getAppointmnetByToken);
 
 appointementRouter.get('/all', restrictTo('patient'), getAppointmentsForUser);
+
+appointementRouter.patch(
+  '/token/:token/cancel',
+  restrictTo('patient'),
+  cancelAppointment,
+);
 
 module.exports = {
   appointementRouter,

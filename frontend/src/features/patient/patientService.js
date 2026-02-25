@@ -11,5 +11,5 @@ export const getAppointmentByTokenRequest = (token) =>
 
 export const getAllAppointmentsRequest = () => api.get('/appointments/all');
 
-export const cancelAppointmentRequest = (id) =>
-  api.patch(`/appointments/${id}/cancel`);
+export const cancelAppointmentRequest = (token) =>
+  api.patch(`/appointments/token/${token}/cancel`);

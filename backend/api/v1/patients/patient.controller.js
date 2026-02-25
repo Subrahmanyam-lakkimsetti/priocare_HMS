@@ -47,6 +47,8 @@ const getPatientByIdController = catchAsync(async (req, res) => {
   });
 });
 
+
+
 module.exports = {
   createPatientController,
   getPatientController,

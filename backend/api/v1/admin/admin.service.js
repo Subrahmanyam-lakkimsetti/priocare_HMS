@@ -21,7 +21,6 @@ const createDoctorUser = async ({ email }) => {
 };
 
 const createReceptionist = async ({ email }) => {
-  console.log(email);
   const isReceptionExists = await User.findOne({ email });
 
   if (isReceptionExists) {

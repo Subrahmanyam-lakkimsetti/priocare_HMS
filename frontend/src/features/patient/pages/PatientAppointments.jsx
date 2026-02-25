@@ -290,7 +290,7 @@ export default function PatientAppointments() {
                   {appt.status === 'confirmed' && (
                     <div className="border-t border-gray-100 pt-4 mt-4">
                       <button
-                        onClick={() => dispatch(cancelAppointment(appt._id))}
+                        onClick={() => dispatch(cancelAppointment(appt.token))}
                         className="w-full flex items-center justify-center gap-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-4 py-2.5 rounded-lg transition-all"
                       >
                         <svg

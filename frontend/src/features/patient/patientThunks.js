@@ -72,8 +72,11 @@ export const cancelAppointment = createAsyncThunk(
   'patient/cancelAppointment',
   async (token, { rejectWithValue }) => {
     try {
-      await cancelAppointmentRequest(token);
-      return id;
+      const res = await cancelAppointmentRequest(token);
+
+      
+
+      return res.data.data; // ✅ NOW correct
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || 'Failed to cancel appointment',

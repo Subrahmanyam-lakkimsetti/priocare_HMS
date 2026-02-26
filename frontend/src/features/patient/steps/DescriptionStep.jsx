@@ -22,7 +22,7 @@ export default function DescriptionStep() {
     <div className="space-y-4">
       {/* Quick suggestion chips */}
       <div>
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
           Quick suggestions
         </p>
         <div className="flex flex-wrap gap-2">
@@ -33,7 +33,7 @@ export default function DescriptionStep() {
               className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
                 value === p
                   ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50'
+                  : 'bg-gray-50 text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
               {p}
@@ -53,16 +53,16 @@ export default function DescriptionStep() {
           }
           placeholder="e.g. I have had a sore throat and mild fever since yesterday evening, and it hurts to swallow..."
           rows={5}
-          className={`w-full px-4 py-4 text-sm text-gray-800 placeholder-gray-300 bg-white border-2 rounded-xl resize-none outline-none transition-all duration-200 leading-relaxed ${
+          className={`w-full px-4 py-4 text-sm text-gray-900 placeholder-gray-400 bg-white border-2 rounded-xl resize-none outline-none transition-all duration-200 leading-relaxed shadow-sm ${
             isValid
-              ? 'border-blue-300 focus:border-blue-500'
-              : 'border-gray-200 focus:border-blue-400'
+              ? 'border-blue-400 focus:border-blue-600 focus:shadow-blue-100 focus:shadow-md'
+              : 'border-gray-300 focus:border-blue-500 focus:shadow-blue-100 focus:shadow-md'
           }`}
         />
         {/* Char counter */}
         <div className="absolute bottom-3 right-3 flex items-center gap-2">
           <span
-            className={`text-xs font-medium tabular-nums ${charCount > maxChars * 0.9 ? 'text-orange-400' : 'text-gray-300'}`}
+            className={`text-xs font-medium tabular-nums ${charCount > maxChars * 0.9 ? 'text-orange-400' : 'text-gray-400'}`}
           >
             {charCount}/{maxChars}
           </span>
@@ -71,7 +71,7 @@ export default function DescriptionStep() {
 
       {/* Live preview — only when valid */}
       {isValid && (
-        <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+        <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
           <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
             <svg
               className="w-3.5 h-3.5 text-white"
@@ -98,7 +98,7 @@ export default function DescriptionStep() {
 
       {/* Helper hint */}
       {!isValid && (
-        <p className="text-xs text-gray-400 flex items-center gap-1.5">
+        <p className="text-xs text-gray-500 flex items-center gap-1.5">
           <svg
             className="w-3.5 h-3.5"
             fill="none"

@@ -47,12 +47,12 @@ const patientSlice = createSlice({
   reducers: {
     setField: (s, a) => {
       s.intake = { ...s.intake, ...a.payload };
-      saveIntake(s.intake); // ⭐ auto save
+      saveIntake(s.intake);
     },
 
     setVitals: (s, a) => {
       s.intake.vitals = { ...s.intake.vitals, ...a.payload };
-      saveIntake(s.intake); // ⭐ auto save
+      saveIntake(s.intake);
     },
 
     toggleArrayValue: (s, a) => {
@@ -63,12 +63,13 @@ const patientSlice = createSlice({
         ? arr.filter((v) => v !== value)
         : [...arr, value];
 
-      saveIntake(s.intake); // ⭐ auto save
+      saveIntake(s.intake);
     },
 
     openReview: (s) => {
       s.showReview = true;
     },
+
     closeReview: (s) => {
       s.showReview = false;
     },
@@ -96,6 +97,7 @@ const patientSlice = createSlice({
   },
 
   extraReducers: (b) => {
+    // CREATE
     b.addCase(createAppointment.pending, (s) => {
       s.submitting = true;
     });
@@ -124,6 +126,7 @@ const patientSlice = createSlice({
       s.error = a.payload;
     });
 
+    // FETCH ACTIVE
     b.addCase(fetchActiveAppointment.pending, (s) => {
       s.loadingAppointment = true;
     });
@@ -138,6 +141,7 @@ const patientSlice = createSlice({
       s.activeAppointment = null;
     });
 
+    // FETCH BY TOKEN
     b.addCase(fetchAppointmentByToken.pending, (s) => {
       s.loadingAppointment = true;
     });
@@ -165,11 +169,23 @@ const patientSlice = createSlice({
       s.loadingAppointmentsList = false;
     });
 
-    // CANCEL
+    // ✅ CANCEL (UPDATED PROPERLY)
     b.addCase(cancelAppointment.fulfilled, (s, a) => {
+      const updatedAppointment = a.payload;
+
       s.appointments = s.appointments.map((appt) =>
-        appt._id === a.payload ? { ...appt, status: 'cancelled' } : appt,
+        appt._id === updatedAppointment._id ? updatedAppointment : appt,
       );
+
+      console.log('PAYLOAD FROM BACKEND:', a.payload);
+
+      // also update activeAppointment if needed
+      if (
+        s.activeAppointment &&
+        s.activeAppointment._id === updatedAppointment._id
+      ) {
+        s.activeAppointment = updatedAppointment;
+      }
     });
   },
 });

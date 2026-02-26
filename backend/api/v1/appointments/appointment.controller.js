@@ -61,11 +61,12 @@ const getAppointmnetByToken = catchAsync(async (req, res) => {
 });
 
 const cancelAppointment = catchAsync(async (req, res) => {
-  await appointmentService.cancelAppointment(req.params);
+  const appointment = await appointmentService.cancelAppointment(req.params);
 
   res.status(200).json({
     isSuccess: true,
     message: 'Appointment cancelled successfully',
+    data: appointment,
   });
 });
 

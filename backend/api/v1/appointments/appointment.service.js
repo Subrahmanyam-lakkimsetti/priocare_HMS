@@ -25,7 +25,6 @@ const generateToken = async () => {
 const getAppointmentsForUser = async (userId) => {
   const patient = await Patient.findOne({ userId });
 
-
   if (!patient) {
     throw new AppError('No patient found!', 404);
   }
@@ -52,8 +51,6 @@ const createAppointment = async (userId, triageData) => {
     throw new AppError('failed', 401);
   }
 
-
-
   // const triage = {};
 
   //  assign Doctor
@@ -65,7 +62,6 @@ const createAppointment = async (userId, triageData) => {
   triageData.triage.priorityScore = triage.priorityScore || 25;
   triageData.triage.severityLevel = triage.severityLevel || 'low';
   triageData.triage.source = 'Gemini AI';
-
 
   const appointmentdoc = await Appointment.create({
     patientId: isPatientExists?._id,
@@ -102,19 +98,14 @@ const getActiveAppointment = async (userId) => {
     return null;
   }
 
-
-
   const { patients: patientDetails } = await getDoctorQueue(
     appointment.doctorId._id,
     appointment.scheduledDate,
   );
 
-
   let exceptedStartTime = null;
   let exceptedEndTime = null;
   let queuePosition = null;
-
-
 
   if (patientDetails?.length > 0) {
     const details = patientDetails.filter((pat) =>
@@ -125,7 +116,6 @@ const getActiveAppointment = async (userId) => {
     exceptedEndTime = details[0].exceptedEndTime;
     queuePosition = details[0].queuePosition;
   }
-
 
   return {
     ...appointment.toObject(),
@@ -164,7 +154,10 @@ const cancelAppointment = async ({ token }) => {
     {
       status: 'cancelled',
     },
-  );
+    {
+      new: true,
+    },
+  ).populate('doctorId', 'firstName lastName department experienceYears');
 
   if (!appointment) {
     throw new AppError('Appointment not found!', 404);

@@ -12,6 +12,8 @@ class PatientDTO {
     this.isTemporary = patient.isTemporary;
     this.createdAt = patient.createdAt;
     this.photo = patient.photo;
+    this.userId = patient.userId;
+    this.updatedAt = patient.updatedAt;
   }
 }
 

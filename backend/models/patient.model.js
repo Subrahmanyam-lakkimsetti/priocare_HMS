@@ -1,11 +1,10 @@
-const { boolean } = require('joi');
 const mongoose = require('mongoose');
 
 const patientScheema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'user',
       required: true,
       unique: true, // ensures only one profile present
     },

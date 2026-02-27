@@ -13,7 +13,7 @@ const createPatientController = catchAsync(async (req, res) => {
   res.status(200).json({
     isSuccess: true,
     message: 'patient profile created sucessfully',
-    patient: new PatientDTO(patient),
+    data: new PatientDTO(patient),
   });
 });
 
@@ -23,27 +23,29 @@ const getPatientController = catchAsync(async (req, res) => {
   res.status(200).json({
     isSuccess: true,
     message: 'your patient profile',
-    patient: new PatientDTO(patient),
+    data: new PatientDTO(patient),
   });
 });
 
 const updatePatientController = catchAsync(async (req, res) => {
+  console.log('file', req.file);
   const updatedPatient = await updatePatient(req);
 
   res.status(200).json({
     isSuccess: true,
     message: 'Patient profile updated sucessfully',
-    patient: new PatientDTO(updatedPatient),
+    data: new PatientDTO(updatedPatient),
   });
 });
 
 const getPatientByIdController = catchAsync(async (req, res) => {
+  console.log('file', req.file);
   const patient = await getPatientById(req.params.id);
 
   res.status(200).json({
     isSuccess: true,
     message: 'patient details',
-    patient: new PatientDTO(patient),
+    data: new PatientDTO(patient),
   });
 });
 

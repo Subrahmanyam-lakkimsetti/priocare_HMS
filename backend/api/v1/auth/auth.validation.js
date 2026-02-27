@@ -27,7 +27,26 @@ const loginScheema = Joi.object({
   }),
 });
 
+const updatePasswordScheema = Joi.object({
+  currentPassword: Joi.string().min(6).required().messages({
+    'string.min': 'Password must be at least 6 characters long',
+    'any.required': 'Password is required',
+  }),
+  newPassword: Joi.string().min(6).required().messages({
+    'string.min': 'Password must be at least 6 characters long',
+    'any.required': 'Password is required',
+  }),
+  confirmNewPassword: Joi.string()
+    .valid(Joi.ref('newPassword'))
+    .required()
+    .messages({
+      'any.only': 'Password and Confirm Password do not match',
+      'any.required': 'confirmNewPassword is required',
+    }),
+}).required();
+
 module.exports = {
   registerSchema,
   loginScheema,
+  updatePasswordScheema,
 };

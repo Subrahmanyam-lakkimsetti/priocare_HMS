@@ -1,4 +1,9 @@
-const { registerUser, loginUser, getUser } = require('./auth.service');
+const {
+  registerUser,
+  loginUser,
+  getUser,
+  updatePassword,
+} = require('./auth.service');
 const catchAsync = require('../../../utils/catchAsync.util');
 const { UserDTO } = require('./auth.dto');
 const { setCookie } = require('../../../utils/cookie.util');
@@ -51,9 +56,19 @@ const getMe = catchAsync(async (req, res) => {
   });
 });
 
+const updatePasswordController = catchAsync(async (req, res) => {
+  await updatePassword(req.body, req.data);
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'password updated successfully',
+  });
+});
+
 module.exports = {
   patientRegisterController,
   loginController,
   logoutController,
   getMe,
+  updatePasswordController,
 };

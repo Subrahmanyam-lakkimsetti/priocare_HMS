@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchActiveAppointment } from '../patientThunks';
 import { useNavigate, useLocation } from 'react-router-dom';
 import NoAppointmentPage from './NoAppointmentPage';
+import { getMyProfileRequest } from '../patientProfile/profileService';
 
 const NAV_ITEMS = [
   {
@@ -238,6 +239,9 @@ export default function PatientHome() {
   const nav = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileExists, setProfileExists] = useState(true);
+  const [profileBannerDismissed, setProfileBannerDismissed] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const { activeAppointment, loadingAppointment } = useSelector(
     (s) => s.patient,
@@ -250,6 +254,15 @@ export default function PatientHome() {
 
   useEffect(() => {
     dispatch(fetchActiveAppointment());
+  }, []);
+
+  // Check if patient profile exists
+  useEffect(() => {
+    getMyProfileRequest()
+      .then(() => setProfileExists(true))
+      .catch((err) => {
+        if (err?.response?.status === 404) setProfileExists(false);
+      });
   }, []);
 
   const activeKey =
@@ -290,6 +303,8 @@ export default function PatientHome() {
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  const showProfileBanner = !profileExists && !profileBannerDismissed;
 
   return (
     <>
@@ -353,6 +368,30 @@ export default function PatientHome() {
         .tip-card:hover {
           background: #f8fafc;
         }
+
+        .profile-banner {
+          animation: bannerSlideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes bannerSlideDown {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-backdrop {
+          animation: backdropIn 0.25s ease both;
+        }
+        @keyframes backdropIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+
+        .modal-card {
+          animation: modalPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes modalPopIn {
+          from { opacity: 0; transform: scale(0.92) translateY(12px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
       `}</style>
 
       <div
@@ -407,6 +446,120 @@ export default function PatientHome() {
 
           {/* ── Main content ── */}
           <main className="flex-1 p-6 pt-26">
+            {/* ── Profile Incomplete Banner ── */}
+            {showProfileBanner && (
+              <div className="profile-banner max-w-4xl mx-auto mb-5">
+                <div
+                  className="relative flex items-center justify-between gap-4 px-5 py-4 rounded-2xl overflow-hidden"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)',
+                    border: '1.5px solid #c7d2fe',
+                  }}
+                >
+                  {/* Decorative background blob */}
+                  <div
+                    className="absolute right-24 -top-6 w-28 h-28 rounded-full opacity-20 pointer-events-none"
+                    style={{
+                      background:
+                        'radial-gradient(circle, #6366f1, transparent 70%)',
+                    }}
+                  />
+
+                  <div className="flex items-center gap-3.5">
+                    {/* Icon */}
+                    <div
+                      className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                        boxShadow: '0 4px 12px rgba(99,102,241,0.35)',
+                      }}
+                    >
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                        />
+                      </svg>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-bold text-indigo-900 leading-tight">
+                        Your profile isn't set up yet
+                      </p>
+                      <p className="text-xs text-indigo-500 mt-0.5">
+                        Add your details so your doctor has everything they need
+                        before your visit.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {/* CTA Button — matches the indigo accent used throughout */}
+                    <button
+                      onClick={() => nav('/patient/profile')}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:scale-105 active:scale-95"
+                      style={{
+                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                        color: 'white',
+                        boxShadow: '0 3px 10px rgba(99,102,241,0.4)',
+                      }}
+                    >
+                      Complete Profile
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
+                        />
+                      </svg>
+                    </button>
+
+                    {/* Dismiss */}
+                    <button
+                      onClick={() => setProfileBannerDismissed(true)}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
+                      style={{ color: '#a5b4fc' }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.background = '#c7d2fe')
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background = 'transparent')
+                      }
+                      aria-label="Dismiss"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Loading */}
             {loadingAppointment && (
               <div className="flex flex-col items-center justify-center py-32 gap-5">
@@ -428,7 +581,13 @@ export default function PatientHome() {
             {!loadingAppointment && !activeAppointment && (
               <NoAppointmentPage
                 firstName={user?.firstName}
-                onStartConsultation={() => nav('/patient/intake')}
+                onStartConsultation={() => {
+                  if (!profileExists) {
+                    setShowProfileModal(true);
+                  } else {
+                    nav('/patient/intake');
+                  }
+                }}
               />
             )}
 
@@ -590,6 +749,151 @@ export default function PatientHome() {
           </main>
         </div>
       </div>
+
+      {/* ── Profile Required Modal ── */}
+      {showProfileModal && (
+        <div
+          className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{
+            background: 'rgba(15, 23, 42, 0.55)',
+            backdropFilter: 'blur(6px)',
+          }}
+          onClick={() => setShowProfileModal(false)}
+        >
+          <div
+            className="modal-card relative w-full max-w-md rounded-3xl overflow-hidden"
+            style={{
+              background: 'white',
+              boxShadow: '0 32px 64px -12px rgba(0,0,0,0.25)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top gradient band */}
+            <div
+              className="h-1.5 w-full"
+              style={{
+                background: 'linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4)',
+              }}
+            />
+
+            <div className="px-8 pt-8 pb-7">
+              {/* Icon */}
+              <div className="flex justify-center mb-6">
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #eef2ff, #e0e7ff)',
+                    border: '1.5px solid #c7d2fe',
+                  }}
+                >
+                  <svg
+                    className="w-8 h-8"
+                    style={{ color: '#6366f1' }}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.75}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Text */}
+              <div className="text-center mb-7">
+                <h3
+                  className="font-bold text-gray-900 mb-2"
+                  style={{ fontSize: '1.2rem', letterSpacing: '-0.02em' }}
+                >
+                  Profile Setup Required
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  To book a consultation, we need a few details about you first.
+                  Your profile helps your doctor review your medical background
+                  and provide the best possible care.
+                </p>
+              </div>
+
+              {/* Checklist */}
+              <div
+                className="rounded-2xl px-5 py-4 mb-7 space-y-2.5"
+                style={{ background: '#f8fafc', border: '1px solid #e8edf2' }}
+              >
+                {[
+                  'Personal & contact information',
+                  'Medical history & existing conditions',
+                  'Current medications & allergies',
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2.5">
+                    <div
+                      className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: '#e0e7ff' }}
+                    >
+                      <svg
+                        className="w-3 h-3"
+                        style={{ color: '#6366f1' }}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4.5 12.75l6 6 9-13.5"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-xs text-gray-600 font-medium">{item}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-2.5">
+                <button
+                  onClick={() => {
+                    setShowProfileModal(false);
+                    nav('/patient/profile');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{
+                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                    color: 'white',
+                    boxShadow: '0 6px 20px rgba(99,102,241,0.4)',
+                  }}
+                >
+                  Set Up My Profile
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={() => setShowProfileModal(false)}
+                  className="w-full py-2.5 rounded-2xl text-sm font-medium text-gray-400 transition-colors hover:text-gray-600 hover:bg-gray-50"
+                >
+                  Maybe later
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

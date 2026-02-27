@@ -49,7 +49,6 @@ const loginUser = async ({ email, password }) => {
 };
 
 const getUser = async ({ id }) => {
-
   const user = await User.findById(id).select('email role isActive');
 
   if (!user) {
@@ -59,8 +58,26 @@ const getUser = async ({ id }) => {
   return user;
 };
 
+const updatePassword = async ({ currentPassword, newPassword }, { id }) => {
+  const currentUser = await User.findById(id);
+
+  console.log(currentPassword);
+  if (!currentUser) {
+    throw new AppError('user not found', 404);
+  }
+
+  if (!(await currentUser.comparePasswords(currentPassword))) {
+    throw new AppError('current password is invalid', 401);
+  }
+
+  currentUser.password = newPassword;
+
+  currentUser.save();
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getUser,
+  updatePassword,
 };

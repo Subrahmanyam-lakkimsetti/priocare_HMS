@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from './authThunks';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -352,9 +353,12 @@ export default function Login() {
             {/* Footer note */}
             <p className="text-center text-xs text-gray-400 mt-6">
               Don't have an account?{' '}
-              <button className="text-blue-600 hover:text-blue-700 font-medium transition-colors">
-                Contact your administrator
-              </button>
+              <Link
+                to="/register"
+                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                Create one here
+              </Link>
             </p>
           </div>
 

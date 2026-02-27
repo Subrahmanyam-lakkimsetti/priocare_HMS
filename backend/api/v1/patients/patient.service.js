@@ -34,7 +34,10 @@ const createPatient = async (userId, payload, file) => {
 
 const getPatient = async ({ id }) => {
   // get the patient
-  const patient = await Patient.findOne({ userId: id });
+  const patient = await Patient.findOne({ userId: id }).populate(
+    'userId',
+    'email',
+  );
 
   if (!patient) {
     throw new AppError('Patient profile does not found', 404);
@@ -45,32 +48,23 @@ const getPatient = async ({ id }) => {
 };
 
 const updatePatient = async ({ data: { id: userId }, body: updates, file }) => {
-  let photo;
-  if (file) {
-    photo = file.path;
-  }
-
   const filteredObj = {};
 
-  Object.keys(updates).map((field) => {
+  Object.keys(updates).forEach((field) => {
     if (UPDATE_ALLOWED_FIELDS.includes(field)) {
-      return (filteredObj[field] = updates[field]);
+      filteredObj[field] = updates[field];
     }
   });
 
-  const patient = await Patient.findOneAndUpdate(
-    { userId },
-    {
-      ...filteredObj,
-      photo,
-    },
-    {
-      new: true,
-    },
-  );
+  const updateData = { ...filteredObj };
 
-  // get the patient
-  // const patient = await Patient.findOne({ userId });
+  if (file) {
+    updateData.photo = file.path;
+  }
+
+  const patient = await Patient.findOneAndUpdate({ userId }, updateData, {
+    new: true,
+  });
 
   if (!patient) {
     throw new AppError('Patient profile does not found', 404);

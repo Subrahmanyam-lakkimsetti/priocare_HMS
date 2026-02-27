@@ -74,9 +74,7 @@ export const cancelAppointment = createAsyncThunk(
     try {
       const res = await cancelAppointmentRequest(token);
 
-      
-
-      return res.data.data; // ✅ NOW correct
+      return res.data.data; 
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || 'Failed to cancel appointment',

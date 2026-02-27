@@ -9,6 +9,7 @@ import Confirmation from '../../features/patient/pages/Confirmation';
 import AppointmentDetails from '../../features/patient/pages/AppointmentDetails';
 import PatientSidebar from '../../components/shared/PatientSidebar';
 import PatientAppointments from '../../features/patient/pages/PatientAppointments';
+import ProfilePage from '../../features/patient/patientProfile/pages/ProfilePage';
 
 const NAV_ITEMS = [
   { key: 'home', label: 'Dashboard', path: '/patient' },
@@ -88,6 +89,7 @@ export default function PatientLayout() {
             <Route path="confirmation" element={<Confirmation />} />
             <Route path="appointment/:token" element={<AppointmentDetails />} />
             <Route path="appointments" element={<PatientAppointments />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Routes>
         </main>
       </div>

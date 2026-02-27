@@ -1,6 +1,27 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { loginRequest, getMeRequest, logoutRequest } from './authService';
-import { logout } from './authSlice';
+import {
+  loginRequest,
+  getMeRequest,
+  logoutRequest,
+  registerRequest,
+} from './authService';
+
+export const registerUser = createAsyncThunk(
+  'auth/registerUser',
+  async (userData, { rejectWithValue }) => {
+    try {
+      // userData contains { email, password, confirmPassword }
+      const res = await registerRequest(userData);
+      // Response structure: { isSuccess, message, data: user }
+      console.log(res);
+      return res.data; // ← the actual user object
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Registration failed. Please try again.',
+      );
+    }
+  },
+);
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',

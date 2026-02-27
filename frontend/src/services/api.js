@@ -5,9 +5,6 @@ import { logout } from '../features/auth/authSlice';
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Only logout if NOT login route

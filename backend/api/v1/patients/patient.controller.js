@@ -28,7 +28,7 @@ const getPatientController = catchAsync(async (req, res) => {
 });
 
 const updatePatientController = catchAsync(async (req, res) => {
-  const updatedPatient = await updatePatient(req.data.id, req.body);
+  const updatedPatient = await updatePatient(req);
 
   res.status(200).json({
     isSuccess: true,
@@ -46,8 +46,6 @@ const getPatientByIdController = catchAsync(async (req, res) => {
     patient: new PatientDTO(patient),
   });
 });
-
-
 
 module.exports = {
   createPatientController,

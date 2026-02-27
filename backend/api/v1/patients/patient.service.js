@@ -41,19 +41,41 @@ const getPatient = async ({ id }) => {
   return patient;
 };
 
-const updatePatient = async (userId, updates) => {
+const updatePatient = async ({ data: { id: userId }, body: updates, file }) => {
+  console.log(file);
+
+  let photo;
+  if (file) {
+    photo = file.path;
+  }
+
+  const filteredObj = {};
+
+  Object.keys(updates).map((field) => {
+    if (UPDATE_ALLOWED_FIELDS.includes(field)) {
+      return (filteredObj[field] = updates[field]);
+    }
+  });
+
+  const patient = await Patient.findOneAndUpdate(
+    { userId },
+    {
+      ...filteredObj,
+      photo,
+    },
+    {
+      new: true,
+    },
+  );
+
+  console.log('patient', patient);
+
   // get the patient
-  const patient = await Patient.findOne({ userId });
+  // const patient = await Patient.findOne({ userId });
 
   if (!patient) {
     throw new AppError('Patient profile does not found', 404);
   }
-
-  Object.keys(updates).forEach((field) => {
-    if (UPDATE_ALLOWED_FIELDS.includes(field)) {
-      patient[field] = updates[field];
-    }
-  });
 
   return patient;
 };

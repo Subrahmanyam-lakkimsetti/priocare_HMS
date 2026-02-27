@@ -14,7 +14,7 @@ const {
   updatePatientController,
   getPatientByIdController,
 } = require('./patient.controller');
-const { getPatient } = require('./patient.service');
+const upload = require('../../../utils/multer.util');
 
 const patientRouter = express.Router();
 
@@ -42,6 +42,7 @@ patientRouter.get('/me', getPatientController);
 // patch
 patientRouter.patch(
   '/me',
+  upload.single('photo'),
   validateInput(updatePatientValidationSchema),
   updatePatientController,
 );

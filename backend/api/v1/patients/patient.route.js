@@ -32,6 +32,7 @@ patientRouter.use(restrictTo('patient'));
 // post
 patientRouter.post(
   '/',
+  upload.single('photo'),
   validateInput(patientvalidationSchema),
   createPatientController,
 );

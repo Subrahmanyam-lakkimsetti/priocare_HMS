@@ -4,8 +4,10 @@ const cloudinary = require('../config/cloudinary.config');
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  folder: 'priocare-patient-profiles',
-  allowedFormats: ['jpg', 'png'],
+  params: {
+    folder: 'priocare-patient-profiles',
+    allowedFormats: ['jpg', 'png'],
+  },
 });
 
 const upload = multer({ storage });

@@ -12,7 +12,10 @@ UPDATE_ALLOWED_FIELDS = [
   'insuranceDetails',
 ];
 
-const createPatient = async (userId, payload) => {
+const createPatient = async (userId, payload, file) => {
+  if (file) {
+    payload.photo = file.path;
+  }
   const isPatientExists = await Patient.findOne({ userId });
 
   if (isPatientExists) {
@@ -42,8 +45,6 @@ const getPatient = async ({ id }) => {
 };
 
 const updatePatient = async ({ data: { id: userId }, body: updates, file }) => {
-  console.log(file);
-
   let photo;
   if (file) {
     photo = file.path;

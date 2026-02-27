@@ -8,7 +8,7 @@ const {
 } = require('./patient.service');
 
 const createPatientController = catchAsync(async (req, res) => {
-  const patient = await createPatient(req.data.id, req.body);
+  const patient = await createPatient(req.data.id, req.body, req.file);
 
   res.status(200).json({
     isSuccess: true,
@@ -28,7 +28,6 @@ const getPatientController = catchAsync(async (req, res) => {
 });
 
 const updatePatientController = catchAsync(async (req, res) => {
-  console.log('in-patient-controller');
   const updatedPatient = await updatePatient(req);
 
   res.status(200).json({

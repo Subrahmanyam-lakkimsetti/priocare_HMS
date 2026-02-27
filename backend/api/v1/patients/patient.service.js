@@ -68,8 +68,6 @@ const updatePatient = async ({ data: { id: userId }, body: updates, file }) => {
     },
   );
 
-  console.log('patient', patient);
-
   // get the patient
   // const patient = await Patient.findOne({ userId });
 

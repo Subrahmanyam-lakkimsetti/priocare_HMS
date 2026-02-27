@@ -28,6 +28,7 @@ const getPatientController = catchAsync(async (req, res) => {
 });
 
 const updatePatientController = catchAsync(async (req, res) => {
+  console.log('in-patient-controller');
   const updatedPatient = await updatePatient(req);
 
   res.status(200).json({

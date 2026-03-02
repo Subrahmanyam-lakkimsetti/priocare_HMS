@@ -61,7 +61,6 @@ const getUser = async ({ id }) => {
 const updatePassword = async ({ currentPassword, newPassword }, { id }) => {
   const currentUser = await User.findById(id);
 
-  console.log(currentPassword);
   if (!currentUser) {
     throw new AppError('user not found', 404);
   }

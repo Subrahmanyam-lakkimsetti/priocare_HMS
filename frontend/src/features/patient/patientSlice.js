@@ -169,15 +169,13 @@ const patientSlice = createSlice({
       s.loadingAppointmentsList = false;
     });
 
-    // ✅ CANCEL (UPDATED PROPERLY)
+
     b.addCase(cancelAppointment.fulfilled, (s, a) => {
       const updatedAppointment = a.payload;
 
       s.appointments = s.appointments.map((appt) =>
         appt._id === updatedAppointment._id ? updatedAppointment : appt,
       );
-
-      console.log('PAYLOAD FROM BACKEND:', a.payload);
 
       // also update activeAppointment if needed
       if (

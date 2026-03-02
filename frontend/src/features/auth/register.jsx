@@ -164,8 +164,6 @@ export default function Register() {
     e.preventDefault();
     if (!validate()) return;
 
-    console.log(form);
-
     dispatch(
       registerUser({
         email: form.email,

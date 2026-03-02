@@ -35,9 +35,6 @@ const generateSummary = async (patientDetails) => {
 
     const raw = await aiClient(summeryPrompt);
 
-    console.log(raw);
-
-    console.log(JSON.parse(raw));
 
     return JSON.parse(raw);
   } catch (error) {

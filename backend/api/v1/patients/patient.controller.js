@@ -39,7 +39,6 @@ const updatePatientController = catchAsync(async (req, res) => {
 });
 
 const getPatientByIdController = catchAsync(async (req, res) => {
-  console.log('file', req.file);
   const patient = await getPatientById(req.params.id);
 
   res.status(200).json({

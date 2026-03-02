@@ -31,7 +31,7 @@ const getActiveAppointment = catchAsync(async (req, res) => {
     req.data.id,
   );
 
-  console.log('appointment in controller:', appointment);
+
 
   res.status(200).json({
     isSuccess: true,

@@ -33,7 +33,7 @@ function Nav({ onBook }) {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center shrink-0">
             <svg
               width="16"
               height="16"
@@ -83,11 +83,11 @@ function Nav({ onBook }) {
 /* ─── Hero ──────────────────────────────────────────────── */
 function Hero({ onBook }) {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/40 to-cyan-50/60">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-linear-to-br from-slate-50 via-blue-50/40 to-cyan-50/60">
       {/* Decorative circles — CSS only, no JS */}
-      <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-blue-100/50 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-[400px] h-[400px] bg-cyan-100/50 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-32 -right-32 w-150 h-150 bg-blue-100/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 w-100 h-100 bg-cyan-100/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 bg-white/30 rounded-full blur-3xl pointer-events-none" />
 
       {/* Subtle grid */}
       <div
@@ -113,7 +113,7 @@ function Hero({ onBook }) {
 
             <h1 className="text-5xl lg:text-6xl font-black text-gray-900 leading-tight mb-5">
               Healthcare that{' '}
-              <span className="bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
                 fits your life
               </span>
             </h1>
@@ -133,7 +133,7 @@ function Hero({ onBook }) {
                 'Clear, simple guidance',
               ].map((f) => (
                 <div key={f} className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center shrink-0">
                     <svg
                       width="10"
                       height="10"
@@ -185,7 +185,7 @@ function Hero({ onBook }) {
             {/* Main card */}
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center">
                   <svg
                     width="20"
                     height="20"
@@ -248,7 +248,7 @@ function Hero({ onBook }) {
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl ${s.active ? 'bg-blue-50 border border-blue-100' : s.done ? 'bg-gray-50' : 'bg-gray-50/50'}`}
                   >
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black ${s.done ? 'bg-blue-600 text-white' : s.active ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-400'}`}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-black ${s.done ? 'bg-blue-600 text-white' : s.active ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-400'}`}
                     >
                       {s.done ? '✓' : s.step}
                     </div>
@@ -310,7 +310,7 @@ function Hero({ onBook }) {
         <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
           Scroll
         </span>
-        <div className="w-px h-8 bg-gradient-to-b from-gray-400 to-transparent" />
+        <div className="w-px h-8 bg-linear-to-b from-gray-400 to-transparent" />
       </div>
     </section>
   );
@@ -419,7 +419,7 @@ function HowSection() {
   return (
     <section
       id="how"
-      className="py-24 px-6 bg-gradient-to-b from-gray-50 to-white"
+      className="py-24 px-6 bg-linear-to-b from-gray-50 to-white"
     >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
@@ -440,14 +440,14 @@ function HowSection() {
         {/* Steps */}
         <div className="relative">
           {/* Connecting line */}
-          <div className="hidden lg:block absolute top-10 left-[calc(12.5%+12px)] right-[calc(12.5%+12px)] h-0.5 bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-200" />
+          <div className="hidden lg:block absolute top-10 left-[calc(12.5%+12px)] right-[calc(12.5%+12px)] h-0.5 bg-linear-to-r from-blue-200 via-cyan-200 to-blue-200" />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {steps.map((step, i) => (
               <div key={step.n} className="relative flex flex-col">
                 {/* Step number + icon */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="relative w-11 h-11 bg-blue-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-200 z-10">
+                  <div className="relative w-11 h-11 bg-blue-700 rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-blue-200 z-10">
                     <Icon d={step.icon} size={18} stroke={1.8} />
                     <svg
                       width="18"
@@ -523,7 +523,7 @@ function CareSection() {
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Before */}
-          <div className="bg-gradient-to-br from-blue-700 to-cyan-600 rounded-2xl p-8 text-white">
+          <div className="bg-linear-to-br from-blue-700 to-cyan-600 rounded-2xl p-8 text-white">
             <div className="inline-flex items-center gap-2 bg-white/15 border border-white/20 rounded-full px-3 py-1 mb-5">
               <svg
                 width="14"
@@ -563,7 +563,7 @@ function CareSection() {
                 },
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-3">
-                  <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
                     <Icon d={item.icon} size={14} stroke={2} />
                   </div>
                   <span className="text-sm font-medium text-white/90">
@@ -622,7 +622,7 @@ function CareSection() {
                   className="flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-4 py-3"
                 >
                   <div
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${item.color === 'blue' ? 'bg-blue-100 text-blue-600' : 'bg-cyan-100 text-cyan-600'}`}
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${item.color === 'blue' ? 'bg-blue-100 text-blue-600' : 'bg-cyan-100 text-cyan-600'}`}
                   >
                     <Icon d={item.icon} size={14} stroke={2} />
                   </div>
@@ -674,7 +674,7 @@ function ForSection() {
   ];
 
   return (
-    <section className="py-24 px-6 bg-gradient-to-b from-white to-gray-50">
+    <section className="py-24 px-6 bg-linear-to-b from-white to-gray-50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-full px-4 py-1.5 mb-4">
@@ -717,7 +717,7 @@ function ForSection() {
               <div className="space-y-2">
                 {role.features.map((f) => (
                   <div key={f} className="flex items-center gap-2">
-                    <div className="w-4 h-4 bg-blue-50 border border-blue-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-4 h-4 bg-blue-50 border border-blue-200 rounded-full flex items-center justify-center shrink-0">
                       <svg
                         width="8"
                         height="8"
@@ -752,7 +752,7 @@ function EmergencySection() {
       <div className="max-w-6xl mx-auto">
         <div className="bg-red-50 border-2 border-red-100 rounded-2xl px-8 py-10 flex flex-col lg:flex-row items-center gap-8">
           {/* Icon */}
-          <div className="w-20 h-20 bg-red-100 border-2 border-red-200 rounded-2xl flex items-center justify-center flex-shrink-0">
+          <div className="w-20 h-20 bg-red-100 border-2 border-red-200 rounded-2xl flex items-center justify-center shrink-0">
             <svg
               width="36"
               height="36"
@@ -779,7 +779,7 @@ function EmergencySection() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 flex-shrink-0">
+          <div className="flex flex-col gap-3 shrink-0">
             <div className="flex items-center gap-3 bg-white border-2 border-red-200 rounded-xl px-5 py-3">
               <svg
                 width="18"
@@ -887,7 +887,7 @@ function CTASection({ onBook }) {
   return (
     <section className="py-24 px-6 bg-white">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-gradient-to-br from-blue-700 via-blue-800 to-cyan-700 rounded-3xl px-8 py-14 text-center relative overflow-hidden">
+        <div className="bg-linear-to-br from-blue-700 via-blue-800 to-cyan-700 rounded-3xl px-8 py-14 text-center relative overflow-hidden">
           <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/5 rounded-full" />
           <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-white/5 rounded-full" />
           <div className="relative z-10">

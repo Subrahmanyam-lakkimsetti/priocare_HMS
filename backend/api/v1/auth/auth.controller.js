@@ -3,6 +3,8 @@ const {
   loginUser,
   getUser,
   updatePassword,
+  forgetPassword,
+  resetPassword,
 } = require('./auth.service');
 const catchAsync = require('../../../utils/catchAsync.util');
 const { UserDTO } = require('./auth.dto');
@@ -65,10 +67,33 @@ const updatePasswordController = catchAsync(async (req, res) => {
   });
 });
 
+const forgetPasswordController = catchAsync(async (req, res) => {
+  const url = await forgetPassword(req);
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'password reset mail sent successful',
+    data: {
+      url,
+    },
+  });
+});
+
+const resetPasswordController = catchAsync(async (req, res) => {
+  await resetPassword(req.params.resettoken, req.body.newPassword);
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'password sucessfully changed',
+  });
+});
+
 module.exports = {
   patientRegisterController,
   loginController,
   logoutController,
   getMe,
   updatePasswordController,
+  forgetPasswordController,
+  resetPasswordController,
 };

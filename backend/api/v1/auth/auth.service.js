@@ -1,6 +1,8 @@
 const User = require('../../../models/user.model');
 const AppError = require('../../../utils/AppError.util');
 const { generateToken } = require('../../../utils/jwt.util');
+const crypto = require('crypto');
+
 const registerUser = async ({ email, password }) => {
   const existingUser = await User.findOne({ email });
 
@@ -74,9 +76,48 @@ const updatePassword = async ({ currentPassword, newPassword }, { id }) => {
   currentUser.save();
 };
 
+const forgetPassword = async (req) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new AppError('user not found!', 404);
+  }
+
+  const token = await user.generateResetPasswordToken();
+  user.save();
+
+  const backendResetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/resetToken/${token}`;
+
+  return backendResetUrl;
+};
+
+const resetPassword = async (resetToken, newPassword) => {
+  const token = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: token,
+    passwordResetTokenExpireTime: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new AppError('reset token is expired or not found', 404);
+  }
+
+  user.password = newPassword;
+
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpireTime = undefined;
+
+  user.save();
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getUser,
   updatePassword,
+  forgetPassword,
+  resetPassword,
 };

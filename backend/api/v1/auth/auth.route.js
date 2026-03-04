@@ -3,6 +3,8 @@ const {
   registerSchema,
   loginScheema,
   updatePasswordScheema,
+  forgetPasswordSchema,
+  resetPasswordScheema,
 } = require('./auth.validation');
 const { validateInput } = require('../../../middlewares/validation.middleware');
 const {
@@ -11,6 +13,8 @@ const {
   logoutController,
   getMe,
   updatePasswordController,
+  forgetPasswordController,
+  resetPasswordController,
 } = require('./auth.controller');
 const { authMiddleware } = require('../../../middlewares/auth.middleware');
 
@@ -22,7 +26,21 @@ authRouter.post(
   patientRegisterController,
 );
 
+// login
 authRouter.post('/login', validateInput(loginScheema), loginController);
+
+// forget password
+authRouter.post(
+  '/forgetPassword',
+  validateInput(forgetPasswordSchema),
+  forgetPasswordController,
+);
+
+authRouter.patch(
+  '/reset-password/resetToken/:resettoken',
+  validateInput(resetPasswordScheema),
+  resetPasswordController,
+);
 
 // protected routes
 authRouter.use(authMiddleware);

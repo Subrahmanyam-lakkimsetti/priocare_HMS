@@ -10,6 +10,7 @@ const aiClient = async (prompt) => {
     contents: prompt,
   });
 
+  console.log(response.text);
   return response.text;
 };
 

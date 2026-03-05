@@ -61,7 +61,6 @@ OUTPUT STRICT JSON:
 }
 `;
 
-
 module.exports = {
   prompt,
 };

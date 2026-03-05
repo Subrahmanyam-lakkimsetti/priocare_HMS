@@ -9,7 +9,9 @@ const patientCheckin = async ({ token }) => {
   }
 
   if (appointment.status !== 'confirmed') {
-    throw new AppError(`Check-in not allowed for ${appointment.status} patients`);
+    throw new AppError(
+      `Check-in not allowed for ${appointment.status} patients`,
+    );
   }
 
   appointment.status = 'checked_in';

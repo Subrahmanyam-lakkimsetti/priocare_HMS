@@ -17,6 +17,7 @@ const evaluateTriage = async (input) => {
 
     return await aiClient(aiTriagePrompt);
   } catch (error) {
+    console.log(error.message);
     throw new AppError('AI failed to generate Response', 401);
   }
 };

@@ -19,8 +19,11 @@ const {
   getQueue,
   callPatient,
   startConsultation,
+  endConsultation,
+  getAiSummary,
+  getActiveConsultation,
+  treatedPatientsHistory,
 } = require('./doctor.controller');
-const { getAiSummary } = require('./doctor.service');
 
 const doctorRouter = express.Router();
 
@@ -65,6 +68,24 @@ doctorRouter.patch(
   '/patients/start-consultation',
   restrictTo('doctor'),
   startConsultation,
+);
+
+doctorRouter.patch(
+  '/patients/:token/end-consultation',
+  restrictTo('doctor'),
+  endConsultation,
+);
+
+doctorRouter.get(
+  '/patients/active',
+  restrictTo('doctor'),
+  getActiveConsultation,
+);
+
+doctorRouter.get(
+  '/patients/treatment-complemented',
+  restrictTo('doctor'),
+  treatedPatientsHistory,
 );
 
 module.exports = {

@@ -140,9 +140,9 @@ export default function AppointmentDetails() {
 
   /* ── Main ────────────────────────────────────────────── */
   return (
-    <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50 pt-20">
+    <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50">
       {/* Header */}
-      <header className="fixed top-0 left-0 lg:left-64 right-0 z-20 bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4 shadow-sm">
+      <header className="sticky top-0 z-20 bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4 shadow-sm">
         <button
           onClick={() => nav('/patient')}
           className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
@@ -180,7 +180,7 @@ export default function AppointmentDetails() {
       </header>
 
       {/* Scrollable content */}
-      <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8 lg:py-8">
+      <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* ── Called Banner ─────────────────────────────── */}
           {isCalled && (
@@ -249,11 +249,11 @@ export default function AppointmentDetails() {
 
           {/* Hero Section */}
           <div
-            className={`bg-gradient-to-br ${sevCfg.gradient} rounded-2xl p-6 text-white shadow-lg`}
+            className={`bg-linear-to-br ${sevCfg.gradient} rounded-2xl p-6 text-white shadow-lg`}
           >
             <div className="flex flex-wrap items-start justify-between gap-4">
               {/* Token */}
-              <div className="flex-1 min-w-[12rem]">
+              <div className="flex-1 min-w-48">
                 <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">
                   Your Token
                 </p>
@@ -310,7 +310,7 @@ export default function AppointmentDetails() {
               </div>
 
               {/* Doctor Info */}
-              <div className="text-right min-w-[15rem]">
+              <div className="text-right min-w-60">
                 <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-2">
                   Assigned Doctor
                 </p>

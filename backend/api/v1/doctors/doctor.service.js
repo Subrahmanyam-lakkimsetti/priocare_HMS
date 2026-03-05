@@ -43,9 +43,7 @@ const callPatient = async (userId, date) => {
   return calledPatient;
 };
 
-const startConsultation = async (userId, date) => {
-  const { start, end } = getDayRange(date);
-
+const startConsultation = async (userId) => {
   const doctor = await Doctor.findOne({ userId });
 
   if (!doctor) {
@@ -56,7 +54,6 @@ const startConsultation = async (userId, date) => {
     {
       $match: {
         doctorId: doctor._id,
-        scheduledDate: { $gte: start, $lte: end },
         status: 'called',
       },
     },
@@ -90,7 +87,6 @@ const startConsultation = async (userId, date) => {
       _id: appt._id,
       status: 'called',
       doctorId: doctor._id,
-      scheduledDate: { $gte: start, $lte: end },
     },
     {
       status: 'in_consultation',
@@ -122,13 +118,10 @@ const startConsultation = async (userId, date) => {
     try {
       const summary = await generateSummary(appointmentObj);
 
-      await Appointment.findByIdAndUpdate(
-        { _id: appt._id },
-        {
-          aiSummary: summary,
-          aisummaryUpdatedAt: new Date(),
-        },
-      );
+      await Appointment.findByIdAndUpdate(appt._id, {
+        aiSummary: summary,
+        aisummaryUpdatedAt: new Date(),
+      });
 
       console.log('AI summary saved');
     } catch (err) {
@@ -141,28 +134,114 @@ const startConsultation = async (userId, date) => {
   return appointmentObj;
 };
 
-const getAiSummary = async (userId, date) => {
-  // const { start, end } = getDayRange(date);
-
-  // const summary = await Appointment.findOne({
-  //   doctorId: userId,
-  //   scheduledDate: { $gte: start, $lte: end },
-  //   status: { $in: ['in_consultation'] },
-  // }).select('aiSummary');
-
-  const summary = await Appointment.findOne({
-    token,
-  }).select('aisummary');
+const getAiSummary = async (token) => {
+  const summary = await Appointment.findOne({ token }).select(
+    'aiSummary aisummaryUpdatedAt token',
+  );
 
   if (!summary) {
-    throw new AppError('summary does not exists', 404);
+    throw new AppError('Summary does not exist', 404);
   }
 
   return summary;
+};
+
+const endConsultation = async (token) => {
+  const appointment = await Appointment.findOneAndUpdate(
+    {
+      token,
+    },
+    {
+      status: 'completed',
+      consulationEndsAt: new Date(),
+    },
+    {
+      new: true,
+    },
+  );
+
+  if (!appointment) {
+    throw new AppError('appointment not found!', 404);
+  }
+
+  return appointment;
+};
+
+const getActiveConsultation = async (userId, date) => {
+  const doctor = await Doctor.findOne({ userId });
+
+  if (!doctor) {
+    throw new AppError('no doctor found!', 404);
+  }
+
+  const pipeline = [
+    {
+      $match: {
+        doctorId: doctor._id,
+        status: { $in: ['called', 'in_consultation'] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'patients',
+        localField: 'patientId',
+        foreignField: '_id',
+        as: 'patientDetails',
+      },
+    },
+    {
+      $unwind: '$patientDetails',
+    },
+
+    {
+      $limit: 1,
+    },
+  ];
+
+  const activeAppointment = await Appointment.aggregate(pipeline);
+
+  if (!activeAppointment) {
+    throw new AppError('no active appointment', 404);
+  }
+
+  return activeAppointment;
+};
+
+const treatedPatientsHistory = async (userId) => {
+  const doctor = await Doctor.findOne({ userId });
+
+  if (!doctor) {
+    throw new AppError('No doctor found!', 404);
+  }
+
+  const appointments = await Appointment.aggregate([
+    {
+      $match: {
+        doctorId: doctor._id,
+        status: 'completed',
+      },
+    },
+    {
+      $lookup: {
+        from: 'patients',
+        localField: 'patientId',
+        foreignField: '_id',
+        as: 'patientDetails',
+      },
+    },
+    {
+      $unwind: '$patientDetails',
+    },
+  ]);
+
+  return appointments;
 };
 
 module.exports = {
   callPatient,
   startConsultation,
   getAiSummary,
+  endConsultation,
+  getActiveConsultation,
+  treatedPatientsHistory,
 };

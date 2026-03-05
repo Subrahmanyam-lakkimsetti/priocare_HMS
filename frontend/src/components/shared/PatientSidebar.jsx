@@ -4,10 +4,86 @@ import { logoutUser } from '../../features/auth/authThunks';
 import { useState } from 'react';
 
 const NAV_ITEMS = [
-  { key: 'home', label: 'Dashboard', path: '/patient' },
-  { key: 'appointments', label: 'Appointments', path: '/patient/appointments' },
-  { key: 'records', label: 'Medical Records', path: '/patient/records' },
-  { key: 'profile', label: 'Profile', path: '/patient/profile' },
+  {
+    key: 'home',
+    label: 'Dashboard',
+    path: '/patient',
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+        />
+      </svg>
+    ),
+  },
+  {
+    key: 'appointments',
+    label: 'Appointments',
+    path: '/patient/appointments',
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        />
+      </svg>
+    ),
+  },
+  {
+    key: 'records',
+    label: 'Medical Records',
+    path: '/patient/records',
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+    ),
+  },
+  {
+    key: 'profile',
+    label: 'Profile',
+    path: '/patient/profile',
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export default function PatientSidebar({ sidebarOpen, setSidebarOpen }) {
@@ -43,13 +119,10 @@ export default function PatientSidebar({ sidebarOpen, setSidebarOpen }) {
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50"
             onClick={() => setShowLogoutModal(false)}
           />
-
-          {/* Modal */}
           <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
@@ -127,9 +200,9 @@ export default function PatientSidebar({ sidebarOpen, setSidebarOpen }) {
 
       <aside
         className={`fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-100 z-30 flex flex-col
-  transform transition-transform duration-300 ease-in-out
-  ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-  lg:translate-x-0`}
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0`}
       >
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-6 py-5 border-b border-gray-100">
@@ -161,6 +234,9 @@ export default function PatientSidebar({ sidebarOpen, setSidebarOpen }) {
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
+                <span className={isActive ? 'text-blue-600' : 'text-gray-400'}>
+                  {item.icon}
+                </span>
                 {item.label}
               </button>
             );
@@ -174,14 +250,12 @@ export default function PatientSidebar({ sidebarOpen, setSidebarOpen }) {
               {user?.firstName?.[0]}
               {user?.lastName?.[0]}
             </div>
-
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-800 truncate">
                 {user?.firstName} {user?.lastName}
               </p>
               <p className="text-xs text-gray-400 truncate">{user?.email}</p>
             </div>
-
             <button
               onClick={() => setShowLogoutModal(true)}
               className="p-2 rounded-lg hover:bg-red-50 transition-colors group"

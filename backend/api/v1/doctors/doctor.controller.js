@@ -38,10 +38,9 @@ const callPatient = catchAsync(async (req, res) => {
 });
 
 const startConsultation = catchAsync(async (req, res) => {
-  const { date } = req.query;
   const userId = req.data.id;
 
-  const patientDetails = await doctorService.startConsultation(userId, date);
+  const patientDetails = await doctorService.startConsultation(userId);
 
   res.status(200).json({
     isSuccess: true,
@@ -51,9 +50,7 @@ const startConsultation = catchAsync(async (req, res) => {
 });
 
 const getAiSummary = catchAsync(async (req, res) => {
-  const { token } = req.params;
-
-  const aiSummary = await doctorService.getAiSummary(token);
+  const aiSummary = await doctorService.getAiSummary(req.params.token);
 
   res.status(200).json({
     isSuccess: true,
@@ -62,4 +59,43 @@ const getAiSummary = catchAsync(async (req, res) => {
   });
 });
 
-module.exports = { getQueue, callPatient, startConsultation, getAiSummary };
+const endConsultation = catchAsync(async (req, res) => {
+  await doctorService.endConsultation(req.params.token);
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'consultation ended',
+  });
+});
+
+const getActiveConsultation = catchAsync(async (req, res) => {
+  const activeAppointment = await doctorService.getActiveConsultation(
+    req.data.id,
+  );
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'Active Appointment state',
+    data: activeAppointment,
+  });
+});
+
+const treatedPatientsHistory = catchAsync(async (req, res) => {
+  const patients = await doctorService.treatedPatientsHistory(req.data.id);
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'patients history',
+    data: patients,
+  });
+});
+
+module.exports = {
+  getQueue,
+  callPatient,
+  startConsultation,
+  getAiSummary,
+  endConsultation,
+  getActiveConsultation,
+  treatedPatientsHistory,
+};

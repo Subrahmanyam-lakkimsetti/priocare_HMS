@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Heart,
@@ -117,7 +114,7 @@ const SmartHospitalLanding = () => {
     <div className="min-h-screen bg-black text-white overflow-hidden">
       {/* Animated Background Layer */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-black to-gray-950" />
+        <div className="absolute inset-0 bg-linear-to-br from-gray-950 via-black to-gray-950" />
         {/* Animated grid overlay */}
         <div
           className="absolute inset-0 opacity-20"
@@ -135,7 +132,7 @@ const SmartHospitalLanding = () => {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg blur opacity-30" />
+              <div className="absolute -inset-1 bg-linear-to-r from-emerald-500 to-teal-500 rounded-lg blur opacity-30" />
               <span className="relative text-xl font-light tracking-wider text-emerald-300">
                 PrioCare
               </span>
@@ -144,7 +141,7 @@ const SmartHospitalLanding = () => {
             {/* Scroll Progress Indicator */}
             <div className="hidden lg:block w-32 h-1 bg-white/5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300"
+                className="h-full bg-linear-to-r from-emerald-500 to-teal-500 transition-all duration-300"
                 style={{
                   width: `${
                     (scrollY /
@@ -172,13 +169,13 @@ const SmartHospitalLanding = () => {
                 className="relative group hover:text-white transition-colors"
               >
                 <span className="relative z-10">{item}</span>
-                <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 group-hover:w-full transition-all duration-300" />
+                <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-linear-to-r from-emerald-500 to-teal-500 group-hover:w-full transition-all duration-300" />
               </a>
             ))}
           </div>
 
-          <button className="group relative px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-sm font-light hover:shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <button className="group relative px-6 py-2.5 rounded-full bg-linear-to-r from-emerald-500 to-teal-500 text-sm font-light hover:shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 overflow-hidden">
+            <div className="absolute inset-0 bg-linear-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <span className="relative flex items-center gap-2">
               Book Visit
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -205,8 +202,8 @@ const SmartHospitalLanding = () => {
                   i === 0
                     ? 'rgba(16, 185, 129, 0.4)'
                     : i === 1
-                    ? 'rgba(20, 184, 166, 0.3)'
-                    : 'rgba(56, 189, 248, 0.2)'
+                      ? 'rgba(20, 184, 166, 0.3)'
+                      : 'rgba(56, 189, 248, 0.2)'
                 } 0%, transparent 70%)`,
                 left: `${20 + i * 30}%`,
                 top: `${10 + i * 25}%`,
@@ -235,7 +232,7 @@ const SmartHospitalLanding = () => {
 
           {/* Interactive Glow */}
           <div
-            className="absolute w-96 h-96 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-full blur-3xl transition-all duration-300 pointer-events-none"
+            className="absolute w-96 h-96 bg-linear-to-r from-emerald-500/10 to-teal-500/10 rounded-full blur-3xl transition-all duration-300 pointer-events-none"
             style={{
               left: `${mousePos.x - 192}px`,
               top: `${mousePos.y - 192}px`,
@@ -313,7 +310,7 @@ const SmartHospitalLanding = () => {
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
           <div className="space-y-12">
             {/* Glowing Badge */}
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-8 animate-glow-pulse">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-8 animate-glow-pulse">
               <Sparkles className="w-5 h-5 text-emerald-400" />
               <span className="text-emerald-400 text-sm font-medium tracking-wider">
                 REIMAGINING HEALTHCARE
@@ -325,8 +322,8 @@ const SmartHospitalLanding = () => {
               <h1 className="text-7xl md:text-8xl font-light leading-tight mb-8">
                 <span className="block mb-6 opacity-90">Healthcare That</span>
                 <span className="relative">
-                  <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 blur-xl opacity-50" />
-                  <span className="relative bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+                  <span className="absolute inset-0 bg-linear-to-r from-emerald-400 via-teal-300 to-cyan-400 blur-xl opacity-50" />
+                  <span className="relative bg-linear-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
                     Feels Human
                   </span>
                 </span>
@@ -334,8 +331,8 @@ const SmartHospitalLanding = () => {
 
               {/* Animated Underline */}
               <div className="relative w-64 h-1 mx-auto mt-8">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500 to-transparent blur-sm" />
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 animate-shimmer" />
+                <div className="absolute inset-0 bg-linear-to-r from-transparent via-emerald-500 to-transparent blur-sm" />
+                <div className="absolute inset-0 bg-linear-to-r from-emerald-400 to-teal-400 animate-shimmer" />
               </div>
             </div>
 
@@ -347,8 +344,8 @@ const SmartHospitalLanding = () => {
 
             {/* CTA Buttons with Enhanced Effects */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-16">
-              <button className="group relative px-10 py-5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-medium tracking-wide transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/30">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+              <button className="group relative px-10 py-5 bg-linear-to-r from-emerald-500 to-teal-500 rounded-2xl text-white font-medium tracking-wide transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/30">
+                <div className="absolute inset-0 bg-linear-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                 <span className="relative flex items-center gap-3">
                   Begin Your Journey
                   <div className="relative w-6 h-6">
@@ -362,7 +359,7 @@ const SmartHospitalLanding = () => {
                   <Phone className="w-5 h-5" />
                   Talk to Someone
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-linear-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </button>
             </div>
 
@@ -386,7 +383,7 @@ const SmartHospitalLanding = () => {
           {/* Animated Scroll Indicator */}
           <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
             <div className="relative w-6 h-10 rounded-full border-2 border-emerald-400/30 flex justify-center p-1">
-              <div className="w-1 h-3 bg-gradient-to-b from-emerald-400 to-teal-400 rounded-full animate-bounce" />
+              <div className="w-1 h-3 bg-linear-to-b from-emerald-400 to-teal-400 rounded-full animate-bounce" />
             </div>
           </div>
         </div>
@@ -401,7 +398,7 @@ const SmartHospitalLanding = () => {
         <div className="max-w-7xl mx-auto">
           {/* Section Header with Connection Lines */}
           <div className="text-center mb-20 relative">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
+            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
               <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
               <span className="text-emerald-400 text-sm font-medium tracking-wider">
                 WHY WE'RE DIFFERENT
@@ -411,8 +408,8 @@ const SmartHospitalLanding = () => {
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               Care That Truly{' '}
               <span className="relative">
-                <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 blur-xl opacity-30" />
-                <span className="relative text-transparent bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text">
+                <span className="absolute inset-0 bg-linear-to-r from-emerald-400 to-teal-400 blur-xl opacity-30" />
+                <span className="relative text-transparent bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text">
                   Understands You
                 </span>
               </span>
@@ -424,11 +421,11 @@ const SmartHospitalLanding = () => {
             </p>
 
             {/* Connection Dots */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-linear-to-r from-transparent via-emerald-500/20 to-transparent" />
           </div>
 
           {/* Circular Feature Matrix */}
-          <div className="relative min-h-[600px]">
+          <div className="relative min-h-150">
             {/* Animated Orbital Rings */}
             <div className="absolute inset-0 flex items-center justify-center">
               {[0, 1, 2].map((i) => (
@@ -448,8 +445,8 @@ const SmartHospitalLanding = () => {
             {/* Central Orb */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <div className="relative w-48 h-48">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-full blur-xl" />
-                <div className="relative w-full h-full bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-full border border-emerald-400/20 backdrop-blur-xl flex items-center justify-center">
+                <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 to-teal-500/10 rounded-full blur-xl" />
+                <div className="relative w-full h-full bg-linear-to-br from-emerald-500/5 to-teal-500/5 rounded-full border border-emerald-400/20 backdrop-blur-xl flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-4xl text-emerald-400 font-light mb-2">
                       4x
@@ -510,22 +507,22 @@ const SmartHospitalLanding = () => {
                       benefit.position === 'top'
                         ? '1 / 2 / 2 / 3'
                         : benefit.position === 'right'
-                        ? '2 / 3 / 3 / 4'
-                        : benefit.position === 'bottom'
-                        ? '3 / 2 / 4 / 3'
-                        : benefit.position === 'left'
-                        ? '2 / 1 / 3 / 2'
-                        : '',
+                          ? '2 / 3 / 3 / 4'
+                          : benefit.position === 'bottom'
+                            ? '3 / 2 / 4 / 3'
+                            : benefit.position === 'left'
+                              ? '2 / 1 / 3 / 2'
+                              : '',
                   }}
                 >
                   <div className="relative transform-gpu transition-all duration-700 hover:rotate-y-12">
                     {/* Hover Glow */}
-                    <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute -inset-4 bg-linear-to-r from-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     {/* Feature Card */}
-                    <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 group-hover:scale-105 group-hover:border-emerald-400/40">
+                    <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 group-hover:scale-105 group-hover:border-emerald-400/40">
                       {/* Orbital Position Indicator */}
-                      <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
+                      <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-linear-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg">
                         <div className="w-2 h-2 bg-white rounded-full" />
                       </div>
 
@@ -553,7 +550,7 @@ const SmartHospitalLanding = () => {
                       </p>
 
                       {/* Stats Badge */}
-                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-full">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-emerald-500/10 to-teal-500/10 rounded-full">
                         <TrendingUp className="w-4 h-4 text-emerald-400" />
                         <span className="text-emerald-400 text-sm font-light">
                           {benefit.stats}
@@ -590,7 +587,7 @@ const SmartHospitalLanding = () => {
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Section Header */}
           <div className="text-center mb-24">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-8">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-8">
               <Cpu className="w-5 h-5 text-emerald-400" />
               <span className="text-emerald-400 text-sm font-medium tracking-wider">
                 YOUR CARE PATHWAY
@@ -599,7 +596,7 @@ const SmartHospitalLanding = () => {
 
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               A Journey Designed
-              <span className="block mt-4 text-transparent bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text">
+              <span className="block mt-4 text-transparent bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text">
                 Just For You
               </span>
             </h2>
@@ -612,7 +609,7 @@ const SmartHospitalLanding = () => {
           {/* Enhanced Timeline - FIXED LAYOUT */}
           <div className="relative">
             {/* Central Timeline Line */}
-            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500/20 via-teal-500/20 to-cyan-500/20 -translate-x-1/2" />
+            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-emerald-500/20 via-teal-500/20 to-cyan-500/20 -translate-x-1/2" />
 
             {/* Timeline Items - Fixed Container */}
             <div className="space-y-24 lg:space-y-32">
@@ -676,7 +673,7 @@ const SmartHospitalLanding = () => {
                   >
                     <div className="relative">
                       <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20" />
-                      <div className="relative w-6 h-6 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full border-4 border-black" />
+                      <div className="relative w-6 h-6 bg-linear-to-br from-emerald-500 to-teal-500 rounded-full border-4 border-black" />
                     </div>
                   </div>
 
@@ -702,7 +699,7 @@ const SmartHospitalLanding = () => {
                       }}
                     />
 
-                    <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 hover:scale-[1.02] hover:border-emerald-400/30">
+                    <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 hover:scale-[1.02] hover:border-emerald-400/30">
                       {/* Step Badge */}
                       <div className="absolute -top-4 left-8">
                         <div
@@ -719,7 +716,7 @@ const SmartHospitalLanding = () => {
                       <div className="flex flex-col lg:flex-row items-start gap-6">
                         {/* Icon */}
                         <div
-                          className={`w-16 h-16 rounded-2xl bg-${item.color}-500/10 border border-${item.color}-400/20 flex items-center justify-center flex-shrink-0`}
+                          className={`w-16 h-16 rounded-2xl bg-${item.color}-500/10 border border-${item.color}-400/20 flex items-center justify-center shrink-0`}
                         >
                           <item.icon
                             className={`w-8 h-8 text-${item.color}-400`}
@@ -762,7 +759,7 @@ const SmartHospitalLanding = () => {
                       <div className="lg:hidden absolute -bottom-6 left-1/2 -translate-x-1/2">
                         <div className="relative">
                           <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-20" />
-                          <div className="relative w-4 h-4 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full border-2 border-black" />
+                          <div className="relative w-4 h-4 bg-linear-to-br from-emerald-500 to-teal-500 rounded-full border-2 border-black" />
                         </div>
                       </div>
                     </div>
@@ -772,12 +769,12 @@ const SmartHospitalLanding = () => {
             </div>
 
             {/* Mobile Connection Line */}
-            <div className="lg:hidden absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-500/20 via-teal-500/20 to-cyan-500/20 -translate-x-1/2" />
+            <div className="lg:hidden absolute left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-emerald-500/20 via-teal-500/20 to-cyan-500/20 -translate-x-1/2" />
           </div>
 
           {/* Journey Summary CTA */}
           <div className="mt-24 text-center">
-            <div className="inline-flex flex-col sm:flex-row items-center justify-between gap-6 bg-gradient-to-b from-emerald-500/5 to-transparent backdrop-blur-sm border border-emerald-400/10 rounded-2xl p-8 max-w-3xl mx-auto">
+            <div className="inline-flex flex-col sm:flex-row items-center justify-between gap-6 bg-linear-to-b from-emerald-500/5 to-transparent backdrop-blur-sm border border-emerald-400/10 rounded-2xl p-8 max-w-3xl mx-auto">
               <div className="text-left">
                 <h4 className="text-xl font-light text-white mb-3">
                   Ready to Begin Your Journey?
@@ -787,8 +784,8 @@ const SmartHospitalLanding = () => {
                   of care
                 </p>
               </div>
-              <button className="group relative px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-light hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 overflow-hidden whitespace-nowrap">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <button className="group relative px-8 py-3.5 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-light hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 overflow-hidden whitespace-nowrap">
+                <div className="absolute inset-0 bg-linear-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="relative flex items-center gap-3">
                   Start Your Journey
                   <svg
@@ -821,7 +818,7 @@ const SmartHospitalLanding = () => {
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
+            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
               <Eye className="w-5 h-5 text-emerald-400" />
               <span className="text-emerald-400 text-sm font-medium tracking-wider">
                 BEFORE YOUR VISIT
@@ -830,7 +827,7 @@ const SmartHospitalLanding = () => {
 
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               Preparing You For
-              <span className="block mt-4 text-transparent bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text">
+              <span className="block mt-4 text-transparent bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text">
                 Better Care
               </span>
             </h2>
@@ -866,15 +863,15 @@ const SmartHospitalLanding = () => {
               },
             ].map((step, i) => (
               <div key={i} className="group relative">
-                <div className="relative h-full bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 hover:scale-105 hover:border-emerald-400/30">
+                <div className="relative h-full bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 hover:scale-105 hover:border-emerald-400/30">
                   {/* Number Badge */}
-                  <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-lg font-medium shadow-lg">
+                  <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-linear-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-lg font-medium shadow-lg">
                     {i + 1}
                   </div>
 
                   {/* Icon */}
                   <div
-                    className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-${step.color}-500/10 to-${step.color}-600/10 border border-${step.color}-400/20 flex items-center justify-center`}
+                    className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-linear-to-br from-${step.color}-500/10 to-${step.color}-600/10 border border-${step.color}-400/20 flex items-center justify-center`}
                   >
                     <step.icon
                       className={`w-10 h-10 text-${step.color}-400`}
@@ -906,7 +903,7 @@ const SmartHospitalLanding = () => {
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
+            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
               <RefreshCw className="w-5 h-5 text-emerald-400" />
               <span className="text-emerald-400 text-sm font-medium tracking-wider">
                 AFTER YOUR VISIT
@@ -915,7 +912,7 @@ const SmartHospitalLanding = () => {
 
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               Care That Continues
-              <span className="block mt-4 text-transparent bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text">
+              <span className="block mt-4 text-transparent bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text">
                 Beyond The Visit
               </span>
             </h2>
@@ -952,10 +949,10 @@ const SmartHospitalLanding = () => {
                 },
               ].map((feature, i) => (
                 <div key={i} className="group relative">
-                  <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-6 transform-gpu transition-all duration-500 hover:border-emerald-400/30">
+                  <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-6 transform-gpu transition-all duration-500 hover:border-emerald-400/30">
                     <div className="flex items-start gap-6">
                       <div
-                        className={`w-14 h-14 rounded-xl bg-gradient-to-br from-${feature.color}-500/10 to-${feature.color}-600/10 border border-${feature.color}-400/20 flex items-center justify-center flex-shrink-0`}
+                        className={`w-14 h-14 rounded-xl bg-linear-to-br from-${feature.color}-500/10 to-${feature.color}-600/10 border border-${feature.color}-400/20 flex items-center justify-center shrink-0`}
                       >
                         <feature.icon
                           className={`w-7 h-7 text-${feature.color}-400`}
@@ -997,7 +994,7 @@ const SmartHospitalLanding = () => {
                     />
 
                     {/* Center Content */}
-                    <div className="absolute inset-16 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 flex items-center justify-center">
+                    <div className="absolute inset-16 bg-linear-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 flex items-center justify-center">
                       <div className="text-center">
                         <div className="text-4xl text-emerald-400 font-light mb-2">
                           75%
@@ -1011,9 +1008,9 @@ const SmartHospitalLanding = () => {
                 </div>
 
                 {/* Floating Elements */}
-                <div className="absolute top-1/4 left-1/4 w-12 h-12 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-teal-400/20 animate-float-slow" />
+                <div className="absolute top-1/4 left-1/4 w-12 h-12 bg-linear-to-br from-teal-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-teal-400/20 animate-float-slow" />
                 <div
-                  className="absolute bottom-1/4 right-1/4 w-16 h-16 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 animate-float-slow"
+                  className="absolute bottom-1/4 right-1/4 w-16 h-16 bg-linear-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 animate-float-slow"
                   style={{ animationDelay: '1s' }}
                 />
               </div>
@@ -1031,7 +1028,7 @@ const SmartHospitalLanding = () => {
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
+            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
               <Users className="w-5 h-5 text-emerald-400" />
               <span className="text-emerald-400 text-sm font-medium tracking-wider">
                 DESIGNED FOR EVERYONE
@@ -1040,7 +1037,7 @@ const SmartHospitalLanding = () => {
 
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               Healthcare That Works
-              <span className="block mt-4 text-transparent bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text">
+              <span className="block mt-4 text-transparent bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text">
                 For Your Life
               </span>
             </h2>
@@ -1080,14 +1077,14 @@ const SmartHospitalLanding = () => {
                 className="group relative mb-8 last:mb-0"
                 style={{ transform: `translateY(${role.offset}px)` }}
               >
-                <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 hover:scale-105 hover:border-emerald-400/30 hover:z-10">
+                <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 hover:scale-105 hover:border-emerald-400/30 hover:z-10">
                   {/* Stack Shadow */}
-                  <div className="absolute -bottom-4 left-4 right-4 h-4 bg-gradient-to-t from-emerald-500/5 to-transparent rounded-b-3xl blur-sm" />
+                  <div className="absolute -bottom-4 left-4 right-4 h-4 bg-linear-to-t from-emerald-500/5 to-transparent rounded-b-3xl blur-sm" />
 
                   <div className="flex items-center gap-6">
                     {/* Icon */}
                     <div
-                      className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-${role.color}-500/10 to-${role.color}-600/10 border border-${role.color}-400/20 flex items-center justify-center flex-shrink-0`}
+                      className={`w-20 h-20 rounded-2xl bg-linear-to-br from-${role.color}-500/10 to-${role.color}-600/10 border border-${role.color}-400/20 flex items-center justify-center shrink-0`}
                     >
                       <role.icon
                         className={`w-10 h-10 text-${role.color}-400`}
@@ -1126,7 +1123,7 @@ const SmartHospitalLanding = () => {
       >
         {/* Emergency Pulse Effect */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-950/30 via-black to-red-950/20" />
+          <div className="absolute inset-0 bg-linear-to-br from-red-950/30 via-black to-red-950/20" />
           {[0, 1, 2].map((i) => (
             <div
               key={i}
@@ -1142,7 +1139,7 @@ const SmartHospitalLanding = () => {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Emergency Header */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-red-500/10 to-orange-500/10 backdrop-blur-xl rounded-2xl border border-red-400/20 mb-10">
+            <div className="inline-flex items-center gap-4 px-8 py-4 bg-linear-to-r from-red-500/10 to-orange-500/10 backdrop-blur-xl rounded-2xl border border-red-400/20 mb-10">
               <div className="relative">
                 <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-20" />
                 <AlertTriangle className="relative w-6 h-6 text-red-400" />
@@ -1154,7 +1151,7 @@ const SmartHospitalLanding = () => {
 
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               When You Need Help
-              <span className="block mt-4 text-transparent bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text">
+              <span className="block mt-4 text-transparent bg-linear-to-r from-red-400 to-orange-400 bg-clip-text">
                 Right Now
               </span>
             </h2>
@@ -1194,10 +1191,10 @@ const SmartHospitalLanding = () => {
                 ].map((feature, i) => (
                   <div
                     key={i}
-                    className="group flex items-start gap-6 p-6 bg-gradient-to-r from-red-500/5 to-transparent rounded-2xl border border-red-400/10 hover:border-red-400/30 transition-all duration-300"
+                    className="group flex items-start gap-6 p-6 bg-linear-to-r from-red-500/5 to-transparent rounded-2xl border border-red-400/10 hover:border-red-400/30 transition-all duration-300"
                   >
                     <div
-                      className={`w-14 h-14 rounded-xl bg-gradient-to-br from-${feature.color}-500/10 to-${feature.color}-600/10 border border-${feature.color}-400/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}
+                      className={`w-14 h-14 rounded-xl bg-linear-to-br from-${feature.color}-500/10 to-${feature.color}-600/10 border border-${feature.color}-400/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300`}
                     >
                       <feature.icon
                         className={`w-7 h-7 text-${feature.color}-400`}
@@ -1223,7 +1220,7 @@ const SmartHospitalLanding = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
                     <div className="absolute inset-0 bg-red-500 rounded-full blur-3xl animate-pulse opacity-30" />
-                    <div className="relative w-48 h-48 bg-gradient-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center border-8 border-red-400/30 shadow-2xl">
+                    <div className="relative w-48 h-48 bg-linear-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center border-8 border-red-400/30 shadow-2xl">
                       <Heart
                         className="w-24 h-24 text-white"
                         fill="white"
@@ -1235,14 +1232,14 @@ const SmartHospitalLanding = () => {
 
                 {/* Emergency Badges */}
                 <div className="absolute top-0 left-0">
-                  <div className="px-4 py-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 backdrop-blur-xl rounded-full border border-red-400/20">
+                  <div className="px-4 py-2 bg-linear-to-r from-red-500/20 to-orange-500/20 backdrop-blur-xl rounded-full border border-red-400/20">
                     <span className="text-red-400 text-sm font-medium">
                       24/7
                     </span>
                   </div>
                 </div>
                 <div className="absolute bottom-0 right-0">
-                  <div className="px-4 py-2 bg-gradient-to-r from-red-500/20 to-orange-500/20 backdrop-blur-xl rounded-full border border-red-400/20">
+                  <div className="px-4 py-2 bg-linear-to-r from-red-500/20 to-orange-500/20 backdrop-blur-xl rounded-full border border-red-400/20">
                     <span className="text-red-400 text-sm font-medium">
                       Immediate
                     </span>
@@ -1254,8 +1251,8 @@ const SmartHospitalLanding = () => {
 
           {/* Emergency CTA */}
           <div className="text-center mt-20">
-            <button className="group relative px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl text-white font-medium tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/30">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <button className="group relative px-12 py-6 bg-linear-to-r from-red-600 to-orange-600 rounded-2xl text-white font-medium tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/30">
+              <div className="absolute inset-0 bg-linear-to-r from-red-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <span className="relative flex items-center justify-center gap-4">
                 <AlertTriangle className="w-6 h-6" />
                 Get Emergency Assistance
@@ -1279,7 +1276,7 @@ const SmartHospitalLanding = () => {
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
+            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
               <Shield className="w-5 h-5 text-emerald-400" />
               <span className="text-emerald-400 text-sm font-medium tracking-wider">
                 BUILT ON TRUST
@@ -1288,7 +1285,7 @@ const SmartHospitalLanding = () => {
 
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               Your Safety Is Our
-              <span className="block mt-4 text-transparent bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text">
+              <span className="block mt-4 text-transparent bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text">
                 First Priority
               </span>
             </h2>
@@ -1323,14 +1320,14 @@ const SmartHospitalLanding = () => {
               },
             ].map((item, i) => (
               <div key={i} className="group relative">
-                <div className="relative h-full bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 hover:scale-105 hover:border-emerald-400/30">
+                <div className="relative h-full bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-8 transform-gpu transition-all duration-500 hover:scale-105 hover:border-emerald-400/30">
                   {/* Icon with Glow */}
                   <div className="relative w-16 h-16 mb-8">
                     <div
-                      className={`absolute inset-0 bg-gradient-to-br from-${item.color}-500/20 to-${item.color}-600/20 rounded-2xl blur-md`}
+                      className={`absolute inset-0 bg-linear-to-br from-${item.color}-500/20 to-${item.color}-600/20 rounded-2xl blur-md`}
                     />
                     <div
-                      className={`relative w-full h-full bg-gradient-to-br from-${item.color}-500/10 to-${item.color}-600/10 rounded-2xl border border-${item.color}-400/20 flex items-center justify-center`}
+                      className={`relative w-full h-full bg-linear-to-br from-${item.color}-500/10 to-${item.color}-600/10 rounded-2xl border border-${item.color}-400/20 flex items-center justify-center`}
                     >
                       <item.icon className={`w-8 h-8 text-${item.color}-400`} />
                     </div>
@@ -1345,7 +1342,7 @@ const SmartHospitalLanding = () => {
                   </p>
 
                   {/* Stats Badge */}
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-full">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-emerald-500/10 to-teal-500/10 rounded-full">
                     <Check className="w-4 h-4 text-emerald-400" />
                     <span className="text-emerald-400 text-sm font-light">
                       {item.stats}
@@ -1369,10 +1366,10 @@ const SmartHospitalLanding = () => {
                 className="group flex flex-col items-center gap-4 cursor-pointer transform-gpu transition-all duration-300 hover:scale-110"
               >
                 <div
-                  className={`relative w-20 h-20 rounded-full bg-gradient-to-br from-${badge.color}-500/10 to-${badge.color}-600/10 border border-${badge.color}-400/20 flex items-center justify-center`}
+                  className={`relative w-20 h-20 rounded-full bg-linear-to-br from-${badge.color}-500/10 to-${badge.color}-600/10 border border-${badge.color}-400/20 flex items-center justify-center`}
                 >
                   <badge.icon className={`w-10 h-10 text-${badge.color}-400`} />
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-teal-500/0 rounded-full group-hover:from-emerald-500/10 group-hover:to-teal-500/10 transition-all duration-300" />
+                  <div className="absolute inset-0 bg-linear-to-br from-emerald-500/0 to-teal-500/0 rounded-full group-hover:from-emerald-500/10 group-hover:to-teal-500/10 transition-all duration-300" />
                 </div>
                 <span className="text-gray-500 text-sm font-light group-hover:text-emerald-400 transition-colors">
                   {badge.label}
@@ -1391,7 +1388,7 @@ const SmartHospitalLanding = () => {
       >
         {/* Animated Background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/20 via-teal-600/15 to-cyan-600/10" />
+          <div className="absolute inset-0 bg-linear-to-br from-emerald-600/20 via-teal-600/15 to-cyan-600/10" />
           {[0, 1, 2].map((i) => (
             <div
               key={i}
@@ -1441,12 +1438,12 @@ const SmartHospitalLanding = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
-              <button className="group relative px-12 py-6 bg-gradient-to-r from-white to-gray-100 text-emerald-600 rounded-2xl text-lg font-medium tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-white/20">
+              <button className="group relative px-12 py-6 bg-linear-to-r from-white to-gray-100 text-emerald-600 rounded-2xl text-lg font-medium tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-white/20">
                 <span className="relative z-10 flex items-center gap-3">
                   Start Free Journey
                   <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-100 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-linear-to-r from-emerald-100 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </button>
 
               <button className="group relative px-12 py-6 backdrop-blur-xl bg-white/5 rounded-2xl border border-emerald-400/20 text-gray-300 font-medium transition-all duration-500 hover:bg-white/10 hover:text-white hover:border-emerald-400/40">
@@ -1465,13 +1462,13 @@ const SmartHospitalLanding = () => {
       </section>
 
       {/* Enhanced Footer */}
-      <footer className="relative py-16 px-6 bg-gradient-to-t from-gray-950 to-black">
+      <footer className="relative py-16 px-6 bg-linear-to-t from-gray-950 to-black">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-linear-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
                   <Heart className="w-6 h-6 text-white" fill="white" />
                 </div>
                 <span className="text-xl font-light tracking-wide text-emerald-300">
@@ -1528,7 +1525,7 @@ const SmartHospitalLanding = () => {
                     placeholder="Your email"
                     className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-800 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50"
                   />
-                  <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg text-sm text-white hover:opacity-90 transition-opacity">
+                  <button className="px-4 py-2 bg-linear-to-r from-emerald-500 to-teal-500 rounded-lg text-sm text-white hover:opacity-90 transition-opacity">
                     Join
                   </button>
                 </div>
@@ -1537,7 +1534,7 @@ const SmartHospitalLanding = () => {
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent mb-8" />
+          <div className="h-px bg-linear-to-r from-transparent via-gray-800 to-transparent mb-8" />
 
           {/* Copyright */}
           <div className="text-center">
@@ -1570,7 +1567,7 @@ const SmartHospitalLanding = () => {
       {/* Scroll Progress Bar */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-black/50 z-40">
         <div
-          className="h-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 transition-all duration-300"
+          className="h-full bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500 transition-all duration-300"
           style={{
             width: `${
               (scrollY / (document.body.scrollHeight - window.innerHeight)) *

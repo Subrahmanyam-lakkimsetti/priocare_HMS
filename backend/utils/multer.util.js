@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'priocare-patient-profiles',
-    allowed_formats: ['jpg', 'png', 'jpeg'], // ✅ correct key
+    allowed_formats: ['jpg', 'png', 'jpeg'],
   },
 });
 

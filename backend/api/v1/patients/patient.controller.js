@@ -28,7 +28,7 @@ const getPatientController = catchAsync(async (req, res) => {
 });
 
 const updatePatientController = catchAsync(async (req, res) => {
-  console.log('file', req.file);
+
   const updatedPatient = await updatePatient(req);
 
   res.status(200).json({

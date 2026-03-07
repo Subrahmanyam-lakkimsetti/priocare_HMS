@@ -24,6 +24,7 @@ const {
   getActiveConsultation,
   treatedPatientsHistory,
 } = require('./doctor.controller');
+const upload = require('../../../utils/multer.util');
 
 const doctorRouter = express.Router();
 
@@ -49,6 +50,7 @@ doctorRouter.get(
 // post
 doctorRouter.post(
   '/',
+  upload.single('photo'),
   validateInput(doctorValidationSchema),
   restrictTo('doctor'),
   createDotorController,
@@ -57,6 +59,7 @@ doctorRouter.post(
 // patch
 doctorRouter.patch(
   '/:id',
+  upload.single('photo'),
   validateInput(updateDoctorValidationSchema),
   restrictTo('doctor'),
   updateDoctor,

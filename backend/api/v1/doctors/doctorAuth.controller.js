@@ -3,7 +3,11 @@ const { DoctorDTO } = require('./doctor.dto');
 const doctorService = require('./doctorAuth.service');
 
 const createDotorController = catchAsync(async (req, res) => {
-  const doctor = await doctorService.createDoctor(req.data.id, req.body);
+  const doctor = await doctorService.createDoctor(
+    req.data.id,
+    req.body,
+    req.file,
+  );
 
   res.status(200).json({
     isSuccess: true,
@@ -35,7 +39,11 @@ const getDoctor = catchAsync(async (req, res) => {
 });
 
 const updateDoctor = catchAsync(async (req, res) => {
-  const doctor = await doctorService.updateDoctor(req.params.id, req.body);
+  const doctor = await doctorService.updateDoctor(
+    req.params.id,
+    req.body,
+    req.file,
+  );
 
   res.status(200).json({
     isSuccess: true,

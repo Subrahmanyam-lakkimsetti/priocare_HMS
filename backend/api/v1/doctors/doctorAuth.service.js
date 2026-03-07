@@ -1,7 +1,10 @@
 const Doctor = require('../../../models/doctor.model');
 const AppError = require('../../../utils/AppError.util');
 
-const createDoctor = async (userId, payload) => {
+const createDoctor = async (userId, payload, file) => {
+  if (file) {
+    payload.photo = file.path;
+  }
 
   // check is Exists
   const isDoctorExists = await Doctor.findOne({ userId });
@@ -32,7 +35,10 @@ const getDoctor = async ({ id }) => {
   return doctor;
 };
 
-const updateDoctor = async (id, updateData) => {
+const updateDoctor = async (id, updateData, file) => {
+  if (file) {
+    updateData.photo = file.path;
+  }
 
   const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
     new: true,

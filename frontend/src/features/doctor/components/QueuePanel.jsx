@@ -3,15 +3,46 @@ import { useDispatch, useSelector } from 'react-redux';
 import { callNextPatient, fetchQueue } from '../doctorThunks';
 
 const SEVERITY_CONFIG = {
-  critical: {
-    bg: '#fee2e2',
+  emergency: {
+    bg: '#fef2f2',
     text: '#dc2626',
     dot: '#ef4444',
-    border: '#fecaca',
+    border: '#fca5a5',
+    cardBg: '#fff1f1',
+    cardBorder: '#f87171',
+    cardGlow: 'rgba(239,68,68,0.12)',
+    cardAccent: '#ef4444',
   },
-  high: { bg: '#ffedd5', text: '#ea580c', dot: '#f97316', border: '#fed7aa' },
-  medium: { bg: '#fefce8', text: '#ca8a04', dot: '#eab308', border: '#fde68a' },
-  low: { bg: '#f0fdf4', text: '#16a34a', dot: '#22c55e', border: '#bbf7d0' },
+  high: {
+    bg: '#fffbeb',
+    text: '#d97706',
+    dot: '#f59e0b',
+    border: '#fcd34d',
+    cardBg: '#fffdf0',
+    cardBorder: '#fbbf24',
+    cardGlow: 'rgba(245,158,11,0.12)',
+    cardAccent: '#f59e0b',
+  },
+  medium: {
+    bg: '#fefce8',
+    text: '#ca8a04',
+    dot: '#eab308',
+    border: '#fde68a',
+    cardBg: '#fefef5',
+    cardBorder: '#facc15',
+    cardGlow: 'rgba(234,179,8,0.10)',
+    cardAccent: '#eab308',
+  },
+  low: {
+    bg: '#f0fdf4',
+    text: '#16a34a',
+    dot: '#22c55e',
+    border: '#bbf7d0',
+    cardBg: '#f6fef9',
+    cardBorder: '#86efac',
+    cardGlow: 'rgba(34,197,94,0.10)',
+    cardAccent: '#22c55e',
+  },
 };
 
 function SeverityBadge({ level }) {
@@ -45,11 +76,25 @@ function SeverityBadge({ level }) {
   );
 }
 
+/**
+ * Safely parse a timestamp string and return a Date object in local time.
+ * If the string has no timezone info (no 'Z' or '+'), treat it as UTC by appending 'Z'.
+ */
+function parseAsUTC(timestamp) {
+  if (!timestamp) return null;
+  const str = String(timestamp);
+  // If already has timezone offset (Z, +HH:mm, -HH:mm), parse as-is
+  // Otherwise append 'Z' to treat as UTC so JS converts to local time correctly
+  const hasTimezone = /Z$|[+-]\d{2}:\d{2}$|[+-]\d{4}$/.test(str);
+  return new Date(hasTimezone ? str : str + 'Z');
+}
+
 function getWaitingTime(checkedInAt) {
   if (!checkedInAt) return null;
-  const totalMins = Math.floor(
-    (Date.now() - new Date(checkedInAt).getTime()) / 60000,
-  );
+  const checkedInDate = parseAsUTC(checkedInAt);
+  if (!checkedInDate || isNaN(checkedInDate.getTime())) return null;
+
+  const totalMins = Math.floor((Date.now() - checkedInDate.getTime()) / 60000);
   if (totalMins < 1) return 'Just arrived';
   if (totalMins < 60) return `${totalMins}m`;
   const hrs = Math.floor(totalMins / 60);
@@ -59,9 +104,10 @@ function getWaitingTime(checkedInAt) {
 
 function waitingColor(checkedInAt) {
   if (!checkedInAt) return '#94a3b8';
-  const mins = Math.floor(
-    (Date.now() - new Date(checkedInAt).getTime()) / 60000,
-  );
+  const checkedInDate = parseAsUTC(checkedInAt);
+  if (!checkedInDate || isNaN(checkedInDate.getTime())) return '#94a3b8';
+
+  const mins = Math.floor((Date.now() - checkedInDate.getTime()) / 60000);
   if (mins >= 45) return '#ef4444';
   if (mins >= 20) return '#f97316';
   return '#94a3b8';
@@ -69,9 +115,10 @@ function waitingColor(checkedInAt) {
 
 function waitingWeight(checkedInAt) {
   if (!checkedInAt) return 400;
-  const mins = Math.floor(
-    (Date.now() - new Date(checkedInAt).getTime()) / 60000,
-  );
+  const checkedInDate = parseAsUTC(checkedInAt);
+  if (!checkedInDate || isNaN(checkedInDate.getTime())) return 400;
+
+  const mins = Math.floor((Date.now() - checkedInDate.getTime()) / 60000);
   return mins >= 20 ? 600 : 400;
 }
 
@@ -203,17 +250,17 @@ export default function QueuePanel({ date }) {
         /* ── Patient cards ── */
         .qp-card {
           border-radius: 12px; border: 1px solid #e2e8f0;
-          padding: 12px; background: #fff;
+          padding: 12px 12px 12px 16px; background: #fff;
           transition: background 0.15s, border-color 0.15s, transform 0.15s, opacity 0.15s, box-shadow 0.15s;
           cursor: default; position: relative;
           flex-shrink: 0;
         }
-        .qp-card:hover { filter: brightness(0.97); }
+        .qp-card:hover { filter: brightness(0.97); transform: translateY(-1px); }
         .qp-card::before {
           content: ''; position: absolute;
-          left: 0; top: 8px; bottom: 8px; width: 3px;
-          border-radius: 0 3px 3px 0;
-          background: var(--severity-dot, #e2e8f0); opacity: 0.8;
+          left: 0; top: 0; bottom: 0; width: 4px;
+          border-radius: 12px 0 0 12px;
+          background: var(--severity-dot, #e2e8f0);
         }
         .qp-card.flash { animation: qp-card-flash 0.5s ease forwards; }
         @keyframes qp-card-flash {
@@ -382,9 +429,12 @@ export default function QueuePanel({ date }) {
                 key={p._id}
                 className={cardClass}
                 style={{
-                  '--severity-dot': cfg.dot,
-                  borderColor: isCalled ? undefined : cfg.border,
-                  background: isCalled ? undefined : cfg.bg + '55',
+                  '--severity-dot': cfg.cardAccent,
+                  borderColor: isCalled ? undefined : cfg.cardBorder,
+                  background: isCalled ? undefined : cfg.cardBg,
+                  boxShadow: isCalled
+                    ? undefined
+                    : `0 2px 8px ${cfg.cardGlow}, inset 0 0 0 1px ${cfg.cardBorder}`,
                 }}
               >
                 {isNext && (

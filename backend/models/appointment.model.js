@@ -42,10 +42,6 @@ const appointmentSchema = new mongoose.Schema(
       required: true,
     },
 
-    preferedTime: {
-      type: String,
-    },
-
     status: {
       type: String,
       enum: [
@@ -106,6 +102,35 @@ const appointmentSchema = new mongoose.Schema(
 appointmentSchema.index({
   doctorId: 1,
   scheduledDate: 1,
+});
+
+appointmentSchema.pre('aggregate', function () {
+  const pipeline = this.pipeline();
+
+  const alreadyHasLookup = pipeline.some((stage) => stage.$lookup);
+
+  if (!alreadyHasLookup) {
+    pipeline.unshift(
+      {
+        $lookup: {
+          from: 'doctors',
+          localField: 'doctorId',
+          foreignField: '_id',
+          as: 'doctorDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: 'patients',
+          localField: 'patientId',
+          foreignField: '_id',
+          as: 'patientDetails',
+        },
+      },
+      { $unwind: '$doctorDetails' },
+      { $unwind: '$patientDetails' },
+    );
+  }
 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);

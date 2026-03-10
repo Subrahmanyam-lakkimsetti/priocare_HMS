@@ -1,9 +1,9 @@
-const express = require('express');
-const apiRouter = require('./api/v1/route');
-const AppError = require('./utils/AppError.util');
-const errorMiddleware = require('./middlewares/error.middleware');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
+const express = require("express");
+const apiRouter = require("./api/v1/route");
+const AppError = require("./utils/AppError.util");
+const errorMiddleware = require("./middlewares/error.middleware");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
 const app = express();
 
@@ -17,19 +17,21 @@ app.use(
   }),
 );
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.json({
     isSuccess: true,
-    message: 'Welcome to Priocare HMS Backend',
+    message: "Welcome to Priocare HMS Backend",
   });
 });
 
-app.use('/api/v1', apiRouter);
+//hello
 
-app.get('/health-check', (req, res) => {
+app.use("/api/v1", apiRouter);
+
+app.get("/health-check", (req, res) => {
   res.json({
     isSuccess: true,
-    message: 'API is working fine',
+    message: "API is working fine",
   });
 });
 

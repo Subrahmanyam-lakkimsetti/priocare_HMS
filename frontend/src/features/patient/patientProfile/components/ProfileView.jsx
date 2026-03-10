@@ -9,7 +9,7 @@ const InfoRow = ({ label, value }) => (
     <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
       {label}
     </span>
-    <span className="text-base text-gray-900 break-words">
+    <span className="text-base text-gray-900 wrap-break-word">
       {value || <span className="text-gray-400 italic">Not provided</span>}
     </span>
   </div>
@@ -138,11 +138,11 @@ const ProfileView = ({ profile }) => {
       </div>
 
       {/* Hero Card */}
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 shadow-sm p-5">
+      <div className="bg-linear-to-br from-white to-gray-50 rounded-xl border border-gray-200 shadow-sm p-5">
         <div className="flex flex-col sm:flex-row items-start gap-5">
           {/* Avatar with upload overlay */}
           <div className="relative shrink-0">
-            <div className="w-20 h-20 rounded-xl overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center border-2 border-white shadow-md">
+            <div className="w-20 h-20 rounded-xl overflow-hidden bg-linear-to-br from-indigo-50 to-purple-50 flex items-center justify-center border-2 border-white shadow-md">
               {displayPhoto ? (
                 <img
                   src={displayPhoto}
@@ -202,7 +202,7 @@ const ProfileView = ({ profile }) => {
             <h2 className="text-xl font-bold text-gray-900">
               {profile.firstName} {profile.lastName}
             </h2>
-            <p className="text-sm text-gray-600 mt-1 break-words">
+            <p className="text-sm text-gray-600 mt-1 wrap-break-word">
               {profile.userId?.email}
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-3">

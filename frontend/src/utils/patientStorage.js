@@ -1,20 +1,23 @@
-const KEY = 'patient_intake_v1';
+const getKey = (userId) => `patient_intake_v1_${userId}`;
 
-export const loadIntake = () => {
+export const loadIntake = (userId) => {
+  if (!userId) return undefined;
   try {
-    const data = localStorage.getItem(KEY);
+    const data = localStorage.getItem(getKey(userId));
     return data ? JSON.parse(data) : undefined;
   } catch {
     return undefined;
   }
 };
 
-export const saveIntake = (intake) => {
+export const saveIntake = (userId, intake) => {
+  if (!userId) return;
   try {
-    localStorage.setItem(KEY, JSON.stringify(intake));
+    localStorage.setItem(getKey(userId), JSON.stringify(intake));
   } catch {}
 };
 
-export const clearIntake = () => {
-  localStorage.removeItem(KEY);
+export const clearIntake = (userId) => {
+  if (!userId) return;
+  localStorage.removeItem(getKey(userId));
 };

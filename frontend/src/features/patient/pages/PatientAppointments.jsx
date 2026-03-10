@@ -204,7 +204,7 @@ export default function PatientAppointments() {
 
         {/* Timeline */}
         <div className="relative">
-          <div className="absolute left-[27px] top-6 bottom-6 w-px bg-gradient-to-b from-blue-200 via-gray-200 to-gray-100 hidden sm:block" />
+          <div className="absolute left-6.75 top-6 bottom-6 w-px bg-linear-to-b from-blue-200 via-gray-200 to-gray-100 hidden sm:block" />
 
           <div className="space-y-5">
             {appointments.map((appt) => {
@@ -251,7 +251,7 @@ export default function PatientAppointments() {
                   >
                     {/* Top accent bar */}
                     <div
-                      className={`h-1 w-full bg-gradient-to-r ${status.gradient}`}
+                      className={`h-1 w-full bg-linear-to-r ${status.gradient}`}
                     />
 
                     {/* Card body: two columns */}
@@ -412,7 +412,7 @@ export default function PatientAppointments() {
                             onClick={() =>
                               navigate(`/patient/appointment/${appt.token}`)
                             }
-                            className={`view-details-btn group flex items-center justify-center gap-1.5 text-xs font-semibold text-white px-3 py-2 rounded-xl transition-all w-full bg-gradient-to-r ${status.gradient} shadow-sm hover:shadow-md hover:opacity-95 active:scale-[0.98]`}
+                            className={`view-details-btn group flex items-center justify-center gap-1.5 text-xs font-semibold text-white px-3 py-2 rounded-xl transition-all w-full bg-linear-to-r ${status.gradient} shadow-sm hover:shadow-md hover:opacity-95 active:scale-[0.98]`}
                           >
                             <svg
                               className="w-3.5 h-3.5 shrink-0"
@@ -536,7 +536,7 @@ export default function PatientAppointments() {
                                   {/* Connector line */}
                                   {i < timelineEvents.length - 1 && (
                                     <div
-                                      className={`h-px flex-1 mx-1 mt-[-28px] ${status.dot} opacity-25 shrink-0 min-w-[12px]`}
+                                      className={`h-px flex-1 mx-1 -mt-7 ${status.dot} opacity-25 shrink-0 min-w-3`}
                                     />
                                   )}
                                 </div>

@@ -26,275 +26,76 @@ export default function DoctorDashboard() {
     year: 'numeric',
   });
 
+  // Animation classes
+  const fadeUp = (delay) =>
+    `transition-all duration-500 ease-out translate-y-4 opacity-0 ${
+      mounted ? 'translate-y-0 opacity-100' : ''
+    } ${delay}`;
+
   return (
-    <>
-      <style>{`
-        .dash-root {
-          min-height: 100vh;
-          background: #f8fafc;
-          padding: 40px 32px;
-          max-width: 960px;
-          margin: 0 auto;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-
-        /* Entrance animations */
-        .fade-up {
-          opacity: 0;
-          transform: translateY(16px);
-          transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-        .fade-up.show { opacity: 1; transform: translateY(0); }
-        .d1 { transition-delay: 0.05s; }
-        .d2 { transition-delay: 0.13s; }
-        .d3 { transition-delay: 0.21s; }
-        .d4 { transition-delay: 0.29s; }
-
-        /* ── Header ── */
-        .header-wrap {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 36px;
-        }
-        .header-date {
-          font-size: 12px;
-          font-weight: 500;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: #94a3b8;
-          margin-bottom: 6px;
-        }
-        .header-greeting {
-          font-size: 28px;
-          font-weight: 700;
-          color: #0f172a;
-          margin: 0 0 4px;
-          letter-spacing: -0.4px;
-        }
-        .header-sub {
-          font-size: 13.5px;
-          color: #64748b;
-          font-weight: 400;
-        }
-        .header-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background: #eff6ff;
-          border: 1px solid #bfdbfe;
-          border-radius: 20px;
-          padding: 6px 14px;
-          font-size: 12px;
-          font-weight: 600;
-          color: #2563eb;
-          white-space: nowrap;
-          flex-shrink: 0;
-          margin-top: 4px;
-        }
-        .badge-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #2563eb;
-          animation: pulse-blue 2s infinite;
-        }
-        @keyframes pulse-blue {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(0.85); }
-        }
-
-        /* ── Section label ── */
-        .section-label {
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: #94a3b8;
-          margin-bottom: 14px;
-        }
-
-        /* ── Action Cards ── */
-        .cards-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-          margin-bottom: 16px;
-        }
-        @media (max-width: 580px) { .cards-grid { grid-template-columns: 1fr; } }
-
-        .card {
-          border-radius: 16px;
-          padding: 28px 24px 24px;
-          cursor: pointer;
-          position: relative;
-          overflow: hidden;
-          transition: transform 0.22s ease, box-shadow 0.22s ease;
-        }
-        .card:hover { transform: translateY(-2px); }
-
-        /* Primary — blue */
-        .card-blue {
-          background: #2563eb;
-          box-shadow: 0 4px 20px rgba(37,99,235,0.25);
-        }
-        .card-blue:hover {
-          box-shadow: 0 8px 32px rgba(37,99,235,0.38);
-        }
-        .card-blue::after {
-          content: '';
-          position: absolute;
-          top: -50px; right: -50px;
-          width: 180px; height: 180px;
-          background: rgba(255,255,255,0.06);
-          border-radius: 50%;
-          pointer-events: none;
-        }
-
-        /* Secondary — white */
-        .card-white {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 2px 10px rgba(15,23,42,0.05);
-        }
-        .card-white:hover {
-          box-shadow: 0 6px 24px rgba(15,23,42,0.10);
-          border-color: #c7d2fe;
-        }
-
-        .card-icon-wrap {
-          width: 42px; height: 42px;
-          border-radius: 12px;
-          display: flex; align-items: center; justify-content: center;
-          margin-bottom: 20px;
-        }
-        .icon-blue-inv  { background: rgba(255,255,255,0.15); }
-        .icon-indigo    { background: #eef2ff; }
-
-        .card-title-blue {
-          font-size: 18px;
-          font-weight: 700;
-          color: #ffffff;
-          margin: 0 0 6px;
-          letter-spacing: -0.2px;
-        }
-        .card-desc-blue {
-          font-size: 13px;
-          color: rgba(255,255,255,0.65);
-          line-height: 1.55;
-          margin: 0;
-        }
-        .card-title-white {
-          font-size: 18px;
-          font-weight: 700;
-          color: #0f172a;
-          margin: 0 0 6px;
-          letter-spacing: -0.2px;
-        }
-        .card-desc-white {
-          font-size: 13px;
-          color: #64748b;
-          line-height: 1.55;
-          margin: 0;
-        }
-
-        .card-cta {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          margin-top: 22px;
-          font-size: 13px;
-          font-weight: 600;
-          transition: gap 0.18s ease;
-        }
-        .card:hover .card-cta { gap: 9px; }
-        .cta-blue  { color: rgba(255,255,255,0.85); }
-        .cta-indigo { color: #4f46e5; }
-
-        /* ── Status Strip ── */
-        .status-strip {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 14px;
-        }
-        @media (max-width: 580px) { .status-strip { grid-template-columns: 1fr; } }
-
-        .status-chip {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 14px;
-          padding: 16px 18px;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .status-chip:hover {
-          border-color: #c7d2fe;
-          box-shadow: 0 4px 14px rgba(15,23,42,0.07);
-        }
-
-        .chip-indicator {
-          width: 36px; height: 36px;
-          border-radius: 10px;
-          display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
-        }
-        .ind-blue   { background: #eff6ff; }
-        .ind-indigo { background: #eef2ff; }
-        .ind-slate  { background: #f1f5f9; }
-
-        .chip-label {
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: #94a3b8;
-          margin-bottom: 2px;
-        }
-        .chip-value {
-          font-size: 13px;
-          font-weight: 700;
-          color: #0f172a;
-        }
-        .chip-sub {
-          font-size: 11px;
-          color: #94a3b8;
-          margin-top: 1px;
-        }
-      `}</style>
-
-      <div className="dash-root">
-        {/* ── Header ── */}
-        <div className={`header-wrap fade-up ${mounted ? 'show' : ''}`}>
+    <div className="min-h-screen bg-slate-100 flex justify-center p-6 md:p-8 font-sans">
+      <div className="w-full max-w-275 mx-auto">
+        {/* Header */}
+        <div
+          className={`
+          bg-white border-2 border-slate-300 rounded-xl md:rounded-2xl 
+          p-6 md:p-8 shadow-lg mb-8 
+          flex flex-wrap items-center justify-between gap-5
+          transition-all duration-500 ease-out translate-y-4 opacity-0
+          ${mounted ? 'translate-y-0 opacity-100' : ''}
+        `}
+        >
           <div>
-            <p className="header-date">{today}</p>
-            <h1 className="header-greeting">
-              {greeting}, {user?.name || 'Doctor'} 👋
+            <p className="text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2">
+              {today}
+            </p>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-1">
+              {greeting}, {user?.firstName || user?.name || 'Doctor'} 👋
             </h1>
-            <p className="header-sub">Here's an overview of your workspace.</p>
+            <p className="text-sm text-slate-400">
+              Here's an overview of your workspace.
+            </p>
           </div>
-          <div className="header-badge">
-            <span className="badge-dot" />
-            PrioCare HMS
+
+          <div className="inline-flex items-center gap-2 bg-white border-2 border-slate-200 rounded-full py-2 px-5 text-sm font-bold text-blue-600 shadow-md shrink-0">
+            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse shadow-lg shadow-blue-200"></span>
+            Doctor Portal
           </div>
         </div>
 
-        {/* ── Quick Actions ── */}
-        <p className={`section-label fade-up d1 ${mounted ? 'show' : ''}`}>
+        {/* Quick Actions Label */}
+        <p
+          className={`
+          text-xs font-bold tracking-wider uppercase text-slate-500 mb-4
+          flex items-center gap-3
+          transition-all duration-500 delay-100 ease-out translate-y-4 opacity-0
+          ${mounted ? 'translate-y-0 opacity-100' : ''}
+        `}
+        >
+          <span className="w-1 h-4 bg-blue-600 rounded-sm"></span>
           Quick Actions
+          <span className="flex-1 h-px bg-linear-to-r from-slate-200 to-transparent"></span>
         </p>
-        <div className={`cards-grid fade-up d2 ${mounted ? 'show' : ''}`}>
-          {/* Consultation Room */}
+
+        {/* Quick Actions Cards */}
+        <div
+          className={`
+          grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 mb-8
+          transition-all duration-500 delay-200 ease-out translate-y-4 opacity-0
+          ${mounted ? 'translate-y-0 opacity-100' : ''}
+        `}
+        >
+          {/* Consultation Room - Blue Card */}
           <div
-            className="card card-blue"
+            className="bg-linear-to-br from-blue-600 to-blue-700 rounded-2xl p-7 md:p-8 cursor-pointer relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl"
             onClick={() => nav('/doctor/consultation')}
           >
-            <div className="card-icon-wrap icon-blue-inv">
+            <div className="absolute -top-12.5 -right-12.5 w-48 h-48 bg-white/10 rounded-full pointer-events-none"></div>
+
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-6">
               <svg
-                width="20"
-                height="20"
+                width="24"
+                height="24"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="white"
@@ -307,15 +108,19 @@ export default function DoctorDashboard() {
                 />
               </svg>
             </div>
-            <h3 className="card-title-blue">Consultation Room</h3>
-            <p className="card-desc-blue">
+
+            <h3 className="text-xl md:text-2xl font-extrabold text-white mb-2">
+              Consultation Room
+            </h3>
+            <p className="text-sm text-white/70 leading-relaxed mb-6">
               View patient queue, manage consultations, and access AI summaries.
             </p>
-            <div className="card-cta cta-blue">
+
+            <div className="inline-flex items-center gap-2 text-white/90 font-bold text-sm group-hover:gap-3 transition-all">
               Open room
               <svg
-                width="14"
-                height="14"
+                width="16"
+                height="16"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -330,18 +135,18 @@ export default function DoctorDashboard() {
             </div>
           </div>
 
-          {/* Patient History */}
+          {/* Patient History - White Card */}
           <div
-            className="card card-white"
+            className="bg-white border-2 border-slate-200 rounded-2xl p-7 md:p-8 cursor-pointer group hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl hover:border-blue-500"
             onClick={() => nav('/doctor/patients')}
           >
-            <div className="card-icon-wrap icon-indigo">
+            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6">
               <svg
-                width="20"
-                height="20"
+                width="24"
+                height="24"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="#4f46e5"
+                stroke="#2563eb"
                 strokeWidth="1.8"
               >
                 <path
@@ -351,15 +156,19 @@ export default function DoctorDashboard() {
                 />
               </svg>
             </div>
-            <h3 className="card-title-white">Patient History</h3>
-            <p className="card-desc-white">
+
+            <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 mb-2">
+              Patient History
+            </h3>
+            <p className="text-sm text-slate-500 leading-relaxed mb-6">
               Review past consultations, records, and patient notes.
             </p>
-            <div className="card-cta cta-indigo">
+
+            <div className="inline-flex items-center gap-2 text-blue-600 font-bold text-sm group-hover:gap-3 transition-all">
               View records
               <svg
-                width="14"
-                height="14"
+                width="16"
+                height="16"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -375,90 +184,116 @@ export default function DoctorDashboard() {
           </div>
         </div>
 
-        {/* ── Status Strip ── */}
-        <p className={`section-label fade-up d3 ${mounted ? 'show' : ''}`}>
+        {/* System Status Label */}
+        <p
+          className={`
+          text-xs font-bold tracking-wider uppercase text-slate-500 mb-4
+          flex items-center gap-3
+          transition-all duration-500 delay-300 ease-out translate-y-4 opacity-0
+          ${mounted ? 'translate-y-0 opacity-100' : ''}
+        `}
+        >
+          <span className="w-1 h-4 bg-blue-600 rounded-sm"></span>
           System Status
+          <span className="flex-1 h-px bg-linear-to-r from-slate-200 to-transparent"></span>
         </p>
-        <div className={`status-strip fade-up d4 ${mounted ? 'show' : ''}`}>
-          {[
-            {
-              ind: 'ind-blue',
-              icon: (
-                <svg
-                  width="18"
-                  height="18"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="#2563eb"
-                  strokeWidth="1.8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  />
-                </svg>
-              ),
-              label: 'System',
-              value: 'PrioCare HMS',
-              sub: 'Hospital Management',
-            },
-            {
-              ind: 'ind-indigo',
-              icon: (
-                <svg
-                  width="18"
-                  height="18"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="#4f46e5"
-                  strokeWidth="1.8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-              ),
-              label: 'AI Assistant',
-              value: 'Gemini AI',
-              sub: 'Triage & summaries',
-            },
-            {
-              ind: 'ind-slate',
-              icon: (
-                <svg
-                  width="18"
-                  height="18"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="#475569"
-                  strokeWidth="1.8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              ),
-              label: 'Live Updates',
-              value: 'Socket Ready',
-              sub: 'Real-time queue sync',
-            },
-          ].map((item) => (
-            <div className="status-chip" key={item.label}>
-              <div className={`chip-indicator ${item.ind}`}>{item.icon}</div>
-              <div>
-                <p className="chip-label">{item.label}</p>
-                <p className="chip-value">{item.value}</p>
-                <p className="chip-sub">{item.sub}</p>
-              </div>
+
+        {/* Status Chips */}
+        <div
+          className={`
+          grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5
+          transition-all duration-500 delay-500 ease-out translate-y-4 opacity-0
+          ${mounted ? 'translate-y-0 opacity-100' : ''}
+        `}
+        >
+          {/* System */}
+          <div className="bg-white border-2 border-slate-200 rounded-xl p-5 md:p-6 flex items-center gap-4 shadow-md hover:shadow-lg hover:border-blue-500 transition-all group hover:-translate-y-0.5">
+            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#2563eb"
+                strokeWidth="1.8"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
+              </svg>
             </div>
-          ))}
+            <div>
+              <p className="text-xs font-bold tracking-wider uppercase text-slate-400 mb-1">
+                System
+              </p>
+              <p className="text-base font-bold text-slate-900 mb-0.5">
+                PrioCare HMS
+              </p>
+              <p className="text-xs text-slate-500">Hospital Management</p>
+            </div>
+          </div>
+
+          {/* AI Assistant */}
+          <div className="bg-white border-2 border-slate-200 rounded-xl p-5 md:p-6 flex items-center gap-4 shadow-md hover:shadow-lg hover:border-purple-500 transition-all group hover:-translate-y-0.5">
+            <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center shrink-0">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#7c3aed"
+                strokeWidth="1.8"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-bold tracking-wider uppercase text-slate-400 mb-1">
+                AI Assistant
+              </p>
+              <p className="text-base font-bold text-slate-900 mb-0.5">
+                Gemini AI
+              </p>
+              <p className="text-xs text-slate-500">Triage & summaries</p>
+            </div>
+          </div>
+
+          {/* Live Updates */}
+          <div className="bg-white border-2 border-slate-200 rounded-xl p-5 md:p-6 flex items-center gap-4 shadow-md hover:shadow-lg hover:border-slate-400 transition-all group hover:-translate-y-0.5">
+            <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center shrink-0 border border-slate-200">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#475569"
+                strokeWidth="1.8"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <div>
+              <p className="text-xs font-bold tracking-wider uppercase text-slate-400 mb-1">
+                Live Updates
+              </p>
+              <p className="text-base font-bold text-slate-900 mb-0.5">
+                Socket Ready
+              </p>
+              <p className="text-xs text-slate-500">Real-time queue sync</p>
+            </div>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

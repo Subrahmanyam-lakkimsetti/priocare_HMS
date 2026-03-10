@@ -161,6 +161,7 @@ export default function IntakeFlow() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const intake = useSelector((s) => s.patient.intake);
+  const userId = useSelector((s) => s.auth.user?._id);
   const [showOptional, setShowOptional] = useState(false);
 
   const checks = {
@@ -508,7 +509,7 @@ export default function IntakeFlow() {
             </button>
 
             <button
-              onClick={() => dispatch(resetIntake())}
+              onClick={() => dispatch(resetIntake(userId))}
               className="px-6 py-3 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all"
             >
               Clear Form

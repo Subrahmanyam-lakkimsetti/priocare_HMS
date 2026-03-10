@@ -82,33 +82,49 @@ function isYesterday(dateStr) {
 
 const SEVERITY = {
   emergency: {
-    color: '#dc2626',
-    bg: '#fee2e2',
-    border: '#fca5a5',
+    bg: 'bg-rose-50',
+    border: 'border-rose-200',
+    text: 'text-rose-600',
+    dot: 'bg-rose-500',
     label: 'Emergency',
   },
   critical: {
-    color: '#dc2626',
-    bg: '#fee2e2',
-    border: '#fca5a5',
+    bg: 'bg-rose-50',
+    border: 'border-rose-200',
+    text: 'text-rose-600',
+    dot: 'bg-rose-500',
     label: 'Critical',
   },
-  high: { color: '#ea580c', bg: '#ffedd5', border: '#fdba74', label: 'High' },
+  high: {
+    bg: 'bg-orange-50',
+    border: 'border-orange-200',
+    text: 'text-orange-600',
+    dot: 'bg-orange-500',
+    label: 'High',
+  },
   medium: {
-    color: '#ca8a04',
-    bg: '#fefce8',
-    border: '#fde047',
+    bg: 'bg-yellow-50',
+    border: 'border-yellow-200',
+    text: 'text-yellow-600',
+    dot: 'bg-yellow-500',
     label: 'Medium',
   },
-  low: { color: '#16a34a', bg: '#f0fdf4', border: '#86efac', label: 'Low' },
+  low: {
+    bg: 'bg-green-50',
+    border: 'border-green-200',
+    text: 'text-green-600',
+    dot: 'bg-green-500',
+    label: 'Low',
+  },
 };
 
 function getSeverity(level) {
   return (
     SEVERITY[level?.toLowerCase()] || {
-      color: '#64748b',
-      bg: '#f8fafc',
-      border: '#e2e8f0',
+      bg: 'bg-slate-50',
+      border: 'border-slate-200',
+      text: 'text-slate-600',
+      dot: 'bg-slate-400',
       label: level || 'N/A',
     }
   );
@@ -130,40 +146,64 @@ function AppointmentCard({ appt, index, animDelay }) {
   const symptoms = appt.triage?.symptoms || [];
 
   return (
-    <div className="ph-card" style={{ animationDelay: `${animDelay}ms` }}>
-      {/* Severity accent bar */}
-      <div className="ph-card-accent" style={{ background: sev.color }} />
+    <div
+      className="group flex items-stretch bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-blue-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 animate-in fade-in slide-in-from-bottom-1"
+      style={{ animationDelay: `${animDelay}ms`, animationFillMode: 'both' }}
+    >
+      {/* Accent bar */}
+      <div className={`w-1 shrink-0 ${sev.bg}`} />
 
-      {/* Left: index + token */}
-      <div className="ph-card-left">
-        <div className="ph-card-num">{index + 1}</div>
-        <div className="ph-card-token">#{appt.token}</div>
+      {/* Left - Token */}
+      <div className="flex flex-col items-center justify-center gap-1 py-3 px-4 border-r border-slate-100 min-w-15 bg-slate-50/50">
+        <span className="text-xs font-bold text-slate-400">#{index + 1}</span>
+        <span className="text-sm font-extrabold text-blue-600 tracking-tight">
+          {appt.token}
+        </span>
       </div>
 
-      {/* Center: patient info */}
-      <div className="ph-card-center">
-        <div className="ph-card-name-row">
-          <span className="ph-card-name">{name}</span>
-          <div className="ph-card-pills">
-            {age && <span className="ph-pill ph-pill-gray">{age}y</span>}
-            {gender && <span className="ph-pill ph-pill-gray">{gender}</span>}
-            {blood && <span className="ph-pill ph-pill-blue">🩸 {blood}</span>}
+      {/* Center - Patient Info */}
+      <div className="flex-1 py-3 px-4 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap mb-1">
+          <span className="text-base font-bold text-slate-900 tracking-tight">
+            {name}
+          </span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {age && (
+              <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                {age}y
+              </span>
+            )}
+            {gender && (
+              <span className="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                {gender}
+              </span>
+            )}
+            {blood && (
+              <span className="text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-full">
+                🩸 {blood}
+              </span>
+            )}
           </div>
         </div>
 
         {appt.triage?.description && (
-          <p className="ph-card-complaint">"{appt.triage.description}"</p>
+          <p className="text-sm text-slate-500 italic mb-1.5 truncate">
+            "{appt.triage.description}"
+          </p>
         )}
 
         {symptoms.length > 0 && (
-          <div className="ph-card-symptoms">
+          <div className="flex flex-wrap gap-1.5">
             {symptoms.slice(0, 3).map((s, i) => (
-              <span key={i} className="ph-symptom-tag">
+              <span
+                key={i}
+                className="text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-md"
+              >
                 {s}
               </span>
             ))}
             {symptoms.length > 3 && (
-              <span className="ph-symptom-more">
+              <span className="text-xs font-medium text-slate-400 px-1 py-0.5">
                 +{symptoms.length - 3} more
               </span>
             )}
@@ -171,47 +211,44 @@ function AppointmentCard({ appt, index, animDelay }) {
         )}
       </div>
 
-      {/* Right: severity + time */}
-      <div className="ph-card-right">
-        <span
-          className="ph-sev-badge"
-          style={{
-            background: sev.bg,
-            color: sev.color,
-            border: `1px solid ${sev.border}`,
-          }}
+      {/* Right - Time & Severity */}
+      <div className="flex flex-col items-end justify-between py-3 px-4 border-l border-slate-100 shrink-0">
+        <div
+          className={`text-xs font-bold px-3 py-1 rounded-full ${sev.bg} ${sev.text} border ${sev.border}`}
         >
+          <span
+            className={`inline-block w-1.5 h-1.5 rounded-full ${sev.dot} mr-1.5 align-middle`}
+          ></span>
           {sev.label}
-        </span>
+        </div>
 
-        <div className="ph-card-time-block">
-          <div className="ph-card-time-row">
+        <div className="flex flex-col items-end gap-0.5 mt-1">
+          <div className="flex items-center gap-1.5">
             <svg
-              width="10"
-              height="10"
+              className="w-3 h-3 text-slate-400"
               fill="none"
               viewBox="0 0 24 24"
-              stroke="#94a3b8"
+              stroke="currentColor"
               strokeWidth={2}
             >
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
-            <span className="ph-card-time-text">
+            <span className="text-xs font-medium text-slate-600 whitespace-nowrap">
               {formatTime(appt.consulationStartsAt)}
               {appt.consulationEndsAt && (
                 <> – {formatTime(appt.consulationEndsAt)}</>
               )}
             </span>
           </div>
+
           {duration && (
-            <div className="ph-card-duration">
+            <div className="flex items-center gap-1.5">
               <svg
-                width="10"
-                height="10"
+                className="w-3 h-3 text-slate-400"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="#94a3b8"
+                stroke="currentColor"
                 strokeWidth={2}
               >
                 <path
@@ -220,7 +257,9 @@ function AppointmentCard({ appt, index, animDelay }) {
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              {duration}
+              <span className="text-xs text-slate-400 font-medium">
+                {duration}
+              </span>
             </div>
           )}
         </div>
@@ -236,20 +275,22 @@ function DateGroup({ dateKey, group, defaultOpen }) {
   const todayFlag = group.label === 'Today';
 
   return (
-    <div className={`ph-group ${open ? 'ph-group-open' : ''}`}>
-      {/* Header */}
-      <button className="ph-group-btn" onClick={() => setOpen((o) => !o)}>
-        <div className="ph-group-btn-left">
-          {/* Date pill */}
+    <div
+      className={`bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm transition-all ${open ? 'border-blue-200 shadow-md' : 'hover:shadow-md'}`}
+    >
+      <button
+        className={`w-full flex items-center justify-between px-5 py-4 text-left font-sans transition-colors hover:bg-slate-50/80 ${open ? 'bg-slate-50/50 border-b border-slate-200' : ''}`}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <div className="flex items-center gap-3">
           <div
-            className={`ph-date-pill ${todayFlag ? 'ph-date-pill-today' : ''}`}
+            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border ${todayFlag ? 'bg-blue-50 border-blue-200' : 'bg-slate-100 border-slate-200'}`}
           >
             <svg
-              width="12"
-              height="12"
+              className={`w-3.5 h-3.5 ${todayFlag ? 'text-blue-600' : 'text-slate-500'}`}
               fill="none"
               viewBox="0 0 24 24"
-              stroke={todayFlag ? '#2563eb' : '#94a3b8'}
+              stroke="currentColor"
               strokeWidth={2}
             >
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -257,22 +298,26 @@ function DateGroup({ dateKey, group, defaultOpen }) {
               <line x1="8" y1="2" x2="8" y2="6" />
               <line x1="3" y1="10" x2="21" y2="10" />
             </svg>
-            <span className="ph-date-text">{group.label}</span>
-            {todayFlag && <span className="ph-today-tag">Today</span>}
+            <span className="text-sm font-bold text-slate-900">
+              {group.label}
+            </span>
+            {todayFlag && (
+              <span className="text-[10px] font-bold uppercase bg-blue-600 text-white px-1.5 py-0.5 rounded">
+                Today
+              </span>
+            )}
           </div>
-
-          {/* Count */}
-          <span className="ph-group-count">
+          <span className="text-xs font-medium text-slate-400">
             {group.items.length} consultation
             {group.items.length !== 1 ? 's' : ''}
           </span>
         </div>
 
-        {/* Chevron */}
-        <div className={`ph-chevron ${open ? 'ph-chevron-open' : ''}`}>
+        <div
+          className={`transition-transform duration-300 ${open ? 'rotate-180 text-blue-600' : 'text-slate-400'}`}
+        >
           <svg
-            width="15"
-            height="15"
+            className="w-4 h-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -287,11 +332,10 @@ function DateGroup({ dateKey, group, defaultOpen }) {
         </div>
       </button>
 
-      {/* Collapsible cards */}
       <div
-        className={`ph-group-body ${open ? 'ph-body-open' : 'ph-body-closed'}`}
+        className={`transition-all duration-300 ease-in-out ${open ? 'max-h-500 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
       >
-        <div className="ph-cards-list">
+        <div className="p-4 space-y-2.5">
           {group.items.map((appt, i) => (
             <AppointmentCard
               key={appt._id}
@@ -324,373 +368,104 @@ export default function PatientHistory() {
   const totalDays = dateKeys.length;
 
   return (
-    <>
-      <style>{`
-        .ph-page {
-          min-height: 100vh;
-          background: #f8fafc;
-          padding: 36px 28px 60px;
-          max-width: 900px;
-          margin: 0 auto;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-
-        /* ── Header ── */
-        .ph-header {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 28px;
-          opacity: 0; transform: translateY(14px);
-          transition: opacity 0.45s ease, transform 0.45s ease;
-        }
-        .ph-header.show { opacity: 1; transform: translateY(0); }
-
-        .ph-eyebrow {
-          font-size: 11px; font-weight: 600;
-          letter-spacing: 0.09em; text-transform: uppercase;
-          color: #94a3b8; margin-bottom: 6px;
-        }
-        .ph-title {
-          font-size: 26px; font-weight: 700;
-          color: #0f172a; letter-spacing: -0.4px; margin: 0 0 4px;
-        }
-        .ph-sub { font-size: 13px; color: #94a3b8; margin: 0; }
-
-        .ph-stats {
-          display: flex; gap: 12px; flex-shrink: 0;
-        }
-        .ph-stat {
-          background: #fff; border: 1px solid #e2e8f0;
-          border-radius: 12px; padding: 10px 16px;
-          text-align: center; min-width: 72px;
-        }
-        .ph-stat-val {
-          font-size: 22px; font-weight: 700;
-          color: #0f172a; line-height: 1;
-          letter-spacing: -0.5px;
-        }
-        .ph-stat-val.blue { color: #2563eb; }
-        .ph-stat-label {
-          font-size: 10.5px; color: #94a3b8;
-          font-weight: 500; margin-top: 2px;
-        }
-
-        /* ── Groups wrapper ── */
-        .ph-groups {
-          display: flex; flex-direction: column; gap: 12px;
-          opacity: 0; transform: translateY(14px);
-          transition: opacity 0.45s ease 0.1s, transform 0.45s ease 0.1s;
-        }
-        .ph-groups.show { opacity: 1; transform: translateY(0); }
-
-        /* ── Date group ── */
-        .ph-group {
-          background: #fff;
-          border: 1px solid #e2e8f0;
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 1px 4px rgba(15,23,42,0.04);
-          transition: box-shadow 0.2s, border-color 0.2s;
-        }
-        .ph-group:hover { box-shadow: 0 4px 16px rgba(15,23,42,0.08); }
-        .ph-group.ph-group-open { border-color: #dbeafe; }
-
-        /* Group button */
-        .ph-group-btn {
-          width: 100%; display: flex; align-items: center;
-          justify-content: space-between;
-          padding: 16px 20px;
-          background: transparent; border: none;
-          cursor: pointer; text-align: left;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          transition: background 0.15s;
-        }
-        .ph-group-btn:hover { background: #f8fafc; }
-        .ph-group-open .ph-group-btn {
-          background: #f8fafc;
-          border-bottom: 1px solid #f1f5f9;
-        }
-
-        .ph-group-btn-left {
-          display: flex; align-items: center; gap: 12px;
-        }
-
-        /* Date pill */
-        .ph-date-pill {
-          display: inline-flex; align-items: center; gap: 7px;
-          background: #f1f5f9; border: 1px solid #e2e8f0;
-          border-radius: 10px; padding: 6px 12px;
-          transition: background 0.15s, border-color 0.15s;
-        }
-        .ph-date-pill-today {
-          background: #eff6ff; border-color: #bfdbfe;
-        }
-        .ph-date-text {
-          font-size: 13.5px; font-weight: 600; color: #0f172a;
-        }
-        .ph-today-tag {
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.07em; text-transform: uppercase;
-          background: #2563eb; color: #fff;
-          border-radius: 5px; padding: 1px 6px;
-        }
-        .ph-group-count {
-          font-size: 12px; color: #94a3b8; font-weight: 500;
-        }
-
-        /* Chevron */
-        .ph-chevron {
-          color: #94a3b8; flex-shrink: 0;
-          transition: transform 0.25s cubic-bezier(.22,1,.36,1), color 0.15s;
-        }
-        .ph-chevron-open { transform: rotate(180deg); color: #2563eb; }
-
-        /* Collapsible */
-        .ph-group-body {
-          overflow: hidden;
-          transition: max-height 0.38s cubic-bezier(.22,1,.36,1), opacity 0.25s ease;
-        }
-        .ph-body-open   { max-height: 4000px; opacity: 1; }
-        .ph-body-closed { max-height: 0;      opacity: 0; }
-
-        .ph-cards-list {
-          padding: 12px 16px 16px;
-          display: flex; flex-direction: column; gap: 10px;
-        }
-
-        /* ── Appointment Card ── */
-        .ph-card {
-          display: flex;
-          align-items: stretch;
-          background: #fff;
-          border: 1px solid #f1f5f9;
-          border-radius: 12px;
-          overflow: hidden;
-          position: relative;
-          transition: box-shadow 0.18s, border-color 0.18s, transform 0.18s;
-          animation: ph-card-in 0.3s ease both;
-        }
-        @keyframes ph-card-in {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .ph-card:hover {
-          border-color: #dbeafe;
-          box-shadow: 0 4px 16px rgba(15,23,42,0.08);
-          transform: translateY(-1px);
-        }
-
-        /* Accent bar */
-        .ph-card-accent {
-          width: 4px; flex-shrink: 0;
-        }
-
-        /* Left: number + token */
-        .ph-card-left {
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          gap: 4px;
-          padding: 14px 16px;
-          border-right: 1px solid #f1f5f9;
-          min-width: 64px; flex-shrink: 0;
-          background: #fafafa;
-        }
-        .ph-card-num {
-          font-size: 11px; font-weight: 700;
-          color: #94a3b8; line-height: 1;
-        }
-        .ph-card-token {
-          font-size: 14px; font-weight: 800;
-          color: #2563eb; letter-spacing: -0.3px;
-        }
-
-        /* Center: patient info */
-        .ph-card-center {
-          flex: 1; padding: 14px 16px; min-width: 0;
-        }
-        .ph-card-name-row {
-          display: flex; align-items: center;
-          gap: 8px; flex-wrap: wrap; margin-bottom: 5px;
-        }
-        .ph-card-name {
-          font-size: 15px; font-weight: 700;
-          color: #0f172a; letter-spacing: -0.2px;
-        }
-
-        /* Pills */
-        .ph-card-pills { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-        .ph-pill {
-          font-size: 10.5px; font-weight: 600;
-          padding: 2px 8px; border-radius: 20px;
-        }
-        .ph-pill-gray  { background: #f1f5f9; color: #64748b; }
-        .ph-pill-blue  { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
-
-        /* Complaint */
-        .ph-card-complaint {
-          font-size: 12.5px; color: #64748b;
-          font-style: italic; line-height: 1.45;
-          margin: 0 0 7px;
-          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-
-        /* Symptoms */
-        .ph-card-symptoms {
-          display: flex; flex-wrap: wrap; gap: 5px;
-        }
-        .ph-symptom-tag {
-          font-size: 11px; font-weight: 500;
-          padding: 2px 8px; border-radius: 6px;
-          background: #f8fafc; color: #475569;
-          border: 1px solid #e2e8f0;
-        }
-        .ph-symptom-more {
-          font-size: 11px; font-weight: 500;
-          color: #94a3b8; padding: 2px 0;
-        }
-
-        /* Right: severity + time */
-        .ph-card-right {
-          display: flex; flex-direction: column;
-          align-items: flex-end; justify-content: space-between;
-          padding: 14px 18px;
-          gap: 10px; flex-shrink: 0;
-          border-left: 1px solid #f8fafc;
-        }
-        .ph-sev-badge {
-          font-size: 11px; font-weight: 700;
-          padding: 3px 10px; border-radius: 20px;
-          letter-spacing: 0.03em;
-          white-space: nowrap;
-        }
-        .ph-card-time-block {
-          display: flex; flex-direction: column;
-          align-items: flex-end; gap: 3px;
-        }
-        .ph-card-time-row {
-          display: flex; align-items: center; gap: 4px;
-        }
-        .ph-card-time-text {
-          font-size: 11.5px; font-weight: 500; color: #475569;
-          white-space: nowrap;
-        }
-        .ph-card-duration {
-          display: flex; align-items: center; gap: 4px;
-          font-size: 11px; color: #94a3b8; font-weight: 500;
-        }
-
-        /* ── Loading ── */
-        .ph-loading {
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          min-height: 300px; gap: 12px;
-        }
-        .ph-spinner {
-          width: 32px; height: 32px;
-          border: 2.5px solid #bfdbfe; border-top-color: #2563eb;
-          border-radius: 50%;
-          animation: ph-spin 0.75s linear infinite;
-        }
-        @keyframes ph-spin { to { transform: rotate(360deg); } }
-        .ph-loading-text { font-size: 13px; color: #94a3b8; }
-
-        /* ── Empty ── */
-        .ph-empty {
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          min-height: 300px; text-align: center; gap: 8px;
-        }
-        .ph-empty-icon {
-          width: 56px; height: 56px; border-radius: 18px;
-          background: #f1f5f9; border: 1px solid #e2e8f0;
-          display: flex; align-items: center; justify-content: center;
-          margin-bottom: 8px;
-        }
-        .ph-empty-title { font-size: 14px; font-weight: 600; color: #64748b; margin: 0; }
-        .ph-empty-sub   { font-size: 12px; color: #cbd5e1; margin: 0; }
-
-        @media (max-width: 640px) {
-          .ph-page { padding: 24px 14px 40px; }
-          .ph-stats { display: none; }
-          .ph-card-right { padding: 12px 12px; }
-          .ph-card-left  { min-width: 52px; padding: 12px 10px; }
-        }
-      `}</style>
-
-      <div className="ph-page">
-        {/* Header */}
-        <div className={`ph-header ${mounted ? 'show' : ''}`}>
-          <div>
-            <p className="ph-eyebrow">Doctor Workspace</p>
-            <h1 className="ph-title">Patient History</h1>
-            <p className="ph-sub">
-              All completed consultations, grouped by date
-            </p>
-          </div>
-          {!loading && history.length > 0 && (
-            <div className="ph-stats">
-              <div className="ph-stat">
-                <div className="ph-stat-val blue">{history.length}</div>
-                <div className="ph-stat-label">Total</div>
-              </div>
-              <div className="ph-stat">
-                <div className="ph-stat-val">{totalDays}</div>
-                <div className="ph-stat-label">Days</div>
-              </div>
-            </div>
-          )}
+    <div className="min-h-screen w-full px-8 py-8 md:px-10 md:py-8 lg:px-12 font-sans">
+      {/* Header */}
+      <div
+        className={`
+        bg-white border border-slate-200 rounded-xl p-6 md:p-7 shadow-md mb-7
+        flex flex-wrap items-end justify-between gap-4
+        transition-all duration-500 ease-out translate-y-1 opacity-0
+        ${mounted ? 'translate-y-0 opacity-100' : ''}
+      `}
+      >
+        <div>
+          <p className="text-xs font-semibold tracking-wider uppercase text-slate-400 mb-1.5">
+            Doctor Workspace
+          </p>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-1">
+            Patient History
+          </h1>
+          <p className="text-sm text-slate-400">
+            All completed consultations, grouped by date
+          </p>
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="ph-loading">
-            <div className="ph-spinner" />
-            <p className="ph-loading-text">Loading history…</p>
-          </div>
-        )}
-
-        {/* Empty */}
-        {!loading && history.length === 0 && (
-          <div className="ph-empty">
-            <div className="ph-empty-icon">
-              <svg
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="#cbd5e1"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
+        {!loading && history.length > 0 && (
+          <div className="flex gap-2">
+            <div className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-center min-w-17.5 shadow-sm">
+              <div className="text-xl font-extrabold text-blue-600 leading-none">
+                {history.length}
+              </div>
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">
+                Total
+              </div>
             </div>
-            <p className="ph-empty-title">No completed consultations yet</p>
-            <p className="ph-empty-sub">
-              Completed sessions will appear here once you finish consultations.
-            </p>
-          </div>
-        )}
-
-        {/* Groups */}
-        {!loading && dateKeys.length > 0 && (
-          <div className={`ph-groups ${mounted ? 'show' : ''}`}>
-            {dateKeys.map((key, i) => (
-              <DateGroup
-                key={key}
-                dateKey={key}
-                group={grouped[key]}
-                defaultOpen={i === 0}
-              />
-            ))}
+            <div className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-center min-w-17.5 shadow-sm">
+              <div className="text-xl font-extrabold text-slate-900 leading-none">
+                {totalDays}
+              </div>
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">
+                Days
+              </div>
+            </div>
           </div>
         )}
       </div>
-    </>
+
+      {/* Loading */}
+      {loading && (
+        <div className="flex flex-col items-center justify-center min-h-75 gap-3">
+          <div className="w-8 h-8 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+          <p className="text-sm text-slate-400">Loading history…</p>
+        </div>
+      )}
+
+      {/* Empty */}
+      {!loading && history.length === 0 && (
+        <div className="flex flex-col items-center justify-center min-h-75 text-center gap-2">
+          <div className="w-14 h-14 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center mb-2">
+            <svg
+              className="w-7 h-7 text-slate-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+          </div>
+          <p className="text-sm font-bold text-slate-500">
+            No completed consultations yet
+          </p>
+          <p className="text-xs text-slate-400">
+            Completed sessions will appear here once you finish consultations.
+          </p>
+        </div>
+      )}
+
+      {/* Groups */}
+      {!loading && dateKeys.length > 0 && (
+        <div
+          className={`
+          space-y-3
+          transition-all duration-500 delay-100 ease-out translate-y-1 opacity-0
+          ${mounted ? 'translate-y-0 opacity-100' : ''}
+        `}
+        >
+          {dateKeys.map((key, i) => (
+            <DateGroup
+              key={key}
+              dateKey={key}
+              group={grouped[key]}
+              defaultOpen={i === 0}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

@@ -196,7 +196,7 @@ const ProfileForm = ({ existingProfile, onDone }) => {
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 px-6 py-5">
+        <div className="bg-linear-to-r from-blue-900 via-blue-800 to-blue-900 px-6 py-5">
           <div className="flex items-center justify-between">
             <div>
               <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1 mb-2">

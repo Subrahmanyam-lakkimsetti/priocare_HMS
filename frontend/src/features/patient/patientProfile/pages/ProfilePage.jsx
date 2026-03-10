@@ -19,7 +19,7 @@ const ProfilePage = () => {
           {/* Animated medical cross */}
           <div className="relative w-14 h-14">
             <div className="absolute inset-0 rounded-2xl bg-blue-100 animate-ping opacity-40" />
-            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg">
+            <div className="relative w-14 h-14 rounded-2xl bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg">
               <svg
                 className="w-7 h-7 text-white"
                 fill="currentColor"

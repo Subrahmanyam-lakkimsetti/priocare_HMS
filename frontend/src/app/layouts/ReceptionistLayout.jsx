@@ -9,7 +9,7 @@ import PatientCheckIn from '../../features/receptionist/pages/PatientCheckIn';
 import TodayAppointments from '../../features/receptionist/pages/TodayAppointments';
 import QueueStatus from '../../features/receptionist/pages/QueueStatus';
 import TokenSearch from '../../features/receptionist/pages/TokenSearch';
-import ConfirmDialog from '../../features/receptionist/components/ConfirmDialog';
+import ConfirmDialog from '../../features/receptionist/components/Confirmdialog';
 
 const NAV_ITEMS = [
   { key: 'dashboard', label: 'Dashboard', path: '/receptionist' },

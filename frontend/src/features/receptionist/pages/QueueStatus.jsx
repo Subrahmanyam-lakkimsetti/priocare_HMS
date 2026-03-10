@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchQueueStatus } from '../receptionistThunks';
-import TokenBadge from '../components/TokenBadge';
-import TokenDetailModal from '../components/TokenDetailModal';
+import TokenBadge from '../components/Tokenbadge';
+import TokenDetailModal from '../components/Tokendetailmodal';
 
 function ProgressBar({ value, total, color }) {
   const pct = total ? Math.min(100, Math.round((value / total) * 100)) : 0;

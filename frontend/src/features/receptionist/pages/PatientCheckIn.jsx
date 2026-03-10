@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkinPatient } from '../receptionistThunks';
 import { clearLastCheckedIn } from '../receptionistSlice';
-import ConfirmDialog from '../components/ConfirmDialog';
-import TokenDetailModal from '../components/TokenDetailModal';
+import ConfirmDialog from '../components/Confirmdialog';
+import TokenDetailModal from '../components/Tokendetailmodal';
 
 const SEV = {
   low: {

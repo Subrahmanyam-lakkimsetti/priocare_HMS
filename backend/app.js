@@ -34,11 +34,6 @@ app.get('/health-check', (req, res) => {
 });
 
 app.all(/.*/, (req, res, next) => {
-  // const err = new Error(`The requested URL ${req.originalUrl} was not found on this server.`);
-  // err.statusCode = 404;
-  // err.status = 'fail';
-  // next(err);
-
   next(
     new AppError(
       `The requested URL ${req.originalUrl} was not found on this server.`,

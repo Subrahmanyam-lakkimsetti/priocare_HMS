@@ -10,6 +10,9 @@ export default function DateStep() {
   const handleChange = (e) => {
     const selected = new Date(e.target.value + 'T00:00:00');
     if (selected.getDay() === 0) return; // silently block Sundays
+
+    const todayDate = new Date(today + 'T00:00:00');
+    if (selected < todayDate) return;
     dispatch(setField({ scheduledDate: e.target.value }));
   };
 

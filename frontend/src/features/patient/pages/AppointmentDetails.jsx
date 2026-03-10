@@ -142,42 +142,6 @@ export default function AppointmentDetails() {
   return (
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4 shadow-sm">
-        <button
-          onClick={() => nav('/patient')}
-          className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-
-        <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-gray-900">
-            Appointment Details
-          </h1>
-          <p className="text-sm text-gray-500">
-            Token <span className="font-medium text-gray-700">#{a.token}</span>
-          </p>
-        </div>
-
-        <span
-          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${statusCfg.color}`}
-        >
-          <span className="w-2 h-2 rounded-full bg-current opacity-70" />
-          {statusCfg.label}
-        </span>
-      </header>
 
       {/* Scrollable content */}
       <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">

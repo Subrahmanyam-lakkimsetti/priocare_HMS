@@ -23,6 +23,7 @@ export default function Login() {
     if (user.role === 'patient') navigate('/patient');
     else if (user.role === 'doctor') navigate('/doctor');
     else if (user.role === 'admin') navigate('/admin');
+    else if (user.role === 'receptionist') navigate('/receptionist');
   }, [isAuthenticated, user, navigate]);
 
   return (

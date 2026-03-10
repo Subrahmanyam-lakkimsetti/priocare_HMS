@@ -17,7 +17,7 @@ export default function Confirmation() {
         {/* Success card */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           {/* Success Header */}
-          <div className="bg-gradient-to-br from-green-600 to-emerald-600 px-6 py-12 text-center relative">
+          <div className="bg-linear-to-br from-green-600 to-emerald-600 px-6 py-12 text-center relative">
             {/* Decorative circles */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-8 -mb-8" />
@@ -60,7 +60,7 @@ export default function Confirmation() {
               <div className="space-y-4">
                 {/* Step 1 */}
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-blue-600 font-bold text-sm">1</span>
                   </div>
                   <div>
@@ -75,7 +75,7 @@ export default function Confirmation() {
 
                 {/* Step 2 */}
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-blue-600 font-bold text-sm">2</span>
                   </div>
                   <div>
@@ -90,7 +90,7 @@ export default function Confirmation() {
 
                 {/* Step 3 */}
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
                     <span className="text-blue-600 font-bold text-sm">3</span>
                   </div>
                   <div>

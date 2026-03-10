@@ -21,15 +21,8 @@ const NAV_ITEMS = [
 export default function PatientLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const nav = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
   const user = useSelector((s) => s.auth?.user);
-
-  const handleLogout = async () => {
-    await dispatch(logoutUser());
-    nav('/', { replace: true });
-  };
 
   const activeKey =
     location.pathname === '/patient'
@@ -39,7 +32,7 @@ export default function PatientLayout() {
         )?.key || 'home';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex overflow-hidden">
+    <div className="min-h-screen bg-[#f1f5f9] flex">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
@@ -54,9 +47,9 @@ export default function PatientLayout() {
         setSidebarOpen={setSidebarOpen}
       />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile top bar */}
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile Top Bar */}
         <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-4 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -76,13 +69,33 @@ export default function PatientLayout() {
               />
             </svg>
           </button>
+
           <h1 className="text-lg font-semibold text-gray-900">
             Patient Portal
           </h1>
         </header>
 
-        {/* Internal Routing */}
-        <main className="flex-1 overflow-y-auto">
+        {/* Desktop Fixed Header */}
+        <header className="hidden lg:flex fixed top-0 left-63 right-0 z-30 bg-white border-b border-gray-100 px-8 h-15 items-center justify-between">
+          <p className="text-sm font-medium text-gray-500">
+            {NAV_ITEMS.find((n) => n.key === activeKey)?.label ?? 'Dashboard'}
+          </p>
+
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
+              <span className="text-xs font-semibold text-blue-600">
+                {user?.name?.[0]?.toUpperCase() ?? 'P'}
+              </span>
+            </div>
+
+            <span className="text-sm text-gray-700">
+              {user?.name ?? 'Patient'}
+            </span>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto pt-15">
           <Routes>
             <Route index element={<PatientHome />} />
             <Route path="intake" element={<IntakeFlow />} />

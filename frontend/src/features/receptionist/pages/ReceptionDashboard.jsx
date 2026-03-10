@@ -5,8 +5,8 @@ import {
   fetchDashboardStats,
   fetchRecentCheckins,
 } from '../receptionistThunks';
-import TokenBadge from '../components/TokenBadge';
-import TokenDetailModal from '../components/TokenDetailModal';
+import TokenBadge from '../components/Tokenbadge';
+import TokenDetailModal from '../components/Tokendetailmodal';
 
 const PAGE_SIZE = 8;
 

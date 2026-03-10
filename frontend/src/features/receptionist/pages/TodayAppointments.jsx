@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTodaysAppointments } from '../receptionistThunks';
-import TokenBadge from '../components/TokenBadge';
-import TokenDetailModal from '../components/TokenDetailModal';
+import TokenBadge from '../components/Tokenbadge';
+import TokenDetailModal from '../components/Tokendetailmodal';
 
 const STATUS_TABS = [
   'all',

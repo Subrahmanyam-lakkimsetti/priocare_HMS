@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import { logoutUser } from '../../features/auth/authThunks';
 
-import ReceptionSidebar from '../../features/receptionist/componentes/ReceptionSidebar';
+import ReceptionSidebar from '../../features/receptionist/components/ReceptionSidebar';
 import ReceptionDashboard from '../../features/receptionist/pages/ReceptionDashboard';
 import PatientCheckIn from '../../features/receptionist/pages/PatientCheckIn';
 import TodayAppointments from '../../features/receptionist/pages/TodayAppointments';

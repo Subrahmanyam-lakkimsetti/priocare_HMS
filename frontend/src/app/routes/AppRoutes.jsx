@@ -17,6 +17,7 @@ import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from './ProtectedRoute';
 import SmartHospitalLanding from '../../pages/EntryPage';
 import AnimatedAuthLayout from '../../components/AnimatedAuthLayout';
+import ReceptionistLayout from '../layouts/ReceptionistLayout';
 
 function AuthLoader({ children }) {
   const dispatch = useDispatch();
@@ -114,6 +115,15 @@ export default function AppRoutes() {
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminLayout />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/receptionist/*"
+            element={
+              <ProtectedRoute allowedRoles={['receptionist']}>
+                <ReceptionistLayout />
               </ProtectedRoute>
             }
           />

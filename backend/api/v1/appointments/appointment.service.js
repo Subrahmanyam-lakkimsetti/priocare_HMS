@@ -136,12 +136,13 @@ const getAppointmentByToken = async ({ token }, id) => {
   }
 
   const appointmentData = await getActiveAppointment(id);
+  console.log(appointmentData);
 
   let exceptedStartTime = null;
   let exceptedEndTime = null;
   let queuePosition = null;
 
-  if (appointment) {
+  if (!appointment) {
     exceptedStartTime = appointmentData.exceptedStartTime;
     exceptedEndTime = appointmentData.exceptedEndTime;
     queuePosition = appointmentData.queuePosition;

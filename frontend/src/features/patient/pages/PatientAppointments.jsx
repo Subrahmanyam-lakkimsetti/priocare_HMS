@@ -222,8 +222,12 @@ export default function PatientAppointments() {
                   icon: '🩺',
                   time: appt.consulationStartsAt,
                 },
+                {
+                  label: 'Ended',
+                  icon: '✅',
+                  time: appt.consulationEndsAt,
+                },
               ].filter((t) => t.time);
-
               return (
                 <div key={appt._id} className="flex gap-4 sm:gap-5 items-start">
                   {/* Timeline dot + date */}

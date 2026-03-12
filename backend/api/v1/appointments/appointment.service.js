@@ -135,14 +135,23 @@ const getAppointmentByToken = async ({ token }, id) => {
     throw new AppError('No appointment found!', 404);
   }
 
-  const { exceptedStartTime, exceptedEndTime, queuePosition } =
-    await getActiveAppointment(id);
+  const appointmentData = await getActiveAppointment(id);
+
+  let exceptedStartTime = null;
+  let exceptedEndTime = null;
+  let queuePosition = null;
+
+  if (appointment) {
+    exceptedStartTime = appointmentData.exceptedStartTime;
+    exceptedEndTime = appointmentData.exceptedEndTime;
+    queuePosition = appointmentData.queuePosition;
+  }
 
   return {
     ...appointment.toObject(),
-    exceptedStartTime: exceptedStartTime || null,
-    exceptedEndTime: exceptedEndTime || null,
-    queuePosition: queuePosition || null,
+    exceptedStartTime,
+    exceptedEndTime,
+    queuePosition,
   };
 };
 

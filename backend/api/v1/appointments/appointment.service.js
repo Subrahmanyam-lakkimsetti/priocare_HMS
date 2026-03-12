@@ -140,9 +140,9 @@ const getAppointmentByToken = async ({ token }, id) => {
 
   return {
     ...appointment.toObject(),
-    exceptedStartTime,
-    exceptedEndTime,
-    queuePosition,
+    exceptedStartTime: exceptedStartTime || null,
+    exceptedEndTime: exceptedEndTime || null,
+    queuePosition: queuePosition || null,
   };
 };
 

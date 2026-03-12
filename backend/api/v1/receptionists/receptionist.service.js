@@ -162,6 +162,7 @@ const appointmentBytoken = async (token) => {
         consulationStartsAt: 1,
         consulationEndsAt: 1,
 
+        "triage.priorityScore": 1,
         'patientDetails.firstName': 1,
         'patientDetails.lastName': 1,
         'patientDetails.age': 1,

@@ -1082,13 +1082,13 @@ const SmartHospitalLanding = () => {
         id="postcare"
         className="relative py-32 px-6"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
+        <div className="absolute inset-0 bg-linear-to-b from-gray-950 via-black to-gray-950">
           {renderBackgroundElements('postcare')}
         </div>
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Section Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
+            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
               <RefreshCw className="w-5 h-5 text-emerald-400" />
               <span className="text-emerald-400 text-sm font-medium tracking-wider">
                 AFTER YOUR VISIT
@@ -1097,7 +1097,7 @@ const SmartHospitalLanding = () => {
 
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               Care That Continues
-              <span className="block mt-4 text-transparent bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text">
+              <span className="block mt-4 text-transparent bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text">
                 Beyond The Visit
               </span>
             </h2>
@@ -1134,10 +1134,10 @@ const SmartHospitalLanding = () => {
                 },
               ].map((feature, i) => (
                 <div key={i} className="group relative">
-                  <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-6 transform-gpu transition-all duration-500 hover:border-emerald-400/30">
+                  <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-6 transform-gpu transition-all duration-500 hover:border-emerald-400/30">
                     <div className="flex items-start gap-6">
                       <div
-                        className={`w-14 h-14 rounded-xl bg-gradient-to-br from-${feature.color}-500/10 to-${feature.color}-600/10 border border-${feature.color}-400/20 flex items-center justify-center flex-shrink-0`}
+                        className={`w-14 h-14 rounded-xl bg-linear-to-br from-${feature.color}-500/10 to-${feature.color}-600/10 border border-${feature.color}-400/20 flex items-center justify-center shrink-0`}
                       >
                         <feature.icon
                           className={`w-7 h-7 text-${feature.color}-400`}
@@ -1179,7 +1179,7 @@ const SmartHospitalLanding = () => {
                     />
 
                     {/* Center Content */}
-                    <div className="absolute inset-16 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 flex items-center justify-center">
+                    <div className="absolute inset-16 bg-linear-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 flex items-center justify-center">
                       <div className="text-center">
                         <div className="text-4xl text-emerald-400 font-light mb-2">
                           75%
@@ -1193,9 +1193,9 @@ const SmartHospitalLanding = () => {
                 </div>
 
                 {/* Floating Elements */}
-                <div className="absolute top-1/4 left-1/4 w-12 h-12 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-teal-400/20 animate-float-slow" />
+                <div className="absolute top-1/4 left-1/4 w-12 h-12 bg-linear-to-br from-teal-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-teal-400/20 animate-float-slow" />
                 <div
-                  className="absolute bottom-1/4 right-1/4 w-16 h-16 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 animate-float-slow"
+                  className="absolute bottom-1/4 right-1/4 w-16 h-16 bg-linear-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 animate-float-slow"
                   style={{ animationDelay: '1s' }}
                 />
               </div>

@@ -1206,7 +1206,7 @@ const SmartHospitalLanding = () => {
 
       {/* Who It's For - Interactive Cards */}
       <section className="relative py-32 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
+        <div className="absolute inset-0 bg-linear-to-b from-gray-950 via-black to-gray-950">
           {renderBackgroundElements('for')}
         </div>
 
@@ -1235,7 +1235,7 @@ const SmartHospitalLanding = () => {
           {/* Accordion Stack Layout - Performance Optimized */}
           <div className="relative">
             {/* Stacking lines indicator */}
-            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-400/20 via-transparent to-emerald-400/20" />
+            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-emerald-400/20 via-transparent to-emerald-400/20" />
 
             {/* Card Stack Container */}
             <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
@@ -1279,20 +1279,20 @@ const SmartHospitalLanding = () => {
               ].map((role, i) => (
                 <div key={i} className="group">
                   {/* Stack Card */}
-                  <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-400/30 hover:translate-y-[-4px]">
+                  <div className="relative bg-linear-to-br from-gray-900/90 to-black/90 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-400/30 hover:-translate-y-1">
                     {/* Stack layer indicators */}
-                    <div className="absolute -top-2 left-6 right-6 h-2 bg-gradient-to-r from-emerald-400/10 via-teal-400/10 to-transparent rounded-t-lg" />
-                    <div className="absolute -bottom-2 left-6 right-6 h-2 bg-gradient-to-r from-transparent via-teal-400/10 to-emerald-400/10 rounded-b-lg" />
+                    <div className="absolute -top-2 left-6 right-6 h-2 bg-linear-to-r from-emerald-400/10 via-teal-400/10 to-transparent rounded-t-lg" />
+                    <div className="absolute -bottom-2 left-6 right-6 h-2 bg-linear-to-r from-transparent via-teal-400/10 to-emerald-400/10 rounded-b-lg" />
 
                     {/* Number indicator */}
-                    <div className="absolute -left-3 top-8 w-8 h-8 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-light shadow-lg">
+                    <div className="absolute -left-3 top-8 w-8 h-8 bg-linear-to-br from-emerald-600 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-light shadow-lg">
                       {i + 1}
                     </div>
 
                     {/* Icon */}
                     <div className="flex justify-center mb-8">
                       <div
-                        className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-${role.color}-500/10 to-${role.color}-600/10 border border-${role.color}-400/20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
+                        className={`w-20 h-20 rounded-2xl bg-linear-to-br from-${role.color}-500/10 to-${role.color}-600/10 border border-${role.color}-400/20 flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
                       >
                         <role.icon
                           className={`w-10 h-10 text-${role.color}-400`}
@@ -1329,12 +1329,12 @@ const SmartHospitalLanding = () => {
                     </div>
 
                     {/* Hover indicator */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-linear-to-r from-transparent via-emerald-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
 
                   {/* Desktop connection lines */}
                   {i < 2 && (
-                    <div className="hidden lg:block absolute top-1/2 right-[-32px] w-8 h-0.5 bg-gradient-to-r from-emerald-400/20 to-transparent" />
+                    <div className="hidden lg:block absolute top-1/2 -right-8 w-8 h-0.5 bg-linear-to-r from-emerald-400/20 to-transparent" />
                   )}
                 </div>
               ))}
@@ -1344,7 +1344,7 @@ const SmartHospitalLanding = () => {
             <div className="hidden lg:block">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%+4rem)] h-[calc(100%+4rem)]">
                 {/* Stack shadow effects */}
-                <div className="absolute top-[-20px] left-[-20px] right-[-20px] bottom-[-20px] bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
+                <div className="absolute -top-5 -left-5 -right-5 bottom-[-20px] bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
               </div>
             </div>
           </div>

@@ -1344,7 +1344,7 @@ const SmartHospitalLanding = () => {
             <div className="hidden lg:block">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%+4rem)] h-[calc(100%+4rem)]">
                 {/* Stack shadow effects */}
-                <div className="absolute -top-5 -left-5 -right-5 bottom-[-20px] bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
+                <div className="absolute -top-5 -left-5 -right-5 -bottom-5 bg-linear-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
               </div>
             </div>
           </div>
@@ -1367,7 +1367,7 @@ const SmartHospitalLanding = () => {
 
       {/* Emergency Response System */}
       <section id="emergency" className="relative py-32 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
+        <div className="absolute inset-0 bg-linear-to-b from-gray-950 via-black to-gray-950">
           {renderBackgroundElements('emergency')}
         </div>
 
@@ -1379,7 +1379,7 @@ const SmartHospitalLanding = () => {
                 className="absolute inset-0 bg-red-500 rounded-full blur-lg animate-ping"
                 style={{ animationDuration: '1.5s' }}
               />
-              <div className="relative w-5 h-5 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
+              <div className="relative w-5 h-5 bg-linear-to-r from-red-500 to-orange-500 rounded-full" />
             </div>
 
             <span className="text-red-400 text-sm font-light tracking-widest uppercase">
@@ -1391,7 +1391,7 @@ const SmartHospitalLanding = () => {
                 className="absolute inset-0 bg-red-500 rounded-full blur-lg animate-ping"
                 style={{ animationDuration: '1.5s', animationDelay: '0.5s' }}
               />
-              <div className="relative w-5 h-5 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
+              <div className="relative w-5 h-5 bg-linear-to-r from-red-500 to-orange-500 rounded-full" />
             </div>
           </div>
 
@@ -1429,9 +1429,9 @@ const SmartHospitalLanding = () => {
                 ].map((feature, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-red-500/5 to-transparent border border-red-400/10 hover:border-red-400/30 transition-all"
+                    className="flex items-start gap-4 p-4 rounded-xl bg-linear-to-r from-red-500/5 to-transparent border border-red-400/10 hover:border-red-400/30 transition-all"
                   >
-                    <div className="w-12 h-12 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-linear-to-br from-red-500/20 to-orange-500/20 rounded-xl flex items-center justify-center shrink-0">
                       <feature.icon className="w-6 h-6 text-red-400" />
                     </div>
                     <div>
@@ -1453,7 +1453,7 @@ const SmartHospitalLanding = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
                     <div className="absolute inset-0 bg-red-500 rounded-full blur-xl opacity-30 animate-pulse" />
-                    <div className="relative w-32 h-32 bg-gradient-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center border-4 border-red-400/40">
+                    <div className="relative w-32 h-32 bg-linear-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center border-4 border-red-400/40">
                       <Heart
                         className="w-16 h-16 text-white"
                         fill="white"
@@ -1468,8 +1468,8 @@ const SmartHospitalLanding = () => {
 
           {/* CTA */}
           <div className="text-center mt-20">
-            <button className="group relative px-10 py-4 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-white font-light tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-red-500/30">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <button className="group relative px-10 py-4 bg-linear-to-r from-red-600 to-orange-600 rounded-full text-white font-light tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-red-500/30">
+              <div className="absolute inset-0 bg-linear-to-r from-red-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <span className="relative flex items-center justify-center gap-3">
                 <AlertTriangle className="w-5 h-5" />
                 Emergency Assistance
@@ -1486,7 +1486,7 @@ const SmartHospitalLanding = () => {
 
       {/* Trust Section */}
       <section className="relative py-32 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
+        <div className="absolute inset-0 bg-linear-to-b from-gray-950 via-black to-gray-950">
           {renderBackgroundElements('trust')}
         </div>
         <div className="max-w-5xl mx-auto relative z-10">
@@ -1528,7 +1528,7 @@ const SmartHospitalLanding = () => {
             ].map((item, i) => (
               <div key={i} className="relative group">
                 {/* Hover Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {/* Content */}
                 <div className="relative p-8 border border-gray-800/50 rounded-3xl backdrop-blur-sm transition-all duration-500 group-hover:border-emerald-400/30">
@@ -1579,7 +1579,7 @@ const SmartHospitalLanding = () => {
 
       {/* Final CTA */}
       <section className="relative py-40 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-black to-gray-950">
+        <div className="absolute inset-0 bg-linear-to-b from-gray-950 via-black to-gray-950">
           {renderBackgroundElements('cta')}
         </div>
 

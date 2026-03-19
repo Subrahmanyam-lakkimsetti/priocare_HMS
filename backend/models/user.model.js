@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
   },
+  isProfileComplete: {
+    type: Boolean,
+    default: false,
+  },
   role: {
     type: String,
     enum: ['admin', 'doctor', 'nurse', 'receptionist', 'patient', 'lab_tech'],

@@ -1,4 +1,5 @@
 const Doctor = require('../../../models/doctor.model');
+const User = require('../../../models/user.model');
 const AppError = require('../../../utils/AppError.util');
 
 const createDoctor = async (userId, payload, file) => {
@@ -17,6 +18,8 @@ const createDoctor = async (userId, payload, file) => {
     userId,
     ...payload,
   });
+
+  await User.findOneAndUpdate({ _id: userId }, { isProfileComplete: true });
 
   return doctorProfile;
 };

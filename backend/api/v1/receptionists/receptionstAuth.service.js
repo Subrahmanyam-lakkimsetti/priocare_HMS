@@ -14,6 +14,7 @@ const createReceptionist = async (userId, payload) => {
     ...payload,
   });
 
+  await User.findOneAndUpdate({ _id: userId }, { isProfileComplete: true });
   return receptionistProfile;
 };
 

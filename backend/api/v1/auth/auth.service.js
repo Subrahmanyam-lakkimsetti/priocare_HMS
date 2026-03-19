@@ -20,6 +20,7 @@ const registerUser = async ({ email, password }) => {
   const token = generateToken({
     userId: newUser.id,
     role: newUser.role,
+    isActive: newUser.isActive,
   });
 
   return {
@@ -45,6 +46,7 @@ const loginUser = async ({ email, password }) => {
   const token = generateToken({
     userId: user.id,
     role: user.role,
+    isActive: user.isActive,
   });
 
   return { user, token };

@@ -102,6 +102,8 @@ const appointmentSchema = new mongoose.Schema(
 appointmentSchema.index({
   doctorId: 1,
   scheduledDate: 1,
+  department: 1,
+  token: 1,
 });
 
 appointmentSchema.pre('aggregate', function () {

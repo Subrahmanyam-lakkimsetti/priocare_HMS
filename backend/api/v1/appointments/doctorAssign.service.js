@@ -33,6 +33,8 @@ const assignDoctor = async ({ specilization, scheduledDate }) => {
     const isAvailable = doctor.availableDays.includes(appointmentDay);
     if (!isAvailable) continue;
 
+    if (!doctor.isActive) continue;
+
     const load = await calculateTotalAppointments(doctor, scheduledDate);
     if (load >= doctor.MaxDailyAppointments) continue;
 

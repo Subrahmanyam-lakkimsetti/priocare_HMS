@@ -1,4 +1,5 @@
 const Patient = require('../../../models/patient.model');
+const User = require('../../../models/user.model');
 const AppError = require('../../../utils/AppError.util');
 
 UPDATE_ALLOWED_FIELDS = [
@@ -28,6 +29,8 @@ const createPatient = async (userId, payload, file) => {
     ...payload,
     isTemporary: false,
   });
+
+  await User.findOneAndUpdate({ _id: userId }, { isProfileComplete: true });
 
   return patient;
 };

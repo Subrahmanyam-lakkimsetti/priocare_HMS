@@ -31,8 +31,6 @@ const getActiveAppointment = catchAsync(async (req, res) => {
     req.data.id,
   );
 
-
-
   res.status(200).json({
     isSuccess: true,
     message: 'current active appointment',
@@ -70,10 +68,23 @@ const cancelAppointment = catchAsync(async (req, res) => {
   });
 });
 
+const getPrescriptionByToken = catchAsync(async (req, res) => {
+  const prescription = await appointmentService.getPrescriptionByToken(req);
+
+  res.status(200).json({
+    isSuccess: true,
+    message: `prescription for appointment ${req.params.token}`,
+    data: {
+      prescription,
+    },
+  });
+});
+
 module.exports = {
   createAppointment,
   getAppointmnetByToken,
   getActiveAppointment,
   getAppointmentsForUser,
   cancelAppointment,
+  getPrescriptionByToken,
 };

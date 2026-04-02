@@ -9,6 +9,7 @@ const {
   getAppointmnetByToken,
   getAppointmentsForUser,
   cancelAppointment,
+  getPrescriptionByToken,
 } = require('./appointment.controller');
 
 const appointementRouter = express.Router();
@@ -26,6 +27,11 @@ appointementRouter.get(
 appointementRouter.get('/token/:token', getAppointmnetByToken);
 
 appointementRouter.get('/all', restrictTo('patient'), getAppointmentsForUser);
+
+appointementRouter.get(
+  '/:token/prescription',
+  getPrescriptionByToken,
+);
 
 appointementRouter.patch(
   '/token/:token/cancel',

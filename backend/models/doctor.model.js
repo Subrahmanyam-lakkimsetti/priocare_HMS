@@ -59,7 +59,7 @@ const doctorSchema = new mongoose.Schema(
       end: {
         type: String,
         required: true,
-        match: /^([01]\d|2[0-3]):([0-5]\d)$/,
+        match: /^([01]\d|2[0-3]):([0-ss5]\d)$/,
       },
     },
     availableDays: [

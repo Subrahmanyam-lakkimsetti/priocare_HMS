@@ -15,6 +15,9 @@ const {
   getPatientByIdController,
 } = require('./patient.controller');
 const upload = require('../../../utils/multer.util');
+const {
+  getPrescriptionWithStatus,
+} = require('./prescription/patient.prescription.controller');
 
 const patientRouter = express.Router();
 
@@ -28,6 +31,8 @@ patientRouter.get(
 );
 
 patientRouter.use(restrictTo('patient'));
+
+patientRouter.get('/appt/:token/prescription', getPrescriptionWithStatus);
 
 // post
 patientRouter.post(

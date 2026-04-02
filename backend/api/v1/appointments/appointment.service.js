@@ -1,5 +1,6 @@
 const Appointment = require('../../../models/appointment.model');
 const Patient = require('../../../models/patient.model');
+const Prescription = require('../../../models/prescription.model');
 const AppError = require('../../../utils/AppError.util');
 const { getDoctor } = require('../doctors/doctorAuth.service');
 const assignDoctor = require('./doctorAssign.service');
@@ -176,10 +177,29 @@ const cancelAppointment = async ({ token }) => {
   return appointment;
 };
 
+const getPrescriptionByToken = async ({ params: { token } }) => {
+  const appt = await Appointment.findOne({ token });
+
+  if (!appt) throw new AppError('appointment not found', 404);
+
+  const prescription = await Prescription.findOne({
+    appointmentId: appt._id,
+  });
+
+  if (!prescription) {
+    throw new AppError('prescription not exists');
+  }
+
+  return prescription;
+};
+
+
+
 module.exports = {
   createAppointment,
   getActiveAppointment,
   getAppointmentByToken,
   getAppointmentsForUser,
   cancelAppointment,
+  getPrescriptionByToken,
 };

@@ -25,6 +25,10 @@ const {
   treatedPatientsHistory,
 } = require('./doctor.controller');
 const upload = require('../../../utils/multer.util');
+const {
+  createPrescription,
+  updatePrescription,
+} = require('./prescription/doctor.pres.controller');
 
 const doctorRouter = express.Router();
 
@@ -56,6 +60,8 @@ doctorRouter.post(
   createDotorController,
 );
 
+doctorRouter.post('/prescription/apptId/:apptId', createPrescription);
+
 // patch
 doctorRouter.patch(
   '/:id',
@@ -63,6 +69,12 @@ doctorRouter.patch(
   validateInput(updateDoctorValidationSchema),
   restrictTo('doctor'),
   updateDoctor,
+);
+
+doctorRouter.patch(
+  '/prescription/:prescriptionId',
+  restrictTo('doctor'),
+  updatePrescription,
 );
 
 doctorRouter.patch('/patients/callNext', restrictTo('doctor'), callPatient);

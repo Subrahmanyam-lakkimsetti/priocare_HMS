@@ -4,6 +4,7 @@ const triagePrompt = require('./aiPrompt.triage');
 
 const evaluateTriage = async (input) => {
   try {
+    console.log(input);
     const { symptoms, vitals, comorbidities, age, description } = input.triage;
 
     const aiTriagePrompt = `${triagePrompt} 

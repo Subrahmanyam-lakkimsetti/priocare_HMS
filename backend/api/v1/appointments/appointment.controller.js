@@ -13,6 +13,35 @@ const createAppointment = catchAsync(async (req, res) => {
   });
 });
 
+const getDoctorsAccordingToSpecilization = catchAsync(async (req, res) => {
+  const doctors = await appointmentService.getDoctorsAccordingToSpecilization(
+    req.body,
+  );
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'available doctors according to patient symptoms',
+    data: {
+      doctors,
+    },
+  });
+});
+
+const createAppointmentManualAssign = catchAsync(async (req, res) => {
+  const appointment = await appointmentService.createAppointmentManualAssign(
+    req.body,
+    req.data.id,
+  );
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'appointment created successfully',
+    data: {
+      appointment,
+    },
+  });
+});
+
 const getAppointmentsForUser = catchAsync(async (req, res) => {
   const appointments = await appointmentService.getAppointmentsForUser(
     req.data.id,
@@ -82,6 +111,8 @@ const getPrescriptionByToken = catchAsync(async (req, res) => {
 
 module.exports = {
   createAppointment,
+  getDoctorsAccordingToSpecilization,
+  createAppointmentManualAssign,
   getAppointmnetByToken,
   getActiveAppointment,
   getAppointmentsForUser,

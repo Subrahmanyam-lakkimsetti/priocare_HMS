@@ -1,4 +1,5 @@
 const Appointment = require('../../../models/appointment.model');
+const Doctor = require('../../../models/doctor.model');
 const Patient = require('../../../models/patient.model');
 const Prescription = require('../../../models/prescription.model');
 const AppError = require('../../../utils/AppError.util');
@@ -6,6 +7,10 @@ const { getDoctor } = require('../doctors/doctorAuth.service');
 const assignDoctor = require('./doctorAssign.service');
 const { getDoctorQueue } = require('./doctorQueue.service');
 const evaluateTriage = require('./triage/aiAdapter.triage');
+
+const getDay = (date) => {
+  return new Date(date).toLocaleDateString('us-en', { weekday: 'short' });
+};
 
 const generateToken = async () => {
   const chars = 'ABCDEFGHJKLMNPQRSTVVWXYZ23456789';
@@ -79,6 +84,81 @@ const createAppointment = async (userId, triageData) => {
     'doctorId',
     'firstName lastName department experienceYears consultationFee',
   );
+
+  return appointment;
+};
+
+const getDoctorsAccordingToSpecilization = async (triageData) => {
+  const triage = JSON.parse(await evaluateTriage(triageData));
+
+  // specilization, date, day
+  const day = getDay(triageData.scheduledDate);
+  console.log(day);
+  const pipeline = [
+    {
+      $match: {
+        isActive: true,
+        availabilityStatus: 'available',
+        specializations: { $in: [triage.recommendedSpecialization] },
+        availableDays: { $in: [day] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'appointments',
+        let: { doctorId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$doctorId', '$$doctorId'] },
+                  { $eq: ['$scheduledDate', triage.scheduledDate] },
+                ],
+              },
+            },
+          },
+          {
+            $count: 'count',
+          },
+        ],
+        as: 'appointmentStats',
+      },
+    },
+    {
+      $addFields: {
+        totalAppointments: {
+          $ifNull: [{ $arrayElemAt: ['$appointmentStats.count', 0] }, 0],
+        },
+      },
+    },
+    {
+      $project: {
+        appointmentStats: 0,
+      },
+    },
+  ];
+
+  const doctors = await Doctor.aggregate(pipeline);
+
+  return { ...doctors, ...triage };
+};
+
+const createAppointmentManualAssign = async (
+  { triageData, doctorId, scheduledDate },
+  patientId,
+) => {
+  const appointment = await Appointment.create({
+    patientId,
+    doctorId,
+    token: await generateToken(),
+    scheduledDate,
+    triage: {
+      ...triageData,
+      source: 'Gemini AI',
+    },
+    createdBy: 'patient',
+  });
 
   return appointment;
 };
@@ -193,10 +273,10 @@ const getPrescriptionByToken = async ({ params: { token } }) => {
   return prescription;
 };
 
-
-
 module.exports = {
   createAppointment,
+  getDoctorsAccordingToSpecilization,
+  createAppointmentManualAssign,
   getActiveAppointment,
   getAppointmentByToken,
   getAppointmentsForUser,

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setField } from '../patientSlice';
 
@@ -10,7 +11,10 @@ const PROMPTS = [
   'Sore throat and fatigue',
 ];
 
-export default function DescriptionStep() {
+// memo ensures this component only re-renders when `value` actually changes.
+// Without memo, every Redux state change anywhere (symptoms, age, etc.)
+// would cause this to re-render and repaint mid-scroll, causing jank.
+function DescriptionStep() {
   const dispatch = useDispatch();
   const value = useSelector((s) => s.patient.intake.description);
 
@@ -30,7 +34,7 @@ export default function DescriptionStep() {
             <button
               key={p}
               onClick={() => dispatch(setField({ description: p }))}
-              className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors duration-150 ${
                 value === p
                   ? 'bg-blue-600 text-white border-blue-600'
                   : 'bg-gray-50 text-gray-700 border-gray-300 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50'
@@ -53,7 +57,7 @@ export default function DescriptionStep() {
           }
           placeholder="e.g. I have had a sore throat and mild fever since yesterday evening, and it hurts to swallow..."
           rows={5}
-          className={`w-full px-4 py-4 text-sm text-gray-900 placeholder-gray-400 bg-white border-2 rounded-xl resize-none outline-none transition-all duration-200 leading-relaxed shadow-sm ${
+          className={`w-full px-4 py-4 text-sm text-gray-900 placeholder-gray-400 bg-white border-2 rounded-xl resize-none outline-none transition-colors duration-200 leading-relaxed shadow-sm ${
             isValid
               ? 'border-blue-400 focus:border-blue-600 focus:shadow-blue-100 focus:shadow-md'
               : 'border-gray-300 focus:border-blue-500 focus:shadow-blue-100 focus:shadow-md'
@@ -118,3 +122,5 @@ export default function DescriptionStep() {
     </div>
   );
 }
+
+export default memo(DescriptionStep);

@@ -1,6 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { closeReview } from '../patientSlice';
-import { createAppointment } from '../patientThunks';
+import {
+  createAppointment,
+  createAppointmentManualAssign,
+} from '../patientThunks';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -95,9 +98,17 @@ export default function ReviewStep() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { intake, showReview, submitting, success } = useSelector(
-    (s) => s.patient,
-  );
+  const {
+    intake,
+    showReview,
+    submitting,
+    success,
+    assignmentMode,
+    selectedDoctor,
+    doctorPickerTriage,
+  } = useSelector((s) => s.patient);
+
+  const userId = useSelector((s) => s.auth.user?._id);
 
   useEffect(() => {
     if (success) {
@@ -117,6 +128,9 @@ export default function ReviewStep() {
         day: 'numeric',
       })
     : '—';
+
+  // True when user explicitly chose a doctor
+  const isManual = assignmentMode === 'manual' && !!selectedDoctor;
 
   const ROWS = [
     {
@@ -218,10 +232,24 @@ export default function ReviewStep() {
     },
   ];
 
+  const handleConfirm = () => {
+    if (isManual) {
+      dispatch(
+        createAppointmentManualAssign({
+          intake: { ...intake, userId },
+          doctorId: selectedDoctor._id,
+          triageData: doctorPickerTriage || {},
+        }),
+      );
+    } else {
+      dispatch(createAppointment(intake));
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        {/* Header */}
+        {/* Header — original gradient, unchanged */}
         <div className="bg-gradient-to-br from-blue-700 to-cyan-600 px-6 py-5">
           <div className="flex items-center justify-between">
             <div>
@@ -253,7 +281,7 @@ export default function ReviewStep() {
           </div>
         </div>
 
-        {/* Summary */}
+        {/* Summary rows — original layout, unchanged */}
         <div className="px-6 py-4">
           {ROWS.map(({ label, value, icon }) => (
             <div
@@ -273,9 +301,46 @@ export default function ReviewStep() {
               </div>
             </div>
           ))}
+
+          {/* Doctor row — appended only in manual mode, matches ROWS style */}
+          {isManual && (
+            <div className="flex items-start gap-3 py-3 border-t border-gray-50">
+              <div className="w-7 h-7 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 text-purple-500 mt-0.5">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
+                  Selected Doctor
+                </p>
+                <p className="text-sm text-gray-800 font-medium leading-relaxed">
+                  Dr. {selectedDoctor.firstName} {selectedDoctor.lastName}
+                </p>
+                <p className="text-xs text-purple-500 mt-0.5">
+                  {selectedDoctor.specializations?.join(', ')} ·{' '}
+                  {selectedDoctor.experienceYears} yrs exp · ₹
+                  {selectedDoctor.consultationFee}
+                </p>
+              </div>
+              <span className="shrink-0 self-start text-xs bg-purple-100 text-purple-700 font-semibold px-2.5 py-1 rounded-full mt-0.5">
+                Your pick
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* AI note */}
+        {/* AI note — text swaps based on mode, card style unchanged */}
         <div className="mx-6 mb-4 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-start gap-2.5">
           <svg
             className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5"
@@ -289,12 +354,13 @@ export default function ReviewStep() {
             />
           </svg>
           <p className="text-xs text-blue-700 leading-relaxed">
-            Our AI will analyze this and automatically assign the most suitable
-            available doctor for your case.
+            {isManual
+              ? `Your appointment will be booked with Dr. ${selectedDoctor.firstName} ${selectedDoctor.lastName}. AI triage will still run to calculate your priority score.`
+              : 'Our AI will analyze this and automatically assign the most suitable available doctor for your case.'}
           </p>
         </div>
 
-        {/* Buttons */}
+        {/* Buttons — original layout and style, unchanged */}
         <div className="flex gap-3 px-6 pb-6">
           <button
             onClick={() => dispatch(closeReview())}
@@ -317,7 +383,7 @@ export default function ReviewStep() {
           </button>
 
           <button
-            onClick={() => dispatch(createAppointment(intake))}
+            onClick={handleConfirm}
             className="flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-blue-700 hover:bg-blue-800 text-white text-sm font-bold rounded-xl transition-all active:scale-95 shadow-sm"
           >
             <svg

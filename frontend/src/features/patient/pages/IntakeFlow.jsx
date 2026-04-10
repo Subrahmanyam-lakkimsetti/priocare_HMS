@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import DescriptionStep from '../steps/DescriptionStep';
@@ -8,6 +8,8 @@ import AgeStep from '../steps/AgeStep';
 import VitalsStep from '../steps/VitalsStep';
 import DateStep from '../steps/DateStep';
 import ReviewStep from '../steps/ReviewStep';
+import AssignmentModeSelector from '../steps/AssignmentModeSelector';
+import DoctorPickerModal from '../steps/Doctorpickermodal';
 import { openReview, resetIntake } from '../patientSlice';
 
 const STEPS = [
@@ -32,7 +34,7 @@ const STEPS = [
         />
       </svg>
     ),
-    component: <DescriptionStep />,
+    Component: DescriptionStep,
     checkKey: 'description',
   },
   {
@@ -56,7 +58,7 @@ const STEPS = [
         />
       </svg>
     ),
-    component: <SymptomsStep />,
+    Component: SymptomsStep,
     checkKey: 'symptoms',
   },
   {
@@ -80,7 +82,7 @@ const STEPS = [
         />
       </svg>
     ),
-    component: <ConditionsStep />,
+    Component: ConditionsStep,
     checkKey: null,
   },
   {
@@ -104,7 +106,7 @@ const STEPS = [
         />
       </svg>
     ),
-    component: <AgeStep />,
+    Component: AgeStep,
     checkKey: 'age',
   },
   {
@@ -128,7 +130,7 @@ const STEPS = [
         />
       </svg>
     ),
-    component: <VitalsStep />,
+    Component: VitalsStep,
     checkKey: null,
   },
   {
@@ -152,45 +154,151 @@ const STEPS = [
         />
       </svg>
     ),
-    component: <DateStep />,
+    Component: DateStep,
     checkKey: 'date',
   },
 ];
 
+// ---------------------------------------------------------------------------
+// RequiredStepCard — memoized so it only re-renders when its own `done` prop
+// actually flips. While the user is scrolling (no state changes), these cards
+// stay completely still in React's tree → no layout/paint work → smooth scroll.
+// `transition-colors` replaces `transition-all` so only color animates on
+// done-state change, never geometry (border, shadow changes don't shift layout).
+// ---------------------------------------------------------------------------
+const RequiredStepCard = memo(function RequiredStepCard({ step, done }) {
+  const { Component } = step;
+  return (
+    <div
+      className={`bg-white rounded-xl overflow-hidden transition-colors duration-300 ${
+        done
+          ? 'border-l-4 border-green-500 shadow-sm'
+          : 'border-l-4 border-blue-500 shadow-sm'
+      }`}
+    >
+      <div className="px-6 py-4 bg-gray-100">
+        <div className="flex items-center gap-3">
+          <div
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
+              done ? 'bg-green-100' : 'bg-blue-100'
+            }`}
+          >
+            <span
+              className={`text-xs font-bold transition-colors duration-300 ${
+                done ? 'text-green-700' : 'text-blue-700'
+              }`}
+            >
+              {step.number}
+            </span>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900">{step.label}</h3>
+              <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+                Required
+              </span>
+            </div>
+            <p className="text-xs text-gray-500">{step.sublabel}</p>
+          </div>
+          {done && (
+            <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+              ✓ Completed
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="p-6">
+        <Component />
+      </div>
+    </div>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// OptionalStepCard — same memoization treatment for optional cards
+// ---------------------------------------------------------------------------
+const OptionalStepCard = memo(function OptionalStepCard({ step }) {
+  const { Component } = step;
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-6 py-4 bg-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+            {step.icon}
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">{step.label}</h3>
+            <p className="text-xs text-gray-500">{step.sublabel}</p>
+          </div>
+        </div>
+      </div>
+      <div className="p-6">
+        <Component />
+      </div>
+    </div>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 export default function IntakeFlow() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const intake = useSelector((s) => s.patient.intake);
+
+  // Granular selectors — only the specific fields this component needs.
+  // Avoids re-rendering when unrelated intake sub-fields change.
+  const description = useSelector((s) => s.patient.intake.description);
+  const symptoms = useSelector((s) => s.patient.intake.symptoms);
+  const age = useSelector((s) => s.patient.intake.age);
+  const scheduledDate = useSelector((s) => s.patient.intake.scheduledDate);
   const userId = useSelector((s) => s.auth.user?._id);
+  const assignmentMode = useSelector((s) => s.patient.assignmentMode);
+  const selectedDoctor = useSelector((s) => s.patient.selectedDoctor);
+
   const [showOptional, setShowOptional] = useState(false);
 
-  const checks = {
-    description: intake.description?.length > 10,
-    symptoms: intake.symptoms?.length > 0,
-    age: !!intake.age,
-    date: !!intake.scheduledDate,
-  };
+  // useMemo so `checks` object identity is stable between renders where
+  // the values haven't changed — prevents child cards from seeing new props
+  const checks = useMemo(
+    () => ({
+      description: description?.length > 10,
+      symptoms: symptoms?.length > 0,
+      age: !!age,
+      date: !!scheduledDate,
+    }),
+    [description, symptoms, age, scheduledDate],
+  );
 
-  const completed = Object.values(checks).filter(Boolean).length;
+  const completed = useMemo(
+    () => Object.values(checks).filter(Boolean).length,
+    [checks],
+  );
   const progress = Math.round((completed / 4) * 100);
   const ready = completed === 4;
+  const canSubmit =
+    ready &&
+    (assignmentMode === 'auto' ||
+      (assignmentMode === 'manual' && !!selectedDoctor));
 
-  // Separate required and optional steps
-  const requiredSteps = STEPS.filter((step) => step.required);
-  const optionalSteps = STEPS.filter((step) => !step.required);
+  const requiredSteps = useMemo(() => STEPS.filter((s) => s.required), []);
+  const optionalSteps = useMemo(() => STEPS.filter((s) => !s.required), []);
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
+  const handleGoBack = () => navigate(-1);
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* LEFT PANEL */}
+      {/* ------------------------------------------------------------------ */}
+      {/* LEFT PANEL                                                          */}
+      {/* ------------------------------------------------------------------ */}
       <div className="hidden ml-60 xl:flex w-75 shrink-0 flex-col bg-linear-to-b from-blue-900 via-blue-800 to-blue-900 border-r border-blue-700/50 overflow-hidden h-screen">
         <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-20 left-0 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col h-full px-6 py-8 overflow-y-auto">
+        <div
+          className="relative z-10 flex flex-col h-full px-6 py-8 overflow-y-auto overscroll-contain"
+          style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
+        >
           {/* Title */}
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1 mb-4">
@@ -255,20 +363,19 @@ export default function IntakeFlow() {
           </div>
 
           {/* Steps list */}
-          <div className="flex-1 space-y-1 overflow-y-auto">
+          <div
+            className="flex-1 space-y-1 overflow-y-auto overscroll-contain"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
             {STEPS.map((step) => {
               const done = step.checkKey ? checks[step.checkKey] : false;
               return (
                 <div
                   key={step.id}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${done ? 'bg-white/15' : 'bg-white/5 opacity-70'}`}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-200 ${done ? 'bg-white/15' : 'bg-white/5 opacity-70'}`}
                 >
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold transition-all ${
-                      done
-                        ? 'bg-cyan-400 text-blue-900'
-                        : 'bg-white/10 text-white/40'
-                    }`}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold transition-colors duration-200 ${done ? 'bg-cyan-400 text-blue-900' : 'bg-white/10 text-white/40'}`}
                   >
                     {done ? (
                       <svg
@@ -316,10 +423,21 @@ export default function IntakeFlow() {
         </div>
       </div>
 
-      {/* CENTER FORM AREA */}
-      <div className="flex-1 min-w-0 overflow-y-auto">
+      {/* ------------------------------------------------------------------ */}
+      {/* CENTER FORM AREA                                                    */}
+      {/* will-change: transform → promotes to its own GPU compositing layer  */}
+      {/* so the browser scrolls it without involving the main thread layout. */}
+      {/* overscroll-contain → prevents scroll chaining to the outer window.  */}
+      {/* ------------------------------------------------------------------ */}
+      <div
+        className="flex-1 min-w-0 overflow-y-auto overscroll-contain"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          willChange: 'transform',
+        }}
+      >
         <div className="px-6 py-8 lg:px-10">
-          {/* Header with Back button */}
+          {/* Header */}
           <div className="mb-6">
             <button
               onClick={handleGoBack}
@@ -340,7 +458,6 @@ export default function IntakeFlow() {
               </svg>
               <span className="text-sm font-medium">Back</span>
             </button>
-
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Tell us about your health concern
             </h1>
@@ -353,62 +470,18 @@ export default function IntakeFlow() {
           {/* REQUIRED SECTIONS */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
+              <div className="w-1 h-6 bg-blue-600 rounded-full" />
               <h2 className="text-lg font-semibold text-gray-900">
                 Required Information
               </h2>
             </div>
-
-            {requiredSteps.map((step) => {
-              const done = checks[step.checkKey];
-
-              return (
-                <div
-                  key={step.id}
-                  className={`bg-white rounded-xl overflow-hidden transition-all duration-300 ${
-                    done
-                      ? 'border-l-4 border-green-500 shadow-sm'
-                      : 'border-l-4 border-blue-500 shadow-sm hover:shadow-md'
-                  }`}
-                >
-                  <div className="px-6 py-4 bg-gray-100">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          done ? 'bg-green-100' : 'bg-blue-100'
-                        }`}
-                      >
-                        <span
-                          className={`text-xs font-bold ${
-                            done ? 'text-green-700' : 'text-blue-700'
-                          }`}
-                        >
-                          {step.number}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-gray-900">
-                            {step.label}
-                          </h3>
-                          <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
-                            Required
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500">{step.sublabel}</p>
-                      </div>
-                      {done && (
-                        <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                          ✓ Completed
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-6">{step.component}</div>
-                </div>
-              );
-            })}
+            {requiredSteps.map((step) => (
+              <RequiredStepCard
+                key={step.id}
+                step={step}
+                done={checks[step.checkKey]}
+              />
+            ))}
           </div>
 
           {/* OPTIONAL SECTIONS */}
@@ -443,7 +516,7 @@ export default function IntakeFlow() {
                 </div>
               </div>
               <svg
-                className={`w-5 h-5 text-gray-400 transition-transform ${showOptional ? 'rotate-180' : ''}`}
+                className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showOptional ? 'rotate-180' : ''}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -460,37 +533,20 @@ export default function IntakeFlow() {
             {showOptional && (
               <div className="mt-3 space-y-4">
                 {optionalSteps.map((step) => (
-                  <div
-                    key={step.id}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden"
-                  >
-                    <div className="px-6 py-4 bg-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                          {step.icon}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900">
-                            {step.label}
-                          </h3>
-                          <p className="text-xs text-gray-500">
-                            {step.sublabel}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-6">{step.component}</div>
-                  </div>
+                  <OptionalStepCard key={step.id} step={step} />
                 ))}
               </div>
             )}
           </div>
 
+          {/* ASSIGNMENT MODE SELECTOR */}
+          <AssignmentModeSelector ready={ready} />
+
           {/* Action row */}
           <div className="flex gap-3 mt-8 mb-10">
             <button
               onClick={handleGoBack}
-              className="px-6 py-3 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all inline-flex items-center gap-2"
+              className="px-6 py-3 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 active:scale-95 transition-colors inline-flex items-center gap-2"
             >
               <svg
                 className="w-4 h-4"
@@ -510,22 +566,24 @@ export default function IntakeFlow() {
 
             <button
               onClick={() => dispatch(resetIntake(userId))}
-              className="px-6 py-3 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all"
+              className="px-6 py-3 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 active:scale-95 transition-colors"
             >
               Clear Form
             </button>
 
             <button
-              onClick={() => ready && dispatch(openReview())}
-              className={`flex-1 py-3 px-6 rounded-xl text-sm font-bold active:scale-95 transition-all ${
-                ready
+              onClick={() => canSubmit && dispatch(openReview())}
+              className={`flex-1 py-3 px-6 rounded-xl text-sm font-bold active:scale-95 transition-colors ${
+                canSubmit
                   ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {ready
-                ? 'Review & Submit'
-                : `Complete ${4 - completed} more required section${4 - completed !== 1 ? 's' : ''}`}
+              {!ready
+                ? `Complete ${4 - completed} more required section${4 - completed !== 1 ? 's' : ''}`
+                : assignmentMode === 'manual' && !selectedDoctor
+                  ? 'Select a doctor to continue'
+                  : 'Review & Submit'}
             </button>
           </div>
 
@@ -557,9 +615,14 @@ export default function IntakeFlow() {
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
+      {/* ------------------------------------------------------------------ */}
+      {/* RIGHT PANEL                                                         */}
+      {/* ------------------------------------------------------------------ */}
       <div className="hidden xl:flex w-64 shrink-0 flex-col bg-gray-50/80 border-l border-gray-100 h-screen overflow-hidden">
-        <div className="px-5 py-8 overflow-y-auto flex flex-col gap-5">
+        <div
+          className="px-5 py-8 overflow-y-auto overscroll-contain flex flex-col gap-5"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
               Completion Status
@@ -570,10 +633,10 @@ export default function IntakeFlow() {
                 return (
                   <div
                     key={step.id}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl ${done ? 'bg-blue-50 border border-blue-100' : 'bg-white border border-gray-100'}`}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors duration-200 ${done ? 'bg-blue-50 border border-blue-100' : 'bg-white border border-gray-100'}`}
                   >
                     <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${done ? 'bg-blue-600' : 'bg-gray-200'}`}
+                      className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200 ${done ? 'bg-blue-600' : 'bg-gray-200'}`}
                     >
                       {done ? (
                         <svg
@@ -594,7 +657,7 @@ export default function IntakeFlow() {
                       )}
                     </div>
                     <span
-                      className={`text-xs font-semibold ${done ? 'text-blue-700' : 'text-gray-500'}`}
+                      className={`text-xs font-semibold transition-colors duration-200 ${done ? 'text-blue-700' : 'text-gray-500'}`}
                     >
                       {step.label}
                     </span>
@@ -602,6 +665,33 @@ export default function IntakeFlow() {
                 );
               })}
             </div>
+          </div>
+
+          {/* Assignment mode status */}
+          <div className="bg-white border border-gray-100 rounded-2xl p-4">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+              Assignment Mode
+            </p>
+            <div
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-colors duration-200 ${assignmentMode === 'manual' ? 'bg-purple-50 border-purple-200' : 'bg-blue-50 border-blue-100'}`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${assignmentMode === 'manual' ? 'bg-purple-500' : 'bg-blue-500'}`}
+              />
+              <span
+                className={`text-xs font-semibold ${assignmentMode === 'manual' ? 'text-purple-700' : 'text-blue-700'}`}
+              >
+                {assignmentMode === 'manual' ? 'Choose Doctor' : 'Auto Assign'}
+              </span>
+            </div>
+            {assignmentMode === 'manual' && selectedDoctor && (
+              <div className="mt-2 px-3 py-2 bg-purple-50 border border-purple-100 rounded-xl">
+                <p className="text-xs text-purple-400 font-medium">Selected</p>
+                <p className="text-xs font-bold text-purple-800">
+                  Dr. {selectedDoctor.firstName} {selectedDoctor.lastName}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="bg-blue-700 rounded-2xl p-4 text-white">
@@ -686,7 +776,9 @@ export default function IntakeFlow() {
         </div>
       </div>
 
+      {/* Modals */}
       <ReviewStep />
+      <DoctorPickerModal />
     </div>
   );
 }

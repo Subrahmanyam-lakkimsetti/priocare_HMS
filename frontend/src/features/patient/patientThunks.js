@@ -5,6 +5,8 @@ import {
   getAppointmentByTokenRequest,
   getAllAppointmentsRequest,
   cancelAppointmentRequest,
+  getAvailableDoctorsRequest,
+  createAppointmentManualAssignRequest,
 } from './patientService';
 
 export const createAppointment = createAsyncThunk(
@@ -73,11 +75,64 @@ export const cancelAppointment = createAsyncThunk(
   async (token, { rejectWithValue }) => {
     try {
       const res = await cancelAppointmentRequest(token);
-
-      return res.data.data; 
+      return res.data.data;
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || 'Failed to cancel appointment',
+      );
+    }
+  },
+);
+
+// Fetch available doctors for manual assignment
+export const fetchAvailableDoctors = createAsyncThunk(
+  'patient/fetchAvailableDoctors',
+  async (intake, { rejectWithValue }) => {
+    try {
+      const payload = {
+        scheduledDate: intake.scheduledDate,
+        triage: {
+          description: intake.description,
+          symptoms: intake.symptoms,
+          comorbidities: intake.comorbidities,
+          age: Number(intake.age),
+          vitals: intake.vitals,
+        },
+      };
+      const res = await getAvailableDoctorsRequest(payload);
+      return res.data.data.doctors;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Failed to fetch doctors',
+      );
+    }
+  },
+);
+
+// Create appointment with manually chosen doctor
+export const createAppointmentManualAssign = createAsyncThunk(
+  'patient/createAppointmentManualAssign',
+  async ({ intake, doctorId, triageData }, { rejectWithValue }) => {
+    try {
+      const payload = {
+        triageData: {
+          description: intake.description,
+          symptoms: intake.symptoms,
+          comorbidities: intake.comorbidities,
+          age: Number(intake.age),
+          vitals: intake.vitals,
+          priorityScore: triageData.priorityScore,
+          severityLevel: triageData.severityLevel,
+          recommendedSpecialization: triageData.recommendedSpecialization,
+        },
+        scheduledDate: intake.scheduledDate,
+        doctorId,
+      };
+      await createAppointmentManualAssignRequest(payload);
+      return true;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Unable to submit appointment',
       );
     }
   },

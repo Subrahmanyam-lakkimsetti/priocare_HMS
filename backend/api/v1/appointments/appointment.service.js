@@ -37,7 +37,9 @@ const getAppointmentsForUser = async (userId) => {
 
   const appointments = await Appointment.find({
     patientId: patient._id,
-  }).populate('doctorId', 'firstName lastName department experienceYears');
+  })
+    .populate('doctorId', 'firstName lastName department experienceYears')
+    .sort({ scheduledDate: -1 });
 
   return appointments;
 };
@@ -146,8 +148,10 @@ const getDoctorsAccordingToSpecilization = async (triageData) => {
 
 const createAppointmentManualAssign = async (
   { triageData, doctorId, scheduledDate },
-  patientId,
+  userId,
 ) => {
+  const { _id: patientId } = await Patient.findOne({ userId });
+
   const appointment = await Appointment.create({
     patientId,
     doctorId,

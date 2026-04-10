@@ -6,6 +6,8 @@ import {
   fetchAppointmentByToken,
   fetchAllAppointments,
   cancelAppointment,
+  fetchAvailableDoctors,
+  createAppointmentManualAssign,
 } from './patientThunks';
 import {
   loadIntake,
@@ -40,6 +42,15 @@ const initialState = {
 
   // No longer preloading here — loaded after login via initIntake
   intake: { ...emptyIntake },
+
+  // Manual doctor assignment state
+  assignmentMode: 'auto', // 'auto' | 'manual'
+  showDoctorPicker: false,
+  availableDoctors: [],
+  doctorPickerTriage: null, // triage info returned alongside doctors
+  loadingDoctors: false,
+  doctorsError: null,
+  selectedDoctor: null,
 };
 
 const patientSlice = createSlice({
@@ -86,28 +97,79 @@ const patientSlice = createSlice({
     },
 
     resetIntake: (s, a) => {
-      const userId = a.payload; // pass userId when dispatching
+      const userId = a.payload;
       if (userId) clearIntake(userId);
       s.intake = { ...emptyIntake };
       s.success = false;
       s.error = null;
       s.showReview = false;
+      s.assignmentMode = 'auto';
+      s.showDoctorPicker = false;
+      s.availableDoctors = [];
+      s.doctorPickerTriage = null;
+      s.selectedDoctor = null;
+    },
+
+    // Assignment mode actions
+    setAssignmentMode: (s, a) => {
+      s.assignmentMode = a.payload; // 'auto' | 'manual'
+      if (a.payload === 'auto') {
+        s.selectedDoctor = null;
+        s.showDoctorPicker = false;
+      }
+    },
+
+    openDoctorPicker: (s) => {
+      s.showDoctorPicker = true;
+    },
+
+    closeDoctorPicker: (s) => {
+      s.showDoctorPicker = false;
+    },
+
+    selectDoctor: (s, a) => {
+      s.selectedDoctor = a.payload;
+      s.showDoctorPicker = false;
+    },
+
+    clearSelectedDoctor: (s) => {
+      s.selectedDoctor = null;
     },
   },
 
   extraReducers: (b) => {
-    // CREATE
+    // CREATE (auto assign)
     b.addCase(createAppointment.pending, (s) => {
       s.submitting = true;
     });
     b.addCase(createAppointment.fulfilled, (s, a) => {
       s.submitting = false;
       s.success = true;
-      // userId passed as meta from thunk
       if (a.meta?.arg?.userId) clearIntake(a.meta.arg.userId);
       s.intake = { ...emptyIntake };
+      s.assignmentMode = 'auto';
+      s.selectedDoctor = null;
     });
     b.addCase(createAppointment.rejected, (s, a) => {
+      s.submitting = false;
+      s.error = a.payload;
+    });
+
+    // CREATE (manual assign)
+    b.addCase(createAppointmentManualAssign.pending, (s) => {
+      s.submitting = true;
+    });
+    b.addCase(createAppointmentManualAssign.fulfilled, (s, a) => {
+      s.submitting = false;
+      s.success = true;
+      if (a.meta?.arg?.intake?.userId) clearIntake(a.meta.arg.intake.userId);
+      s.intake = { ...emptyIntake };
+      s.assignmentMode = 'auto';
+      s.selectedDoctor = null;
+      s.availableDoctors = [];
+      s.doctorPickerTriage = null;
+    });
+    b.addCase(createAppointmentManualAssign.rejected, (s, a) => {
       s.submitting = false;
       s.error = a.payload;
     });
@@ -159,6 +221,33 @@ const patientSlice = createSlice({
         s.activeAppointment = updated;
       }
     });
+
+    // FETCH AVAILABLE DOCTORS
+    b.addCase(fetchAvailableDoctors.pending, (s) => {
+      s.loadingDoctors = true;
+      s.doctorsError = null;
+      s.availableDoctors = [];
+      s.doctorPickerTriage = null;
+    });
+    b.addCase(fetchAvailableDoctors.fulfilled, (s, a) => {
+      s.loadingDoctors = false;
+      // The API returns doctors mixed with triage fields (priorityScore, etc.)
+      // Extract numeric-keyed entries as doctors and triage metadata separately
+      const raw = a.payload;
+      const doctors = Object.entries(raw)
+        .filter(([key]) => !isNaN(Number(key)))
+        .map(([, val]) => val);
+      s.availableDoctors = doctors;
+      s.doctorPickerTriage = {
+        priorityScore: raw.priorityScore,
+        severityLevel: raw.severityLevel,
+        recommendedSpecialization: raw.recommendedSpecialization,
+      };
+    });
+    b.addCase(fetchAvailableDoctors.rejected, (s, a) => {
+      s.loadingDoctors = false;
+      s.doctorsError = a.payload;
+    });
   },
 });
 
@@ -171,6 +260,11 @@ export const {
   resetIntake,
   initIntake,
   saveIntakeForUser,
+  setAssignmentMode,
+  openDoctorPicker,
+  closeDoctorPicker,
+  selectDoctor,
+  clearSelectedDoctor,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;

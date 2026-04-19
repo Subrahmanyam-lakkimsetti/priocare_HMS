@@ -7,6 +7,7 @@ import {
   getAiSummaryRequest,
   getActiveConsultationRequest,
   getTreatedHistoryRequest,
+  createPrescriptionRequest,
 } from './doctorService';
 
 export const fetchQueue = createAsyncThunk(
@@ -71,5 +72,19 @@ export const fetchTreatedHistory = createAsyncThunk(
   async () => {
     const res = await getTreatedHistoryRequest();
     return JSON.parse(JSON.stringify(res.data.data));
+  },
+);
+
+export const createPrescription = createAsyncThunk(
+  'doctor/createPrescription',
+  async ({ apptId, payload }, { rejectWithValue }) => {
+    try {
+      const res = await createPrescriptionRequest(apptId, payload);
+      return res.data?.data?.prescription;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Failed to save prescription',
+      );
+    }
   },
 );

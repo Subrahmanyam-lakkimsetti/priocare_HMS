@@ -7,6 +7,7 @@ import {
   callNextPatient,
   fetchActiveConsultation,
   fetchTreatedHistory,
+  createPrescription,
 } from './doctorThunks';
 
 const initialState = {
@@ -16,6 +17,9 @@ const initialState = {
   aiSummary: null,
   patientHistory: [],
   historyLoading: false,
+  currentPrescription: null,
+  prescriptionLoading: false,
+  prescriptionError: null,
   loading: false,
   error: null,
 };
@@ -74,6 +78,8 @@ const doctorSlice = createSlice({
       state.activePatient = action.payload;
       state.calledPatient = null;
       state.aiSummary = null;
+      state.currentPrescription = null;
+      state.prescriptionError = null;
     });
 
     // endConsultation
@@ -81,6 +87,23 @@ const doctorSlice = createSlice({
       state.activePatient = null;
       state.aiSummary = null;
       state.calledPatient = null;
+      state.currentPrescription = null;
+      state.prescriptionLoading = false;
+      state.prescriptionError = null;
+    });
+
+    // createPrescription
+    builder.addCase(createPrescription.pending, (state) => {
+      state.prescriptionLoading = true;
+      state.prescriptionError = null;
+    });
+    builder.addCase(createPrescription.fulfilled, (state, action) => {
+      state.prescriptionLoading = false;
+      state.currentPrescription = action.payload;
+    });
+    builder.addCase(createPrescription.rejected, (state, action) => {
+      state.prescriptionLoading = false;
+      state.prescriptionError = action.payload || action.error.message;
     });
 
     // fetchAiSummary

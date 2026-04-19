@@ -19,3 +19,6 @@ export const getActiveConsultationRequest = () =>
 
 export const getTreatedHistoryRequest = () =>
   api.get(`/doctors/patients/treatment-complemented`);
+
+export const createPrescriptionRequest = (apptId, payload) =>
+  api.post(`/doctors/prescription/apptId/${apptId}`, payload);

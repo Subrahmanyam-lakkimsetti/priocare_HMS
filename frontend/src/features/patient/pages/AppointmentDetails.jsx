@@ -1,7 +1,8 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchAppointmentByToken } from '../patientThunks';
+import { getPrescriptionByAppointmentTokenRequest } from '../patientService';
 
 const SEVERITY_CONFIG = {
   critical: {
@@ -48,10 +49,54 @@ export default function AppointmentDetails() {
   const { activeAppointment: a, loadingAppointment } = useSelector(
     (s) => s.patient,
   );
+  const [prescription, setPrescription] = useState(null);
+  const [prescriptionLoading, setPrescriptionLoading] = useState(false);
+  const [prescriptionError, setPrescriptionError] = useState('');
 
   useEffect(() => {
     if (!a || a.token !== token) dispatch(fetchAppointmentByToken(token));
   }, [token, a, dispatch]);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!a?.token || a?.status !== 'completed') {
+      setPrescription(null);
+      setPrescriptionError('');
+      setPrescriptionLoading(false);
+      return undefined;
+    }
+
+    setPrescriptionLoading(true);
+    setPrescriptionError('');
+
+    getPrescriptionByAppointmentTokenRequest(a.token)
+      .then((res) => {
+        if (!active) return;
+        setPrescription(res.data?.data?.prescription || null);
+      })
+      .catch((err) => {
+        if (!active) return;
+
+        if (err.response?.status === 404) {
+          setPrescription(null);
+          setPrescriptionError('');
+          return;
+        }
+
+        setPrescriptionError(
+          err.response?.data?.message || 'Unable to load prescription',
+        );
+      })
+      .finally(() => {
+        if (!active) return;
+        setPrescriptionLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [a?.token, a?.status]);
 
   const formatTime = (t) =>
     t
@@ -60,6 +105,26 @@ export default function AppointmentDetails() {
           minute: '2-digit',
         })
       : null;
+
+  const formatDate = (d) => {
+    if (!d) return 'Not set';
+    return new Date(d).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  const medicineAvailabilityClass = (status) => {
+    if (status === 'available') {
+      return 'bg-emerald-100 text-emerald-700';
+    }
+
+    return 'bg-rose-100 text-rose-700';
+  };
+
+  const medicineAvailabilityLabel = (status) =>
+    status === 'available' ? 'Available' : 'Not Available';
 
   const steps = a
     ? [
@@ -700,6 +765,96 @@ export default function AppointmentDetails() {
                   </div>
                 </div>
               </div>
+
+              {/* Need help? */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 bg-green-50 rounded-lg flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 text-green-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h2 className="text-sm font-bold text-gray-900">
+                    Need Help?
+                  </h2>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed mb-3">
+                  If your condition worsens, alert our staff immediately.
+                </p>
+                <button className="w-full bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 text-xs font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    />
+                  </svg>
+                  Alert Staff
+                </button>
+              </div>
+
+              {/* Additional Info */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <h3 className="text-sm font-bold text-gray-900 mb-3">
+                  Additional Information
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <p className="flex items-center gap-2 text-gray-600">
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      />
+                    </svg>
+                    Reception: (555) 123-4567
+                  </p>
+                  <p className="flex items-center gap-2 text-gray-600">
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    {a.doctorId?.department}, 2nd Floor
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Right Column */}
@@ -710,7 +865,7 @@ export default function AppointmentDetails() {
                   <h2 className="text-base font-bold text-gray-900">
                     Visit Journey
                   </h2>
-                  <span className="text-xs text-gray-400 font-medium bg-gray-100 px-2.5 py-1 rounded-full">
+                  <span className="text-xs text-slate-600 font-semibold bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">
                     {currentStep}/{steps.length}
                   </span>
                 </div>
@@ -781,6 +936,128 @@ export default function AppointmentDetails() {
                 </div>
               </div>
 
+              {isCompleted && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-base font-bold text-gray-900">
+                      Prescription
+                    </h2>
+                    <span className="text-xs text-slate-600 font-semibold bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">
+                      From your doctor
+                    </span>
+                  </div>
+
+                  {prescriptionLoading && (
+                    <p className="text-sm text-gray-500">
+                      Loading prescription...
+                    </p>
+                  )}
+
+                  {!prescriptionLoading && prescriptionError && (
+                    <p className="text-sm text-red-600">{prescriptionError}</p>
+                  )}
+
+                  {!prescriptionLoading &&
+                    !prescriptionError &&
+                    !prescription && (
+                      <p className="text-sm text-gray-500">
+                        Prescription is not available yet.
+                      </p>
+                    )}
+
+                  {!prescriptionLoading && prescription && (
+                    <div className="space-y-4">
+                      <div className="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                          Diagnosis
+                        </p>
+                        <p className="text-sm font-medium text-gray-800">
+                          {prescription.diagnosis || 'Not provided'}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                          <p className="text-xs text-slate-500 mb-0.5">
+                            Follow-up Date
+                          </p>
+                          <p className="text-sm font-bold text-gray-800">
+                            {formatDate(prescription.followUpDate)}
+                          </p>
+                        </div>
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                          <p className="text-xs text-slate-500 mb-0.5">Notes</p>
+                          <p className="text-sm font-medium text-gray-800">
+                            {prescription.notes || 'No additional notes'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                          Medications
+                        </p>
+
+                        {prescription.medications?.length ? (
+                          <div className="space-y-2.5">
+                            {prescription.medications.map((med, idx) => (
+                              <div
+                                key={`${med.name}-${idx}`}
+                                className="rounded-xl border border-slate-200 bg-slate-50 p-3"
+                              >
+                                <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                                  <p className="text-sm font-bold text-gray-900">
+                                    {med.name || `Medicine ${idx + 1}`}
+                                  </p>
+                                  <span
+                                    className={`text-[11px] font-semibold px-2 py-1 rounded-full ${medicineAvailabilityClass(med.availabilityStatus)}`}
+                                  >
+                                    {medicineAvailabilityLabel(
+                                      med.availabilityStatus,
+                                    )}
+                                  </span>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                                  <p>
+                                    <span className="text-slate-500">
+                                      Dosage:
+                                    </span>{' '}
+                                    {med.dosage || '—'}
+                                  </p>
+                                  <p>
+                                    <span className="text-slate-500">
+                                      Frequency:
+                                    </span>{' '}
+                                    {med.frequency || '—'}
+                                  </p>
+                                  <p>
+                                    <span className="text-slate-500">
+                                      Duration:
+                                    </span>{' '}
+                                    {med.duration || '—'}
+                                  </p>
+                                  <p>
+                                    <span className="text-slate-500">
+                                      Instructions:
+                                    </span>{' '}
+                                    {med.instructions || '—'}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            No medications listed.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Action Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Stay Available — hidden once consultation is done */}
@@ -825,96 +1102,6 @@ export default function AppointmentDetails() {
                     </p>
                   </div>
                 )}
-
-                {/* Need help? */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-7 h-7 bg-green-50 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-green-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-                        />
-                      </svg>
-                    </div>
-                    <h2 className="text-sm font-bold text-gray-900">
-                      Need Help?
-                    </h2>
-                  </div>
-                  <p className="text-xs text-gray-500 leading-relaxed mb-3">
-                    If your condition worsens, alert our staff immediately.
-                  </p>
-                  <button className="w-full bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 text-xs font-bold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                      />
-                    </svg>
-                    Alert Staff
-                  </button>
-                </div>
-              </div>
-
-              {/* Additional Info */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">
-                  Additional Information
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <p className="flex items-center gap-2 text-gray-600">
-                    <svg
-                      className="w-4 h-4 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      />
-                    </svg>
-                    Reception: (555) 123-4567
-                  </p>
-                  <p className="flex items-center gap-2 text-gray-600">
-                    <svg
-                      className="w-4 h-4 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                    {a.doctorId?.department}, 2nd Floor
-                  </p>
-                </div>
               </div>
             </div>
           </div>

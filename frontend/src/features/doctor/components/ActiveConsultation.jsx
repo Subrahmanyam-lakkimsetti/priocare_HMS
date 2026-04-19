@@ -4,7 +4,16 @@ import {
   startConsultation,
   endConsultation,
   fetchAiSummary,
+  createPrescription,
 } from '../doctorThunks';
+
+const EMPTY_MEDICATION = {
+  name: '',
+  dosage: '',
+  frequency: '',
+  duration: '',
+  instructions: '',
+};
 
 const SEVERITY_CONFIG = {
   critical: {
@@ -91,10 +100,30 @@ export default function ActiveConsultation({ date }) {
   const dispatch = useDispatch();
   const activePatient = useSelector((s) => s.doctor.activePatient);
   const calledPatient = useSelector((s) => s.doctor.calledPatient);
+  const prescriptionLoading = useSelector((s) => s.doctor.prescriptionLoading);
 
   const [bodyVisible, setBodyVisible] = useState(true);
   const [showEndModal, setShowEndModal] = useState(false);
+  const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
   const [ending, setEnding] = useState(false);
+  const [prescriptionSaved, setPrescriptionSaved] = useState(false);
+  const [prescriptionError, setPrescriptionError] = useState('');
+  const [prescriptionForm, setPrescriptionForm] = useState({
+    diagnosis: '',
+    notes: '',
+    followUpDate: '',
+    medications: [{ ...EMPTY_MEDICATION }],
+  });
+
+  const resetPrescriptionForm = () => {
+    setPrescriptionForm({
+      diagnosis: '',
+      notes: '',
+      followUpDate: '',
+      medications: [{ ...EMPTY_MEDICATION }],
+    });
+    setPrescriptionError('');
+  };
 
   const handleStart = async () => {
     setBodyVisible(false);
@@ -114,6 +143,100 @@ export default function ActiveConsultation({ date }) {
     setBodyVisible(true);
     setEnding(false);
     setShowEndModal(false);
+  };
+
+  const openPrescriptionModal = () => {
+    setShowPrescriptionModal(true);
+    setPrescriptionError('');
+  };
+
+  const closePrescriptionModal = () => {
+    if (prescriptionLoading) return;
+    setShowPrescriptionModal(false);
+  };
+
+  const updatePrescriptionField = (field, value) => {
+    setPrescriptionForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const updateMedicationField = (index, field, value) => {
+    setPrescriptionForm((prev) => {
+      const meds = [...prev.medications];
+      meds[index] = {
+        ...meds[index],
+        [field]: value,
+      };
+      return { ...prev, medications: meds };
+    });
+  };
+
+  const addMedication = () => {
+    setPrescriptionForm((prev) => ({
+      ...prev,
+      medications: [...prev.medications, { ...EMPTY_MEDICATION }],
+    }));
+  };
+
+  const removeMedication = (index) => {
+    setPrescriptionForm((prev) => {
+      if (prev.medications.length === 1) {
+        return {
+          ...prev,
+          medications: [{ ...EMPTY_MEDICATION }],
+        };
+      }
+
+      return {
+        ...prev,
+        medications: prev.medications.filter((_, i) => i !== index),
+      };
+    });
+  };
+
+  const handlePrescriptionSubmit = async () => {
+    if (!activePatient?._id) return;
+
+    const diagnosis = prescriptionForm.diagnosis.trim();
+    if (!diagnosis) {
+      setPrescriptionError('Diagnosis is required');
+      return;
+    }
+
+    const medications = prescriptionForm.medications
+      .map((med) => ({
+        name: med.name.trim(),
+        dosage: med.dosage.trim(),
+        frequency: med.frequency.trim(),
+        duration: med.duration.trim(),
+        instructions: med.instructions.trim(),
+      }))
+      .filter((med) => med.name);
+
+    const payload = {
+      diagnosis,
+      medications,
+    };
+
+    if (prescriptionForm.notes.trim()) {
+      payload.notes = prescriptionForm.notes.trim();
+    }
+
+    if (prescriptionForm.followUpDate) {
+      payload.followUpDate = prescriptionForm.followUpDate;
+    }
+
+    const action = await dispatch(
+      createPrescription({ apptId: activePatient._id, payload }),
+    );
+
+    if (createPrescription.fulfilled.match(action)) {
+      setPrescriptionSaved(true);
+      resetPrescriptionForm();
+      setShowPrescriptionModal(false);
+      return;
+    }
+
+    setPrescriptionError(action.payload || 'Failed to save prescription');
   };
 
   const patient = activePatient?.patient;
@@ -262,6 +385,18 @@ export default function ActiveConsultation({ date }) {
         .ac-btn-end { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
         .ac-btn-end:hover { background: #dc2626; color: #fff; border-color: #dc2626; transform: translateY(-1px); }
         .ac-btn-end:active { transform: translateY(0); }
+        .ac-btn-prescription {
+          background: #eef2ff;
+          color: #4338ca;
+          border: 1px solid #c7d2fe;
+        }
+        .ac-btn-prescription:hover {
+          background: #4338ca;
+          color: #fff;
+          border-color: #4338ca;
+          transform: translateY(-1px);
+        }
+        .ac-btn-prescription:active { transform: translateY(0); }
 
         .ac-footer { padding: 12px 18px 16px; border-top: 1px solid #f8fafc; flex-shrink: 0; }
 
@@ -335,6 +470,223 @@ export default function ActiveConsultation({ date }) {
           animation: ac-spin 0.7s linear infinite;
         }
         @keyframes ac-spin { to { transform: rotate(360deg); } }
+
+        .ac-pres-status {
+          margin-bottom: 10px;
+          padding: 8px 10px;
+          border-radius: 10px;
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .ac-pres-status-success {
+          background: #ecfdf3;
+          color: #15803d;
+          border: 1px solid #bbf7d0;
+        }
+        .ac-pres-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 110;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          animation: ac-overlay-in 0.2s ease;
+        }
+        .ac-pres-backdrop {
+          position: absolute;
+          inset: 0;
+          background: rgba(15, 23, 42, 0.45);
+          backdrop-filter: blur(4px);
+        }
+        .ac-pres-modal {
+          position: relative;
+          z-index: 1;
+          background: #fff;
+          width: min(760px, 100%);
+          max-height: 88vh;
+          overflow: hidden;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+          display: flex;
+          flex-direction: column;
+          animation: ac-modal-in 0.25s cubic-bezier(.22,1,.36,1);
+        }
+        .ac-pres-head {
+          padding: 16px 20px;
+          border-bottom: 1px solid #e2e8f0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          background: #f8fafc;
+        }
+        .ac-pres-title {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 700;
+          color: #0f172a;
+        }
+        .ac-pres-sub {
+          margin: 2px 0 0;
+          font-size: 12px;
+          color: #64748b;
+        }
+        .ac-pres-close {
+          width: 32px;
+          height: 32px;
+          border-radius: 10px;
+          border: 1px solid #e2e8f0;
+          background: #fff;
+          color: #475569;
+          cursor: pointer;
+        }
+        .ac-pres-close:hover { background: #f8fafc; }
+        .ac-pres-body {
+          padding: 16px 20px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+        .ac-pres-grid {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 12px;
+        }
+        .ac-pres-field {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .ac-pres-label {
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: #64748b;
+        }
+        .ac-pres-input, .ac-pres-textarea {
+          width: 100%;
+          border: 1px solid #cbd5e1;
+          border-radius: 10px;
+          padding: 10px 12px;
+          font-size: 13px;
+          color: #0f172a;
+          background: #fff;
+          outline: none;
+        }
+        .ac-pres-input:focus, .ac-pres-textarea:focus {
+          border-color: #6366f1;
+          box-shadow: 0 0 0 3px rgba(99,102,241,0.16);
+        }
+        .ac-pres-textarea {
+          min-height: 84px;
+          resize: vertical;
+        }
+        .ac-med-section {
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 12px;
+          background: #f8fafc;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .ac-med-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .ac-med-title {
+          font-size: 12px;
+          font-weight: 700;
+          color: #0f172a;
+        }
+        .ac-med-remove {
+          border: 1px solid #fecaca;
+          background: #fff1f2;
+          color: #dc2626;
+          border-radius: 8px;
+          padding: 4px 8px;
+          font-size: 11px;
+          font-weight: 600;
+          cursor: pointer;
+        }
+        .ac-med-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .ac-med-add {
+          border: 1px dashed #94a3b8;
+          background: #fff;
+          color: #334155;
+          border-radius: 10px;
+          padding: 10px;
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+        .ac-med-add:hover {
+          border-color: #6366f1;
+          color: #4338ca;
+        }
+        .ac-pres-foot {
+          border-top: 1px solid #e2e8f0;
+          padding: 12px 20px;
+          display: flex;
+          gap: 10px;
+          justify-content: flex-end;
+          background: #fff;
+        }
+        .ac-pres-btn {
+          border-radius: 10px;
+          padding: 9px 14px;
+          font-size: 12.5px;
+          font-weight: 700;
+          cursor: pointer;
+          border: 1px solid transparent;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .ac-pres-btn-secondary {
+          border-color: #cbd5e1;
+          background: #fff;
+          color: #334155;
+        }
+        .ac-pres-btn-secondary:hover { background: #f8fafc; }
+        .ac-pres-btn-primary {
+          background: #4338ca;
+          color: #fff;
+        }
+        .ac-pres-btn-primary:hover { background: #3730a3; }
+        .ac-pres-btn-primary:disabled {
+          opacity: 0.65;
+          cursor: wait;
+        }
+        .ac-pres-error {
+          color: #b91c1c;
+          background: #fef2f2;
+          border: 1px solid #fecaca;
+          border-radius: 10px;
+          padding: 8px 10px;
+          font-size: 12px;
+          font-weight: 600;
+        }
+        @media (max-width: 720px) {
+          .ac-pres-grid, .ac-med-grid {
+            grid-template-columns: 1fr;
+          }
+          .ac-pres-foot {
+            flex-direction: column-reverse;
+          }
+          .ac-pres-btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
       `}</style>
 
       <div className="ac-root">
@@ -591,6 +943,31 @@ export default function ActiveConsultation({ date }) {
 
         {activePatient && (
           <div className="ac-footer">
+            {prescriptionSaved && (
+              <div className="ac-pres-status ac-pres-status-success">
+                Prescription saved successfully.
+              </div>
+            )}
+            <button
+              className="ac-btn ac-btn-prescription"
+              onClick={openPrescriptionModal}
+            >
+              <svg
+                width="15"
+                height="15"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add Prescription
+            </button>
             <button
               className="ac-btn ac-btn-end"
               onClick={() => setShowEndModal(true)}
@@ -708,6 +1085,214 @@ export default function ActiveConsultation({ date }) {
                 disabled={ending}
               >
                 Cancel, continue session
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPrescriptionModal && (
+        <div className="ac-pres-overlay">
+          <div className="ac-pres-backdrop" onClick={closePrescriptionModal} />
+          <div className="ac-pres-modal">
+            <div className="ac-pres-head">
+              <div>
+                <h3 className="ac-pres-title">Add Prescription</h3>
+                <p className="ac-pres-sub">
+                  Token #{activePatient?.token} · {activePatient?.patient?.name}
+                </p>
+              </div>
+              <button
+                className="ac-pres-close"
+                onClick={closePrescriptionModal}
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="ac-pres-body">
+              {prescriptionError && (
+                <div className="ac-pres-error">{prescriptionError}</div>
+              )}
+
+              <div className="ac-pres-field">
+                <label className="ac-pres-label">Diagnosis</label>
+                <textarea
+                  className="ac-pres-textarea"
+                  value={prescriptionForm.diagnosis}
+                  onChange={(e) =>
+                    updatePrescriptionField('diagnosis', e.target.value)
+                  }
+                  placeholder="Write diagnosis summary"
+                />
+              </div>
+
+              <div className="ac-pres-grid">
+                <div className="ac-pres-field">
+                  <label className="ac-pres-label">Follow-up Date</label>
+                  <input
+                    type="date"
+                    className="ac-pres-input"
+                    value={prescriptionForm.followUpDate}
+                    onChange={(e) =>
+                      updatePrescriptionField('followUpDate', e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="ac-pres-field">
+                  <label className="ac-pres-label">Doctor Notes</label>
+                  <input
+                    type="text"
+                    className="ac-pres-input"
+                    value={prescriptionForm.notes}
+                    onChange={(e) =>
+                      updatePrescriptionField('notes', e.target.value)
+                    }
+                    placeholder="Optional notes"
+                  />
+                </div>
+              </div>
+
+              {prescriptionForm.medications.map((med, index) => (
+                <div key={index} className="ac-med-section">
+                  <div className="ac-med-top">
+                    <span className="ac-med-title">Medication {index + 1}</span>
+                    <button
+                      className="ac-med-remove"
+                      onClick={() => removeMedication(index)}
+                      type="button"
+                    >
+                      Remove
+                    </button>
+                  </div>
+
+                  <div className="ac-med-grid">
+                    <div className="ac-pres-field">
+                      <label className="ac-pres-label">Medicine Name</label>
+                      <input
+                        type="text"
+                        className="ac-pres-input"
+                        value={med.name}
+                        onChange={(e) =>
+                          updateMedicationField(index, 'name', e.target.value)
+                        }
+                        placeholder="e.g. Paracetamol"
+                      />
+                    </div>
+
+                    <div className="ac-pres-field">
+                      <label className="ac-pres-label">Dosage</label>
+                      <input
+                        type="text"
+                        className="ac-pres-input"
+                        value={med.dosage}
+                        onChange={(e) =>
+                          updateMedicationField(index, 'dosage', e.target.value)
+                        }
+                        placeholder="e.g. 500mg"
+                      />
+                    </div>
+
+                    <div className="ac-pres-field">
+                      <label className="ac-pres-label">Frequency</label>
+                      <input
+                        type="text"
+                        className="ac-pres-input"
+                        value={med.frequency}
+                        onChange={(e) =>
+                          updateMedicationField(
+                            index,
+                            'frequency',
+                            e.target.value,
+                          )
+                        }
+                        placeholder="e.g. Twice daily"
+                      />
+                    </div>
+
+                    <div className="ac-pres-field">
+                      <label className="ac-pres-label">Duration</label>
+                      <input
+                        type="text"
+                        className="ac-pres-input"
+                        value={med.duration}
+                        onChange={(e) =>
+                          updateMedicationField(
+                            index,
+                            'duration',
+                            e.target.value,
+                          )
+                        }
+                        placeholder="e.g. 5 days"
+                      />
+                    </div>
+
+                    <div
+                      className="ac-pres-field"
+                      style={{ gridColumn: '1 / -1' }}
+                    >
+                      <label className="ac-pres-label">Instructions</label>
+                      <input
+                        type="text"
+                        className="ac-pres-input"
+                        value={med.instructions}
+                        onChange={(e) =>
+                          updateMedicationField(
+                            index,
+                            'instructions',
+                            e.target.value,
+                          )
+                        }
+                        placeholder="e.g. After food"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                className="ac-med-add"
+                onClick={addMedication}
+                type="button"
+              >
+                + Add Another Medication
+              </button>
+            </div>
+
+            <div className="ac-pres-foot">
+              <button
+                className="ac-pres-btn ac-pres-btn-secondary"
+                onClick={closePrescriptionModal}
+                disabled={prescriptionLoading}
+              >
+                Cancel
+              </button>
+              <button
+                className="ac-pres-btn ac-pres-btn-primary"
+                onClick={handlePrescriptionSubmit}
+                disabled={prescriptionLoading}
+              >
+                {prescriptionLoading ? (
+                  <>
+                    <span className="ac-end-spinner" /> Saving...
+                  </>
+                ) : (
+                  'Save Prescription'
+                )}
               </button>
             </div>
           </div>

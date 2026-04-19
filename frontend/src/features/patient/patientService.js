@@ -21,3 +21,6 @@ export const getAvailableDoctorsRequest = (payload) =>
 // Manual assign - create appointment with chosen doctor
 export const createAppointmentManualAssignRequest = (payload) =>
   api.post('/appointments/manual-assign/create-appointment', payload);
+
+export const getPrescriptionByAppointmentTokenRequest = (token) =>
+  api.get(`/patients/appt/${token}/prescription`);

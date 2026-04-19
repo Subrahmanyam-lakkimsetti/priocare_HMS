@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   startConsultation,
@@ -245,6 +246,7 @@ export default function ActiveConsultation({ date }) {
   const symptoms = triage?.symptoms || [];
   const severityLevel = triage?.severityLevel?.toLowerCase();
   const scfg = SEVERITY_CONFIG[severityLevel] || SEVERITY_CONFIG.low;
+  const portalTarget = typeof document !== 'undefined' ? document.body : null;
 
   return (
     <>
@@ -992,312 +994,328 @@ export default function ActiveConsultation({ date }) {
         )}
       </div>
 
-      {showEndModal && (
-        <div className="ac-modal-overlay">
-          <div
-            className="ac-modal-backdrop"
-            onClick={() => !ending && setShowEndModal(false)}
-          />
-          <div className="ac-modal">
-            <div className="ac-modal-icon">
-              <svg
-                width="20"
-                height="20"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="#dc2626"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
-                />
-              </svg>
-            </div>
-            <h2 className="ac-modal-title">End Consultation?</h2>
-            <p className="ac-modal-desc">
-              This will close the current session for{' '}
-              <strong>Token #{activePatient?.token}</strong>. Make sure all
-              notes are recorded before ending.
-            </p>
-            <div className="ac-modal-divider" />
-            <div className="ac-modal-patient">
-              <div className="ac-modal-patient-icon">
+      {portalTarget &&
+        showEndModal &&
+        createPortal(
+          <div className="ac-modal-overlay">
+            <div
+              className="ac-modal-backdrop"
+              onClick={() => !ending && setShowEndModal(false)}
+            />
+            <div className="ac-modal">
+              <div className="ac-modal-icon">
                 <svg
-                  width="14"
-                  height="14"
+                  width="20"
+                  height="20"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="#2563eb"
+                  stroke="#dc2626"
                   strokeWidth={2}
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
                   />
                 </svg>
               </div>
-              <div>
-                <div className="ac-modal-patient-token">
-                  {activePatient?.patient?.name ||
-                    `Token #${activePatient?.token}`}
+              <h2 className="ac-modal-title">End Consultation?</h2>
+              <p className="ac-modal-desc">
+                This will close the current session for{' '}
+                <strong>Token #{activePatient?.token}</strong>. Make sure all
+                notes are recorded before ending.
+              </p>
+              <div className="ac-modal-divider" />
+              <div className="ac-modal-patient">
+                <div className="ac-modal-patient-icon">
+                  <svg
+                    width="14"
+                    height="14"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="#2563eb"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
                 </div>
-                <div className="ac-modal-patient-sub">
-                  Started {formatTime(activePatient?.consulationStartsAt)}
+                <div>
+                  <div className="ac-modal-patient-token">
+                    {activePatient?.patient?.name ||
+                      `Token #${activePatient?.token}`}
+                  </div>
+                  <div className="ac-modal-patient-sub">
+                    Started {formatTime(activePatient?.consulationStartsAt)}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="ac-modal-actions">
-              <button
-                className="ac-modal-btn-confirm"
-                onClick={handleEndConfirm}
-                disabled={ending}
-              >
-                {ending ? (
-                  <>
-                    <span className="ac-end-spinner" /> Ending session…
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      width="14"
-                      height="14"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
-                      />
-                    </svg>
-                    Yes, end consultation
-                  </>
-                )}
-              </button>
-              <button
-                className="ac-modal-btn-cancel"
-                onClick={() => setShowEndModal(false)}
-                disabled={ending}
-              >
-                Cancel, continue session
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showPrescriptionModal && (
-        <div className="ac-pres-overlay">
-          <div className="ac-pres-backdrop" onClick={closePrescriptionModal} />
-          <div className="ac-pres-modal">
-            <div className="ac-pres-head">
-              <div>
-                <h3 className="ac-pres-title">Add Prescription</h3>
-                <p className="ac-pres-sub">
-                  Token #{activePatient?.token} · {activePatient?.patient?.name}
-                </p>
-              </div>
-              <button
-                className="ac-pres-close"
-                onClick={closePrescriptionModal}
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
+              <div className="ac-modal-actions">
+                <button
+                  className="ac-modal-btn-confirm"
+                  onClick={handleEndConfirm}
+                  disabled={ending}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  {ending ? (
+                    <>
+                      <span className="ac-end-spinner" /> Ending session…
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        width="14"
+                        height="14"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+                        />
+                      </svg>
+                      Yes, end consultation
+                    </>
+                  )}
+                </button>
+                <button
+                  className="ac-modal-btn-cancel"
+                  onClick={() => setShowEndModal(false)}
+                  disabled={ending}
+                >
+                  Cancel, continue session
+                </button>
+              </div>
             </div>
+          </div>,
+          portalTarget,
+        )}
 
-            <div className="ac-pres-body">
-              {prescriptionError && (
-                <div className="ac-pres-error">{prescriptionError}</div>
-              )}
-
-              <div className="ac-pres-field">
-                <label className="ac-pres-label">Diagnosis</label>
-                <textarea
-                  className="ac-pres-textarea"
-                  value={prescriptionForm.diagnosis}
-                  onChange={(e) =>
-                    updatePrescriptionField('diagnosis', e.target.value)
-                  }
-                  placeholder="Write diagnosis summary"
-                />
+      {portalTarget &&
+        showPrescriptionModal &&
+        createPortal(
+          <div className="ac-pres-overlay">
+            <div
+              className="ac-pres-backdrop"
+              onClick={closePrescriptionModal}
+            />
+            <div className="ac-pres-modal">
+              <div className="ac-pres-head">
+                <div>
+                  <h3 className="ac-pres-title">Add Prescription</h3>
+                  <p className="ac-pres-sub">
+                    Token #{activePatient?.token} ·{' '}
+                    {activePatient?.patient?.name}
+                  </p>
+                </div>
+                <button
+                  className="ac-pres-close"
+                  onClick={closePrescriptionModal}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
               </div>
 
-              <div className="ac-pres-grid">
-                <div className="ac-pres-field">
-                  <label className="ac-pres-label">Follow-up Date</label>
-                  <input
-                    type="date"
-                    className="ac-pres-input"
-                    value={prescriptionForm.followUpDate}
-                    onChange={(e) =>
-                      updatePrescriptionField('followUpDate', e.target.value)
-                    }
-                  />
-                </div>
-
-                <div className="ac-pres-field">
-                  <label className="ac-pres-label">Doctor Notes</label>
-                  <input
-                    type="text"
-                    className="ac-pres-input"
-                    value={prescriptionForm.notes}
-                    onChange={(e) =>
-                      updatePrescriptionField('notes', e.target.value)
-                    }
-                    placeholder="Optional notes"
-                  />
-                </div>
-              </div>
-
-              {prescriptionForm.medications.map((med, index) => (
-                <div key={index} className="ac-med-section">
-                  <div className="ac-med-top">
-                    <span className="ac-med-title">Medication {index + 1}</span>
-                    <button
-                      className="ac-med-remove"
-                      onClick={() => removeMedication(index)}
-                      type="button"
-                    >
-                      Remove
-                    </button>
-                  </div>
-
-                  <div className="ac-med-grid">
-                    <div className="ac-pres-field">
-                      <label className="ac-pres-label">Medicine Name</label>
-                      <input
-                        type="text"
-                        className="ac-pres-input"
-                        value={med.name}
-                        onChange={(e) =>
-                          updateMedicationField(index, 'name', e.target.value)
-                        }
-                        placeholder="e.g. Paracetamol"
-                      />
-                    </div>
-
-                    <div className="ac-pres-field">
-                      <label className="ac-pres-label">Dosage</label>
-                      <input
-                        type="text"
-                        className="ac-pres-input"
-                        value={med.dosage}
-                        onChange={(e) =>
-                          updateMedicationField(index, 'dosage', e.target.value)
-                        }
-                        placeholder="e.g. 500mg"
-                      />
-                    </div>
-
-                    <div className="ac-pres-field">
-                      <label className="ac-pres-label">Frequency</label>
-                      <input
-                        type="text"
-                        className="ac-pres-input"
-                        value={med.frequency}
-                        onChange={(e) =>
-                          updateMedicationField(
-                            index,
-                            'frequency',
-                            e.target.value,
-                          )
-                        }
-                        placeholder="e.g. Twice daily"
-                      />
-                    </div>
-
-                    <div className="ac-pres-field">
-                      <label className="ac-pres-label">Duration</label>
-                      <input
-                        type="text"
-                        className="ac-pres-input"
-                        value={med.duration}
-                        onChange={(e) =>
-                          updateMedicationField(
-                            index,
-                            'duration',
-                            e.target.value,
-                          )
-                        }
-                        placeholder="e.g. 5 days"
-                      />
-                    </div>
-
-                    <div
-                      className="ac-pres-field"
-                      style={{ gridColumn: '1 / -1' }}
-                    >
-                      <label className="ac-pres-label">Instructions</label>
-                      <input
-                        type="text"
-                        className="ac-pres-input"
-                        value={med.instructions}
-                        onChange={(e) =>
-                          updateMedicationField(
-                            index,
-                            'instructions',
-                            e.target.value,
-                          )
-                        }
-                        placeholder="e.g. After food"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <button
-                className="ac-med-add"
-                onClick={addMedication}
-                type="button"
-              >
-                + Add Another Medication
-              </button>
-            </div>
-
-            <div className="ac-pres-foot">
-              <button
-                className="ac-pres-btn ac-pres-btn-secondary"
-                onClick={closePrescriptionModal}
-                disabled={prescriptionLoading}
-              >
-                Cancel
-              </button>
-              <button
-                className="ac-pres-btn ac-pres-btn-primary"
-                onClick={handlePrescriptionSubmit}
-                disabled={prescriptionLoading}
-              >
-                {prescriptionLoading ? (
-                  <>
-                    <span className="ac-end-spinner" /> Saving...
-                  </>
-                ) : (
-                  'Save Prescription'
+              <div className="ac-pres-body">
+                {prescriptionError && (
+                  <div className="ac-pres-error">{prescriptionError}</div>
                 )}
-              </button>
+
+                <div className="ac-pres-field">
+                  <label className="ac-pres-label">Diagnosis</label>
+                  <textarea
+                    className="ac-pres-textarea"
+                    value={prescriptionForm.diagnosis}
+                    onChange={(e) =>
+                      updatePrescriptionField('diagnosis', e.target.value)
+                    }
+                    placeholder="Write diagnosis summary"
+                  />
+                </div>
+
+                <div className="ac-pres-grid">
+                  <div className="ac-pres-field">
+                    <label className="ac-pres-label">Follow-up Date</label>
+                    <input
+                      type="date"
+                      className="ac-pres-input"
+                      value={prescriptionForm.followUpDate}
+                      onChange={(e) =>
+                        updatePrescriptionField('followUpDate', e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="ac-pres-field">
+                    <label className="ac-pres-label">Doctor Notes</label>
+                    <input
+                      type="text"
+                      className="ac-pres-input"
+                      value={prescriptionForm.notes}
+                      onChange={(e) =>
+                        updatePrescriptionField('notes', e.target.value)
+                      }
+                      placeholder="Optional notes"
+                    />
+                  </div>
+                </div>
+
+                {prescriptionForm.medications.map((med, index) => (
+                  <div key={index} className="ac-med-section">
+                    <div className="ac-med-top">
+                      <span className="ac-med-title">
+                        Medication {index + 1}
+                      </span>
+                      <button
+                        className="ac-med-remove"
+                        onClick={() => removeMedication(index)}
+                        type="button"
+                      >
+                        Remove
+                      </button>
+                    </div>
+
+                    <div className="ac-med-grid">
+                      <div className="ac-pres-field">
+                        <label className="ac-pres-label">Medicine Name</label>
+                        <input
+                          type="text"
+                          className="ac-pres-input"
+                          value={med.name}
+                          onChange={(e) =>
+                            updateMedicationField(index, 'name', e.target.value)
+                          }
+                          placeholder="e.g. Paracetamol"
+                        />
+                      </div>
+
+                      <div className="ac-pres-field">
+                        <label className="ac-pres-label">Dosage</label>
+                        <input
+                          type="text"
+                          className="ac-pres-input"
+                          value={med.dosage}
+                          onChange={(e) =>
+                            updateMedicationField(
+                              index,
+                              'dosage',
+                              e.target.value,
+                            )
+                          }
+                          placeholder="e.g. 500mg"
+                        />
+                      </div>
+
+                      <div className="ac-pres-field">
+                        <label className="ac-pres-label">Frequency</label>
+                        <input
+                          type="text"
+                          className="ac-pres-input"
+                          value={med.frequency}
+                          onChange={(e) =>
+                            updateMedicationField(
+                              index,
+                              'frequency',
+                              e.target.value,
+                            )
+                          }
+                          placeholder="e.g. Twice daily"
+                        />
+                      </div>
+
+                      <div className="ac-pres-field">
+                        <label className="ac-pres-label">Duration</label>
+                        <input
+                          type="text"
+                          className="ac-pres-input"
+                          value={med.duration}
+                          onChange={(e) =>
+                            updateMedicationField(
+                              index,
+                              'duration',
+                              e.target.value,
+                            )
+                          }
+                          placeholder="e.g. 5 days"
+                        />
+                      </div>
+
+                      <div
+                        className="ac-pres-field"
+                        style={{ gridColumn: '1 / -1' }}
+                      >
+                        <label className="ac-pres-label">Instructions</label>
+                        <input
+                          type="text"
+                          className="ac-pres-input"
+                          value={med.instructions}
+                          onChange={(e) =>
+                            updateMedicationField(
+                              index,
+                              'instructions',
+                              e.target.value,
+                            )
+                          }
+                          placeholder="e.g. After food"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  className="ac-med-add"
+                  onClick={addMedication}
+                  type="button"
+                >
+                  + Add Another Medication
+                </button>
+              </div>
+
+              <div className="ac-pres-foot">
+                <button
+                  className="ac-pres-btn ac-pres-btn-secondary"
+                  onClick={closePrescriptionModal}
+                  disabled={prescriptionLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="ac-pres-btn ac-pres-btn-primary"
+                  onClick={handlePrescriptionSubmit}
+                  disabled={prescriptionLoading}
+                >
+                  {prescriptionLoading ? (
+                    <>
+                      <span className="ac-end-spinner" /> Saving...
+                    </>
+                  ) : (
+                    'Save Prescription'
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          portalTarget,
+        )}
     </>
   );
 }

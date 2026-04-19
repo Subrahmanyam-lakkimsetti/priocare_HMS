@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from './authThunks';
-import { clearError } from './authSlice';
+import { registerUser, sendOtp, resendOtp } from './authThunks';
+import { clearError, resetOtpState } from './authSlice';
 import { useNavigate, Link } from 'react-router-dom';
+
+const RESEND_COOLDOWN = 30;
 
 const PasswordStrength = ({ password }) => {
   const checks = [
-    { label: 'At least 6 characters', pass: password.length >= 6 }, // Changed from 8 to 6
+    { label: 'At least 6 characters', pass: password.length >= 6 },
     { label: 'Uppercase letter', pass: /[A-Z]/.test(password) },
     { label: 'Number', pass: /[0-9]/.test(password) },
     { label: 'Special character', pass: /[^A-Za-z0-9]/.test(password) },
@@ -118,19 +120,31 @@ const EyeIcon = ({ open }) =>
 export default function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isAuthenticated, error, loading } = useSelector((s) => s.auth);
+  const {
+    user,
+    isAuthenticated,
+    error,
+    loading,
+    otpSent,
+    otpLoading,
+    otpError,
+  } = useSelector((s) => s.auth);
 
   const [form, setForm] = useState({
     email: '',
+    otp: '',
     password: '',
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     dispatch(clearError());
+    dispatch(resetOtpState());
   }, [dispatch]);
 
   useEffect(() => {
@@ -138,19 +152,61 @@ export default function Register() {
     navigate('/patient');
   }, [isAuthenticated, user, navigate]);
 
+  // Start cooldown when OTP sent or resent
+  useEffect(() => {
+    if (otpSent) {
+      startCooldown();
+    }
+  }, [otpSent]);
+
+  const startCooldown = () => {
+    setResendCooldown(RESEND_COOLDOWN);
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  useEffect(() => () => clearInterval(timerRef.current), []);
+
   const set = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
     setFieldErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
+  const validateEmail = () => {
+    if (!form.email.trim()) return 'Email is required';
+    if (!/\S+@\S+\.\S+/.test(form.email)) return 'Enter a valid email';
+    return null;
+  };
+
+  const handleSendOtp = () => {
+    const emailErr = validateEmail();
+    if (emailErr) {
+      setFieldErrors((p) => ({ ...p, email: emailErr }));
+      return;
+    }
+    dispatch(sendOtp({ email: form.email }));
+  };
+
+  const handleResendOtp = () => {
+    if (resendCooldown > 0) return;
+    dispatch(resendOtp({ email: form.email })).then(() => startCooldown());
+  };
+
   const validate = () => {
     const errs = {};
-    if (!form.email.trim()) errs.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(form.email))
-      errs.email = 'Enter a valid email';
+    const emailErr = validateEmail();
+    if (emailErr) errs.email = emailErr;
+    if (!form.otp.trim()) errs.otp = 'OTP is required';
     if (!form.password) errs.password = 'Password is required';
     else if (form.password.length < 6)
-      // Changed from 8 to 6 to match backend
       errs.password = 'At least 6 characters required';
     if (!form.confirmPassword)
       errs.confirmPassword = 'Please confirm your password';
@@ -163,34 +219,46 @@ export default function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-
     dispatch(
       registerUser({
         email: form.email,
+        otp: form.otp,
         password: form.password,
         confirmPassword: form.confirmPassword,
       }),
     );
   };
 
+  const otpVerified = form.otp.trim().length > 0;
+  const canSubmit = otpSent && otpVerified;
+
   const inputBase =
     'w-full pl-10 pr-10 py-2.5 border rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 transition-all';
   const inputClass = (field) =>
-    `${inputBase} ${
-      fieldErrors[field]
-        ? 'border-red-300 focus:ring-red-500/20 focus:border-red-400 bg-red-50/30'
-        : 'border-gray-200 focus:ring-blue-500/30 focus:border-blue-500'
-    }`;
+    `${inputBase} ${fieldErrors[field] ? 'border-red-300 focus:ring-red-500/20 focus:border-red-400 bg-red-50/30' : 'border-gray-200 focus:ring-blue-500/30 focus:border-blue-500'}`;
+
+  const ErrorMsg = ({ field }) =>
+    fieldErrors[field] ? (
+      <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+            clipRule="evenodd"
+          />
+        </svg>
+        {fieldErrors[field]}
+      </p>
+    ) : null;
 
   return (
     <div className="min-h-screen flex font-sans">
-      {/* ── Left Panel ── */}
+      {/* Left Panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-blue-900 via-blue-800 to-cyan-700 flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute -top-20 -left-20 w-96 h-96 bg-white/5 rounded-full" />
         <div className="absolute -bottom-15 -right-15 w-72 h-72 bg-cyan-400/10 rounded-full" />
         <div className="absolute top-1/2 left-1/3 w-40 h-40 bg-blue-400/10 rounded-full" />
 
-        {/* Logo */}
         <div className="relative z-10 flex items-center gap-3">
           <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
             <svg
@@ -212,7 +280,6 @@ export default function Register() {
           </span>
         </div>
 
-        {/* Center content */}
         <div className="relative z-10 space-y-6">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2">
             <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
@@ -229,7 +296,6 @@ export default function Register() {
             Create your PrioCare account and get access to AI-powered symptom
             analysis, priority queueing, and seamless doctor communication.
           </p>
-
           <div className="space-y-3 pt-2">
             {[
               {
@@ -282,7 +348,7 @@ export default function Register() {
         </div>
       </div>
 
-      {/* ── Right Panel ── */}
+      {/* Right Panel */}
       <div className="flex-1 flex items-center justify-center bg-gray-50 px-6 py-12">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
@@ -318,37 +384,88 @@ export default function Register() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email */}
+              {/* Email + Send OTP */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Email Address
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <svg
-                      className="w-4 h-4 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                      />
-                    </svg>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                      <svg
+                        className="w-4 h-4 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="email"
+                      placeholder="you@example.com"
+                      autoFocus
+                      className={inputClass('email')}
+                      value={form.email}
+                      onChange={set('email')}
+                      disabled={otpSent}
+                    />
                   </div>
-                  <input
-                    type="email"
-                    placeholder="you@example.com"
-                    autoFocus
-                    className={inputClass('email')}
-                    value={form.email}
-                    onChange={set('email')}
-                  />
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={otpLoading || otpSent}
+                    className="shrink-0 px-4 py-2.5 bg-blue-700 hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    {otpLoading ? (
+                      <svg
+                        className="animate-spin w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
+                      </svg>
+                    ) : otpSent ? (
+                      <>
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        Sent
+                      </>
+                    ) : (
+                      'Send OTP'
+                    )}
+                  </button>
                 </div>
-                {fieldErrors.email && (
+                <ErrorMsg field="email" />
+                {otpError && (
                   <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
                     <svg
                       className="w-3 h-3"
@@ -361,10 +478,64 @@ export default function Register() {
                         clipRule="evenodd"
                       />
                     </svg>
-                    {fieldErrors.email}
+                    {otpError}
                   </p>
                 )}
               </div>
+
+              {/* OTP Field — appears after send */}
+              {otpSent && (
+                <div className="animate-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Enter OTP
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleResendOtp}
+                      disabled={resendCooldown > 0 || otpLoading}
+                      className={`text-xs font-medium transition-colors ${resendCooldown > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-700'}`}
+                    >
+                      {resendCooldown > 0
+                        ? `Resend in ${resendCooldown}s`
+                        : 'Resend OTP'}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                      <svg
+                        className="w-4 h-4 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Enter OTP sent to your email"
+                      className={inputClass('otp')}
+                      value={form.otp}
+                      onChange={set('otp')}
+                      maxLength={10}
+                      autoComplete="one-time-code"
+                    />
+                  </div>
+                  <ErrorMsg field="otp" />
+                  <p className="mt-1 text-xs text-gray-400">
+                    OTP sent to{' '}
+                    <span className="font-medium text-gray-600">
+                      {form.email}
+                    </span>
+                  </p>
+                </div>
+              )}
 
               {/* Password */}
               <div>
@@ -402,22 +573,7 @@ export default function Register() {
                     <EyeIcon open={showPassword} />
                   </button>
                 </div>
-                {fieldErrors.password && (
-                  <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                    <svg
-                      className="w-3 h-3"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    {fieldErrors.password}
-                  </p>
-                )}
+                <ErrorMsg field="password" />
                 <PasswordStrength password={form.password} />
               </div>
 
@@ -457,23 +613,7 @@ export default function Register() {
                     <EyeIcon open={showConfirm} />
                   </button>
                 </div>
-                {fieldErrors.confirmPassword && (
-                  <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                    <svg
-                      className="w-3 h-3"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    {fieldErrors.confirmPassword}
-                  </p>
-                )}
-                {/* Passwords match indicator */}
+                <ErrorMsg field="confirmPassword" />
                 {form.confirmPassword &&
                   form.password === form.confirmPassword && (
                     <p className="mt-1 text-xs text-emerald-600 flex items-center gap-1">
@@ -513,54 +653,63 @@ export default function Register() {
                 </div>
               )}
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-700 hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 mt-1"
-              >
-                {loading ? (
-                  <>
-                    <svg
-                      className="animate-spin w-4 h-4 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
+              {/* Submit — blocked until OTP entered */}
+              <div className="relative mt-1">
+                <button
+                  type="submit"
+                  disabled={loading || !canSubmit}
+                  className="w-full bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <svg
+                        className="animate-spin w-4 h-4 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
+                      </svg>
+                      Creating account...
+                    </>
+                  ) : (
+                    <>
+                      Create Account
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
                         stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      />
-                    </svg>
-                    Creating account...
-                  </>
-                ) : (
-                  <>
-                    Create Account
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </>
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </>
+                  )}
+                </button>
+                {!canSubmit && (
+                  <p className="text-center text-xs text-gray-400 mt-1.5">
+                    {!otpSent
+                      ? 'Verify email with OTP to continue'
+                      : 'Enter OTP to continue'}
+                  </p>
                 )}
-              </button>
+              </div>
             </form>
 
             <p className="text-center text-xs text-gray-400 mt-6">

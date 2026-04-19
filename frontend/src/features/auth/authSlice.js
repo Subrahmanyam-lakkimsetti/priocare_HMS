@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginUser, fetchCurrentUser, registerUser } from './authThunks';
+import { loginUser, fetchCurrentUser, registerUser, sendOtp, resendOtp } from './authThunks';
 
 const initialState = {
   user: null,
@@ -8,6 +8,9 @@ const initialState = {
   sessionInitialized: false,
   manualLogout: false,
   error: null,
+  otpSent: false,
+  otpLoading: false,
+  otpError: null,
 };
 
 const authSlice = createSlice({
@@ -21,9 +24,18 @@ const authSlice = createSlice({
       state.manualLogout = true;
       state.loading = false;
       state.error = null;
+      state.otpSent = false;
+      state.otpLoading = false;
+      state.otpError = null;
     },
     clearError: (state) => {
       state.error = null;
+      state.otpError = null;
+    },
+    resetOtpState: (state) => {
+      state.otpSent = false;
+      state.otpLoading = false;
+      state.otpError = null;
     },
   },
   extraReducers: (builder) => {
@@ -66,6 +78,33 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
       })
 
+      // Send OTP
+      .addCase(sendOtp.pending, (state) => {
+        state.otpLoading = true;
+        state.otpError = null;
+      })
+      .addCase(sendOtp.fulfilled, (state) => {
+        state.otpLoading = false;
+        state.otpSent = true;
+      })
+      .addCase(sendOtp.rejected, (state, action) => {
+        state.otpLoading = false;
+        state.otpError = action.payload;
+      })
+
+      // Resend OTP
+      .addCase(resendOtp.pending, (state) => {
+        state.otpLoading = true;
+        state.otpError = null;
+      })
+      .addCase(resendOtp.fulfilled, (state) => {
+        state.otpLoading = false;
+      })
+      .addCase(resendOtp.rejected, (state, action) => {
+        state.otpLoading = false;
+        state.otpError = action.payload;
+      })
+
       // Fetch current user
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
@@ -87,5 +126,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, resetOtpState } = authSlice.actions;
 export default authSlice.reducer;

@@ -15,7 +15,16 @@ export const getMeRequest = async () => {
 };
 
 export const registerRequest = async (userData) => {
-  // Backend expects email, password, and confirmPassword
   const res = await api.post('/auth/patient/register', userData);
+  return res.data;
+};
+
+export const sendOtpRequest = async ({ email }) => {
+  const res = await api.post('/auth/send-otp', { email });
+  return res.data;
+};
+
+export const resendOtpRequest = async ({ email }) => {
+  const res = await api.patch('/auth/resend-otp', { email });
   return res.data;
 };

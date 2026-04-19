@@ -15,10 +15,15 @@ const {
   updatePasswordController,
   forgetPasswordController,
   resetPasswordController,
+  sendOtp,
+  resendOtp,
 } = require('./auth.controller');
 const { authMiddleware } = require('../../../middlewares/auth.middleware');
 
 const authRouter = express.Router();
+
+authRouter.post('/send-otp', sendOtp);
+authRouter.patch('/resend-otp', resendOtp);
 
 authRouter.post(
   '/patient/register',

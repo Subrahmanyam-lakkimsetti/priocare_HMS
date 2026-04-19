@@ -15,6 +15,7 @@ const registerSchema = Joi.object({
     'any.only': 'Password and Confirm Password do not match',
     'any.required': 'Confirm Password is required',
   }),
+  otp: Joi.string().min(6).max(6).required(),
 }).required();
 
 const loginScheema = Joi.object({

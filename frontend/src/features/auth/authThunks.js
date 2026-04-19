@@ -1,13 +1,42 @@
-// authThunks.js
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
   loginRequest,
   getMeRequest,
   logoutRequest,
   registerRequest,
+  sendOtpRequest,
+  resendOtpRequest,
 } from './authService';
 import { logout } from './authSlice';
 import { initIntake, resetIntake } from '../patient/patientSlice';
+
+export const sendOtp = createAsyncThunk(
+  'auth/sendOtp',
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const res = await sendOtpRequest({ email });
+      return res;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Failed to send OTP. Please try again.',
+      );
+    }
+  },
+);
+
+export const resendOtp = createAsyncThunk(
+  'auth/resendOtp',
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const res = await resendOtpRequest({ email });
+      return res;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Failed to resend OTP.',
+      );
+    }
+  },
+);
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
@@ -15,7 +44,6 @@ export const registerUser = createAsyncThunk(
     try {
       const res = await registerRequest(userData);
       const user = res.data;
-      // Load this user's intake (will be empty for new users)
       dispatch(initIntake(user._id));
       return user;
     } catch (err) {
@@ -32,7 +60,6 @@ export const loginUser = createAsyncThunk(
     try {
       const res = await loginRequest(credentials);
       const user = res.data;
-      // Load THIS user's persisted intake from localStorage
       dispatch(initIntake(user._id));
       return user;
     } catch (err) {
@@ -49,12 +76,9 @@ export const logoutUser = createAsyncThunk(
     try {
       await logoutRequest();
     } catch {
-      // ignore backend failure
+      // ignore
     }
-
-    const userId = getState().auth.user?._id;
-    // Clear this user's intake from Redux (NOT from localStorage — keep it for when they log back in)
-    dispatch(resetIntake()); // no userId = just clears Redux state
+    dispatch(resetIntake());
     dispatch(logout());
     return true;
   },
@@ -65,11 +89,9 @@ export const fetchCurrentUser = createAsyncThunk(
   async (_, { dispatch, getState, fulfillWithValue }) => {
     const { manualLogout } = getState().auth;
     if (manualLogout) return fulfillWithValue(null);
-
     try {
       const res = await getMeRequest();
       const user = res.data;
-      // Restore this user's intake on page refresh
       dispatch(initIntake(user._id));
       return user;
     } catch {

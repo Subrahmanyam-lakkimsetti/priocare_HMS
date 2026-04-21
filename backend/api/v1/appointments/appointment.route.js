@@ -9,6 +9,7 @@ const {
   getAppointmnetByToken,
   getAppointmentsForUser,
   cancelAppointment,
+  rescheduleAppointment,
   getPrescriptionByToken,
   getDoctorsAccordingToSpecilization,
   createAppointmentManualAssign,
@@ -49,6 +50,12 @@ appointementRouter.patch(
   '/token/:token/cancel',
   restrictTo('patient'),
   cancelAppointment,
+);
+
+appointementRouter.patch(
+  '/token/:token/reschedule',
+  restrictTo('patient'),
+  rescheduleAppointment,
 );
 
 module.exports = {

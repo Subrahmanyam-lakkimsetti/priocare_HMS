@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleArrayValue } from '../patientSlice';
+import { fetchIntakeAutofill } from '../patientThunks';
 
 const CONDITIONS = [
   { label: 'Diabetes', icon: '🩸', desc: 'Type 1 or Type 2' },
@@ -19,6 +20,8 @@ const PRESET_LABELS = CONDITIONS.map((c) => c.label);
 export default function ConditionsStep() {
   const dispatch = useDispatch();
   const selected = useSelector((s) => s.patient.intake.comorbidities);
+  const intake = useSelector((s) => s.patient.intake);
+  const autofill = useSelector((s) => s.patient.intakeAutofill);
   const [custom, setCustom] = useState('');
 
   const toggle = (label) => {
@@ -62,26 +65,46 @@ export default function ConditionsStep() {
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
           Select all that apply
         </p>
-        {selected.length > 0 && (
-          <span className="inline-flex items-center gap-1.5 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-            <svg
-              className="w-3 h-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-            {selected.includes('None')
-              ? 'None reported'
-              : `${selected.length} selected`}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {selected.length > 0 && (
+            <span className="inline-flex items-center gap-1.5 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              {selected.includes('None')
+                ? 'None reported'
+                : `${selected.length} selected`}
+            </span>
+          )}
+          <button
+            type="button"
+            disabled={!intake.description || autofill.loading}
+            onClick={() =>
+              dispatch(
+                fetchIntakeAutofill({
+                  description: intake.description,
+                  symptoms: intake.symptoms,
+                  comorbidities: intake.comorbidities,
+                  vitals: intake.vitals,
+                  age: intake.age,
+                }),
+              )
+            }
+            className="text-xs font-semibold px-2.5 py-1 rounded-full border border-orange-200 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
+          >
+            Auto-suggest
+          </button>
+        </div>
       </div>
 
       {/* Conditions grid */}

@@ -52,6 +52,9 @@ const doctorSlice = createSlice({
       state.aiSummary = null;
       state.calledPatient = null;
     },
+    setAiSummary(state, action) {
+      state.aiSummary = action.payload;
+    },
   },
   extraReducers: (builder) => {
     // fetchQueue
@@ -148,5 +151,5 @@ const doctorSlice = createSlice({
   },
 });
 
-export const { clearConsultation } = doctorSlice.actions;
+export const { clearConsultation, setAiSummary } = doctorSlice.actions;
 export default doctorSlice.reducer;

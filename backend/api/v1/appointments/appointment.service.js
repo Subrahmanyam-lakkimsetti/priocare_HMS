@@ -397,7 +397,6 @@ const getDoctorsAccordingToSpecilization = async (triageData) => {
 
   // specilization, date, day
   const day = getDay(triageData.scheduledDate);
-  console.log(day);
   const pipeline = [
     {
       $match: {
@@ -444,6 +443,8 @@ const getDoctorsAccordingToSpecilization = async (triageData) => {
   ];
 
   const doctors = await Doctor.aggregate(pipeline);
+
+  console.log(doctors);
 
   return { doctors, triage };
 };
@@ -581,6 +582,77 @@ const cancelAppointment = async ({ token }) => {
   return appointment;
 };
 
+const rescheduleAppointment = async ({ token }, userId, body) => {
+  const { scheduledDate, reason } = body || {};
+
+  if (!scheduledDate) {
+    throw new AppError('Scheduled date is required', 400);
+  }
+
+  if (!reason || String(reason).trim().length < 5) {
+    throw new AppError('Reason must be at least 5 characters long', 400);
+  }
+
+  const patient = await Patient.findOne({ userId });
+
+  if (!patient) {
+    throw new AppError('Patient not found', 404);
+  }
+
+  const appointment = await Appointment.findOne({
+    token,
+    patientId: patient._id,
+  });
+
+  if (!appointment) {
+    throw new AppError('Appointment not found', 404);
+  }
+
+  if (appointment.status !== 'confirmed') {
+    throw new AppError('Only confirmed appointments can be rescheduled', 400);
+  }
+
+  const nextDate = new Date(scheduledDate);
+
+  if (Number.isNaN(nextDate.getTime())) {
+    throw new AppError('Invalid scheduled date', 400);
+  }
+
+  const todayDateKey = new Date().toISOString().slice(0, 10);
+  const nextDateKey = nextDate.toISOString().slice(0, 10);
+
+  if (nextDateKey < todayDateKey) {
+    throw new AppError('Scheduled date cannot be in the past', 400);
+  }
+
+  const currentDateKey = appointment.scheduledDate.toISOString().slice(0, 10);
+
+  if (currentDateKey === nextDateKey) {
+    throw new AppError('Please choose a different date to reschedule', 400);
+  }
+
+  appointment.rescheduleHistory = [
+    ...(appointment.rescheduleHistory || []),
+    {
+      previousDate: appointment.scheduledDate,
+      newDate: nextDate,
+      reason: String(reason).trim(),
+      rescheduledAt: new Date(),
+    },
+  ];
+
+  appointment.scheduledDate = nextDate;
+  appointment.rescheduleReason = String(reason).trim();
+  appointment.rescheduledAt = new Date();
+
+  await appointment.save();
+
+  return Appointment.findById(appointment._id).populate(
+    'doctorId',
+    'firstName lastName department experienceYears',
+  );
+};
+
 const getPrescriptionByToken = async ({ params: { token } }) => {
   const appt = await Appointment.findOne({ token });
 
@@ -605,5 +677,6 @@ module.exports = {
   getAppointmentByToken,
   getAppointmentsForUser,
   cancelAppointment,
+  rescheduleAppointment,
   getPrescriptionByToken,
 };

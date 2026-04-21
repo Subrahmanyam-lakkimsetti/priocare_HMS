@@ -3,6 +3,12 @@ const Patient = require('../../../models/patient.model');
 const User = require('../../../models/user.model');
 const AppError = require('../../../utils/AppError.util');
 const { getDayRange } = require('../../../utils/dayRange.util');
+const sendEmail = require('../../../utils/email.util');
+const {
+  emitDoctorRefresh,
+  emitReceptionistRefresh,
+  emitPatientRefresh,
+} = require('../../../utils/realtime.util');
 
 const patientCheckin = async ({ token }) => {
   const appointment = await Appointment.findOne({ token }).populate([
@@ -29,10 +35,20 @@ const patientCheckin = async ({ token }) => {
   appointment.status = 'checked_in';
   appointment.checkedInAt = new Date();
 
-  appointment.save();
+  await appointment.save();
+
+  emitDoctorRefresh({
+    doctorId: appointment.doctorId?._id || appointment.doctorId,
+    scheduledDate: appointment.scheduledDate,
+  });
+  emitReceptionistRefresh({ scheduledDate: appointment.scheduledDate });
+  emitPatientRefresh({
+    patientId: appointment.patientId?._id || appointment.patientId,
+    token: appointment.token,
+  });
 
   const patient = await Patient.findById(appointment.patientId);
-  const { email } = await User.findById(patient.userId);
+  const user = await User.findById(patient.userId);
 
   await sendCheckInConfirmationEmail(appointment, patient, user);
 
@@ -331,7 +347,11 @@ const sendCheckInConfirmationEmail = async (appointment, patient, user) => {
 </body>
 </html>`;
 
-  await sendEmail(email, '✅ PrioCare · Check-In Confirmation', emailHtml);
+  if (!user?.email) {
+    throw new AppError('User email not found for check-in confirmation', 404);
+  }
+
+  await sendEmail(user.email, '✅ PrioCare · Check-In Confirmation', emailHtml);
 };
 
 const dashboardStats = async (date) => {

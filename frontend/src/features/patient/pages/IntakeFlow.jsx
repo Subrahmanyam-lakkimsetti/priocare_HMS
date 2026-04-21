@@ -10,7 +10,13 @@ import DateStep from '../steps/DateStep';
 import ReviewStep from '../steps/ReviewStep';
 import AssignmentModeSelector from '../steps/AssignmentModeSelector';
 import DoctorPickerModal from '../steps/Doctorpickermodal';
-import { openReview, resetIntake } from '../patientSlice';
+import {
+  openReview,
+  resetIntake,
+  applyIntakeAutofill,
+  resetAutofill,
+  undoIntakeAutofill,
+} from '../patientSlice';
 
 const STEPS = [
   {
@@ -255,6 +261,7 @@ export default function IntakeFlow() {
   const userId = useSelector((s) => s.auth.user?._id);
   const assignmentMode = useSelector((s) => s.patient.assignmentMode);
   const selectedDoctor = useSelector((s) => s.patient.selectedDoctor);
+  const intakeAutofill = useSelector((s) => s.patient.intakeAutofill);
 
   const [showOptional, setShowOptional] = useState(false);
 
@@ -348,6 +355,99 @@ export default function IntakeFlow() {
                 </span>
               </div>
             </div>
+
+            {intakeAutofill.showPreview && intakeAutofill.lastResult && (
+              <div className="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+                <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
+                  <div className="px-6 py-4 bg-blue-600 text-white">
+                    <p className="text-xs uppercase tracking-wider text-blue-100">
+                      Priocare Assistant
+                    </p>
+                    <h3 className="text-lg font-bold">Auto-fill suggestions</h3>
+                  </div>
+
+                  <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        Description
+                      </p>
+                      <p className="text-sm text-slate-800">
+                        {intakeAutofill.lastResult.description || '—'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        Symptoms
+                      </p>
+                      <p className="text-sm text-slate-800">
+                        {intakeAutofill.lastResult.symptoms?.length
+                          ? intakeAutofill.lastResult.symptoms.join(', ')
+                          : '—'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        Conditions
+                      </p>
+                      <p className="text-sm text-slate-800">
+                        {intakeAutofill.lastResult.comorbidities?.length
+                          ? intakeAutofill.lastResult.comorbidities.join(', ')
+                          : '—'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        Vitals
+                      </p>
+                      <p className="text-sm text-slate-800">
+                        Heart rate:{' '}
+                        {intakeAutofill.lastResult.vitals?.heartRate || '—'}
+                        {' · '}BP:{' '}
+                        {intakeAutofill.lastResult.vitals?.bloodPressure || '—'}
+                        {' · '}Temp:{' '}
+                        {intakeAutofill.lastResult.vitals?.temperature || '—'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        Age
+                      </p>
+                      <p className="text-sm text-slate-800">
+                        {intakeAutofill.lastResult.age || '—'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="px-6 py-4 bg-slate-50 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => dispatch(resetAutofill())}
+                      className="text-xs font-semibold px-3 py-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-white"
+                    >
+                      Discard
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        dispatch(
+                          applyIntakeAutofill({
+                            ...intakeAutofill.lastResult,
+                            _source: 'preview',
+                          }),
+                        )
+                      }
+                      className="text-xs font-semibold px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      Apply suggestions
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             <div>
               <p className="text-white font-bold text-base">
                 {completed}{' '}
@@ -466,6 +566,26 @@ export default function IntakeFlow() {
               details help us provide better care.
             </p>
           </div>
+
+          {intakeAutofill.lastAppliedSnapshot && (
+            <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+              <div>
+                <p className="text-sm font-semibold text-blue-700">
+                  AI suggestions applied
+                </p>
+                <p className="text-xs text-blue-600">
+                  Want to revert to your previous entries?
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => dispatch(undoIntakeAutofill())}
+                className="text-xs font-semibold px-3 py-2 rounded-lg border border-blue-200 text-blue-700 hover:bg-white"
+              >
+                Undo AI fill
+              </button>
+            </div>
+          )}
 
           {/* REQUIRED SECTIONS */}
           <div className="space-y-4">

@@ -97,6 +97,20 @@ const cancelAppointment = catchAsync(async (req, res) => {
   });
 });
 
+const rescheduleAppointment = catchAsync(async (req, res) => {
+  const appointment = await appointmentService.rescheduleAppointment(
+    req.params,
+    req.data.id,
+    req.body,
+  );
+
+  res.status(200).json({
+    isSuccess: true,
+    message: 'Appointment rescheduled successfully',
+    data: appointment,
+  });
+});
+
 const getPrescriptionByToken = catchAsync(async (req, res) => {
   const prescription = await appointmentService.getPrescriptionByToken(req);
 
@@ -117,5 +131,6 @@ module.exports = {
   getActiveAppointment,
   getAppointmentsForUser,
   cancelAppointment,
+  rescheduleAppointment,
   getPrescriptionByToken,
 };

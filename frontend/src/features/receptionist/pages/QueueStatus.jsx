@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchQueueStatus } from '../receptionistThunks';
 import TokenBadge from '../components/Tokenbadge';
 import TokenDetailModal from '../components/Tokendetailmodal';
+import { connectSocket } from '../../../services/socket';
 
 function ProgressBar({ value, total, color }) {
   const pct = total ? Math.min(100, Math.round((value / total) * 100)) : 0;
@@ -58,6 +59,18 @@ export default function QueueStatus() {
   useEffect(() => {
     setMounted(true);
     refresh();
+  }, [dispatch]);
+
+  useEffect(() => {
+    const socket = connectSocket();
+    const handleRefresh = () => {
+      refresh();
+    };
+
+    socket.on('receptionist:refresh', handleRefresh);
+    return () => {
+      socket.off('receptionist:refresh', handleRefresh);
+    };
   }, [dispatch]);
 
   return (

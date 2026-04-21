@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { fetchAppointmentByToken } from '../receptionistThunks';
 import { clearTokenAppointment } from '../receptionistSlice';
 
@@ -154,6 +155,7 @@ function SectionCard({
 }
 
 export default function TokenSearch() {
+  const [searchParams] = useSearchParams();
   const [token, setToken] = useState('');
   const [searched, setSearched] = useState(false);
   const dispatch = useDispatch();
@@ -162,6 +164,16 @@ export default function TokenSearch() {
     tokenLoading,
     tokenError,
   } = useSelector((s) => s.receptionist);
+
+  useEffect(() => {
+    const queryToken = (searchParams.get('token') || '').trim().toUpperCase();
+
+    if (queryToken.length === 4) {
+      setToken(queryToken);
+      setSearched(true);
+      dispatch(fetchAppointmentByToken(queryToken));
+    }
+  }, [searchParams, dispatch]);
 
   const handleSearch = () => {
     if (token.length !== 4) return;

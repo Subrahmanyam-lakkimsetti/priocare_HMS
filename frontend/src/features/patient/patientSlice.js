@@ -6,8 +6,16 @@ import {
   fetchAppointmentByToken,
   fetchAllAppointments,
   cancelAppointment,
+  rescheduleAppointment,
   fetchAvailableDoctors,
   createAppointmentManualAssign,
+  askPriocareAssistant,
+  fetchAssistantConversation,
+  fetchAssistantConversations,
+  escalateAssistantConversation,
+  fetchAssistantAppointmentContext,
+  fetchIntakeAutofill,
+  deleteAssistantConversation,
 } from './patientThunks';
 import {
   loadIntake,
@@ -27,6 +35,17 @@ const emptyIntake = {
   },
   scheduledDate: '',
 };
+
+const cloneIntake = (intake) => ({
+  ...intake,
+  symptoms: Array.isArray(intake.symptoms) ? [...intake.symptoms] : [],
+  comorbidities: Array.isArray(intake.comorbidities)
+    ? [...intake.comorbidities]
+    : [],
+  vitals: {
+    ...(intake.vitals || {}),
+  },
+});
 
 const initialState = {
   submitting: false,
@@ -51,6 +70,31 @@ const initialState = {
   loadingDoctors: false,
   doctorsError: null,
   selectedDoctor: null,
+
+  assistant: {
+    isOpen: false,
+    sending: false,
+    loadingConversation: false,
+    loadingConversations: false,
+    conversationId: null,
+    conversations: [],
+    messages: [],
+    error: null,
+    lastSafetyNotice: null,
+    requiresEscalation: false,
+    escalationReason: null,
+    context: null,
+  },
+
+  intakeAutofill: {
+    loading: false,
+    error: null,
+    lastResult: null,
+    showPreview: false,
+    lastAppliedSnapshot: null,
+    lastAppliedAt: null,
+    lastAppliedSource: null,
+  },
 };
 
 const patientSlice = createSlice({
@@ -100,6 +144,9 @@ const patientSlice = createSlice({
       const userId = a.payload;
       if (userId) clearIntake(userId);
       s.intake = { ...emptyIntake };
+      s.intakeAutofill.lastAppliedSnapshot = null;
+      s.intakeAutofill.lastAppliedAt = null;
+      s.intakeAutofill.lastAppliedSource = null;
       s.success = false;
       s.error = null;
       s.showReview = false;
@@ -135,6 +182,87 @@ const patientSlice = createSlice({
     clearSelectedDoctor: (s) => {
       s.selectedDoctor = null;
     },
+
+    openAssistant: (s) => {
+      s.assistant.isOpen = true;
+    },
+
+    closeAssistant: (s) => {
+      s.assistant.isOpen = false;
+    },
+
+    clearAssistantError: (s) => {
+      s.assistant.error = null;
+    },
+
+    openAutofillPreview: (s) => {
+      s.intakeAutofill.showPreview = true;
+    },
+
+    closeAutofillPreview: (s) => {
+      s.intakeAutofill.showPreview = false;
+    },
+
+    resetAutofill: (s) => {
+      s.intakeAutofill.lastResult = null;
+      s.intakeAutofill.error = null;
+      s.intakeAutofill.showPreview = false;
+      s.intakeAutofill.lastAppliedAt = null;
+      s.intakeAutofill.lastAppliedSource = null;
+    },
+
+    undoIntakeAutofill: (s) => {
+      if (s.intakeAutofill.lastAppliedSnapshot) {
+        s.intake = cloneIntake(s.intakeAutofill.lastAppliedSnapshot);
+        s.intakeAutofill.lastAppliedSnapshot = null;
+        s.intakeAutofill.lastAppliedAt = null;
+        s.intakeAutofill.lastAppliedSource = null;
+      }
+    },
+
+    applyIntakeAutofill: (s, a) => {
+      s.intakeAutofill.lastAppliedSnapshot = cloneIntake(s.intake);
+      const payload = a.payload || {};
+      const { _source, ...data } = payload;
+      const allowOverride = _source === 'chat';
+      const intake = s.intake;
+
+      if ((allowOverride || !intake.description) && data.description) {
+        intake.description = data.description;
+      }
+
+      if (Array.isArray(data.symptoms) && data.symptoms.length > 0) {
+        const merged = new Set([...(intake.symptoms || []), ...data.symptoms]);
+        intake.symptoms = Array.from(merged);
+      }
+
+      if (Array.isArray(data.comorbidities) && data.comorbidities.length > 0) {
+        const merged = new Set([
+          ...(intake.comorbidities || []),
+          ...data.comorbidities,
+        ]);
+        intake.comorbidities = Array.from(merged);
+      }
+
+      if (!intake.age && data.age) {
+        intake.age = String(data.age);
+      }
+
+      if (data.vitals) {
+        intake.vitals = {
+          ...intake.vitals,
+          heartRate: intake.vitals.heartRate || data.vitals.heartRate || '',
+          bloodPressure:
+            intake.vitals.bloodPressure || data.vitals.bloodPressure || '',
+          temperature:
+            intake.vitals.temperature || data.vitals.temperature || '',
+        };
+      }
+
+      s.intakeAutofill.showPreview = false;
+      s.intakeAutofill.lastAppliedAt = new Date().toISOString();
+      s.intakeAutofill.lastAppliedSource = _source || 'manual';
+    },
   },
 
   extraReducers: (b) => {
@@ -147,6 +275,7 @@ const patientSlice = createSlice({
       s.success = true;
       if (a.meta?.arg?.userId) clearIntake(a.meta.arg.userId);
       s.intake = { ...emptyIntake };
+      s.intakeAutofill.lastAppliedSnapshot = null;
       s.assignmentMode = 'auto';
       s.selectedDoctor = null;
     });
@@ -164,6 +293,7 @@ const patientSlice = createSlice({
       s.success = true;
       if (a.meta?.arg?.intake?.userId) clearIntake(a.meta.arg.intake.userId);
       s.intake = { ...emptyIntake };
+      s.intakeAutofill.lastAppliedSnapshot = null;
       s.assignmentMode = 'auto';
       s.selectedDoctor = null;
       s.availableDoctors = [];
@@ -222,6 +352,17 @@ const patientSlice = createSlice({
       }
     });
 
+    // RESCHEDULE
+    b.addCase(rescheduleAppointment.fulfilled, (s, a) => {
+      const updated = a.payload;
+      s.appointments = s.appointments.map((appt) =>
+        appt._id === updated._id ? updated : appt,
+      );
+      if (s.activeAppointment?._id === updated._id) {
+        s.activeAppointment = updated;
+      }
+    });
+
     // FETCH AVAILABLE DOCTORS
     b.addCase(fetchAvailableDoctors.pending, (s) => {
       s.loadingDoctors = true;
@@ -248,6 +389,121 @@ const patientSlice = createSlice({
       s.loadingDoctors = false;
       s.doctorsError = a.payload;
     });
+
+    b.addCase(askPriocareAssistant.pending, (s, a) => {
+      s.assistant.sending = true;
+      s.assistant.error = null;
+
+      const question = a.meta?.arg?.question;
+      if (question) {
+        s.assistant.messages.push({
+          role: 'patient',
+          content: question,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    });
+    b.addCase(askPriocareAssistant.fulfilled, (s, a) => {
+      s.assistant.sending = false;
+
+      const askData = a.payload?.ask || null;
+      const conversation = a.payload?.conversation || null;
+
+      if (askData?.conversationId) {
+        s.assistant.conversationId = askData.conversationId;
+      }
+
+      if (conversation?.messages) {
+        s.assistant.messages = conversation.messages;
+      } else if (askData?.answer) {
+        s.assistant.messages.push({
+          role: 'assistant',
+          content: askData.answer,
+          createdAt: new Date().toISOString(),
+          confidence: askData.confidence,
+          safetyNotice: askData.safetyNotice,
+        });
+      }
+
+      s.assistant.lastSafetyNotice = askData?.safetyNotice || null;
+      s.assistant.requiresEscalation = Boolean(askData?.requiresEscalation);
+      s.assistant.escalationReason = askData?.escalationReason || null;
+    });
+    b.addCase(askPriocareAssistant.rejected, (s, a) => {
+      s.assistant.sending = false;
+      s.assistant.error = a.payload || 'Assistant failed to respond';
+    });
+
+    b.addCase(fetchAssistantConversation.pending, (s) => {
+      s.assistant.loadingConversation = true;
+      s.assistant.error = null;
+    });
+    b.addCase(fetchAssistantConversation.fulfilled, (s, a) => {
+      s.assistant.loadingConversation = false;
+      s.assistant.conversationId = a.payload?._id || null;
+      s.assistant.messages = a.payload?.messages || [];
+      s.assistant.requiresEscalation = Boolean(
+        a.payload?.escalation?.isEscalated,
+      );
+      s.assistant.escalationReason = a.payload?.escalation?.reason || null;
+    });
+    b.addCase(fetchAssistantConversation.rejected, (s, a) => {
+      s.assistant.loadingConversation = false;
+      s.assistant.error = a.payload || 'Failed to load conversation';
+    });
+
+    b.addCase(fetchAssistantConversations.pending, (s) => {
+      s.assistant.loadingConversations = true;
+      s.assistant.error = null;
+    });
+    b.addCase(fetchAssistantConversations.fulfilled, (s, a) => {
+      s.assistant.loadingConversations = false;
+      s.assistant.conversations = a.payload || [];
+    });
+    b.addCase(fetchAssistantConversations.rejected, (s, a) => {
+      s.assistant.loadingConversations = false;
+      s.assistant.error = a.payload || 'Failed to load conversations';
+    });
+
+    b.addCase(escalateAssistantConversation.fulfilled, (s, a) => {
+      s.assistant.requiresEscalation = Boolean(
+        a.payload?.escalation?.isEscalated,
+      );
+      s.assistant.escalationReason = a.payload?.escalation?.reason || null;
+    });
+
+    b.addCase(fetchAssistantAppointmentContext.fulfilled, (s, a) => {
+      s.assistant.context = a.payload || null;
+    });
+
+    b.addCase(fetchIntakeAutofill.pending, (s) => {
+      s.intakeAutofill.loading = true;
+      s.intakeAutofill.error = null;
+    });
+    b.addCase(fetchIntakeAutofill.fulfilled, (s, a) => {
+      s.intakeAutofill.loading = false;
+      s.intakeAutofill.lastResult = a.payload || null;
+      s.intakeAutofill.error = a.payload?.error || null;
+      s.intakeAutofill.showPreview = !a.payload?.error;
+    });
+    b.addCase(fetchIntakeAutofill.rejected, (s, a) => {
+      s.intakeAutofill.loading = false;
+      s.intakeAutofill.error = a.payload || 'Unable to generate suggestions';
+    });
+
+    b.addCase(deleteAssistantConversation.fulfilled, (s, a) => {
+      const deletedId = a.payload;
+      s.assistant.conversations = s.assistant.conversations.filter(
+        (c) => c._id !== deletedId,
+      );
+      if (s.assistant.conversationId === deletedId) {
+        s.assistant.conversationId = null;
+        s.assistant.messages = [];
+        s.assistant.requiresEscalation = false;
+        s.assistant.escalationReason = null;
+        s.assistant.lastSafetyNotice = null;
+      }
+    });
   },
 });
 
@@ -265,6 +521,14 @@ export const {
   closeDoctorPicker,
   selectDoctor,
   clearSelectedDoctor,
+  openAssistant,
+  closeAssistant,
+  clearAssistantError,
+  openAutofillPreview,
+  closeAutofillPreview,
+  resetAutofill,
+  undoIntakeAutofill,
+  applyIntakeAutofill,
 } = patientSlice.actions;
 
 export default patientSlice.reducer;

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { fetchQueue, fetchActiveConsultation } from '../doctorThunks';
+import { connectSocket } from '../../../services/socket';
 
 import QueuePanel from '../components/QueuePanel';
 import ActiveConsultation from '../components/ActiveConsultation';
@@ -18,9 +20,11 @@ const todayStr = () => toDateString(new Date());
 
 export default function ConsultationRoom() {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
   const [selectedDate, setSelectedDate] = useState(todayStr());
   const [mounted, setMounted] = useState(false);
   const hasMounted = useRef(false);
+  const focusToken = (searchParams.get('token') || '').trim().toUpperCase();
 
   useEffect(() => {
     setMounted(true);
@@ -36,6 +40,21 @@ export default function ConsultationRoom() {
   useEffect(() => {
     dispatch(fetchQueue(selectedDate));
   }, [selectedDate, dispatch]);
+
+  useEffect(() => {
+    const socket = connectSocket();
+    const handleRefresh = (payload) => {
+      const dateKey = payload?.date;
+      if (dateKey && dateKey !== selectedDate) return;
+      dispatch(fetchQueue(selectedDate));
+      dispatch(fetchActiveConsultation());
+    };
+
+    socket.on('doctor:refresh', handleRefresh);
+    return () => {
+      socket.off('doctor:refresh', handleRefresh);
+    };
+  }, [dispatch, selectedDate]);
 
   const isToday = selectedDate === todayStr();
 
@@ -80,6 +99,14 @@ export default function ConsultationRoom() {
           </div>
         )}
       </div>
+
+      {focusToken.length === 4 && (
+        <div className="shrink-0 -mt-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+          Escalation context token:{' '}
+          <span className="font-bold">{focusToken}</span>. Check queue or active
+          consultation for this patient.
+        </div>
+      )}
 
       {/* ── Date Selector ── */}
       <div
@@ -132,7 +159,7 @@ export default function ConsultationRoom() {
             </span>
           </div>
           <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-200">
-            <QueuePanel date={selectedDate} />
+            <QueuePanel date={selectedDate} focusToken={focusToken} />
           </div>
         </div>
 

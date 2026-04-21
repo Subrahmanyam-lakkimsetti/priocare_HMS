@@ -10,6 +10,7 @@ import AppointmentDetails from '../../features/patient/pages/AppointmentDetails'
 import PatientSidebar from '../../components/shared/PatientSidebar';
 import PatientAppointments from '../../features/patient/pages/PatientAppointments';
 import ProfilePage from '../../features/patient/patientProfile/pages/ProfilePage';
+import PriocareAssistantWidget from '../../features/patient/components/PriocareAssistantWidget';
 
 const NAV_ITEMS = [
   { key: 'home', label: 'Dashboard', path: '/patient' },
@@ -105,6 +106,8 @@ export default function PatientLayout() {
             <Route path="profile" element={<ProfilePage />} />
           </Routes>
         </main>
+
+        <PriocareAssistantWidget />
       </div>
     </div>
   );

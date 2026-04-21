@@ -17,7 +17,9 @@ const authMiddleware = catchAsync((req, res, next) => {
   // add the payold data tot the req obj
   req.data = {
     id: decode.userId,
-    role: decode.role,
+    role: String(decode.role || '')
+      .trim()
+      .toLowerCase(),
   };
 
   next();
@@ -25,8 +27,11 @@ const authMiddleware = catchAsync((req, res, next) => {
 
 const restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.data.role)) {
-      throw new AppError('unauthorized', 404);
+    const allowedRoles = roles.map((role) => String(role).toLowerCase());
+    const currentRole = String(req.data.role || '').toLowerCase();
+
+    if (!allowedRoles.includes(currentRole)) {
+      throw new AppError('unauthorized', 403);
     }
 
     next();

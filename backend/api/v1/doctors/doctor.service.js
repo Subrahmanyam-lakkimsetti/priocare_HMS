@@ -5,6 +5,12 @@ const AppError = require('../../../utils/AppError.util');
 const { getDoctorQueue } = require('../appointments/doctorQueue.service');
 const { generateSummary } = require('./prompts/aiAdapter');
 const sendEmail = require('../../../utils/email.util');
+const {
+  emitDoctorRefresh,
+  emitReceptionistRefresh,
+  emitPatientRefresh,
+  emitDoctorAiSummary,
+} = require('../../../utils/realtime.util');
 
 const formatDate = (date) => {
   if (!date) return 'N/A';
@@ -439,6 +445,16 @@ const callPatient = async (userId, date) => {
     }
   })();
 
+  emitDoctorRefresh({
+    doctorId: doctor._id,
+    scheduledDate: calledPatient.scheduledDate,
+  });
+  emitReceptionistRefresh({ scheduledDate: calledPatient.scheduledDate });
+  emitPatientRefresh({
+    patientId: calledPatient.patientId?._id || calledPatient.patientId,
+    token: calledPatient.token,
+  });
+
   return calledPatient;
 };
 
@@ -517,9 +533,18 @@ const startConsultation = async (userId) => {
     try {
       const summary = await generateSummary(appointmentObj);
 
+      const summaryUpdatedAt = new Date();
+
       await Appointment.findByIdAndUpdate(appt._id, {
         aiSummary: summary,
-        aisummaryUpdatedAt: new Date(),
+        aisummaryUpdatedAt: summaryUpdatedAt,
+      });
+
+      emitDoctorAiSummary({
+        doctorId: doctor._id,
+        token: appointmentObj.token,
+        aiSummary: summary,
+        aisummaryUpdatedAt: summaryUpdatedAt,
       });
 
       console.log('AI summary saved');
@@ -527,6 +552,16 @@ const startConsultation = async (userId) => {
       console.log('AI summary failes', err);
     }
   })();
+
+  emitDoctorRefresh({
+    doctorId: doctor._id,
+    scheduledDate: appointment.scheduledDate,
+  });
+  emitReceptionistRefresh({ scheduledDate: appointment.scheduledDate });
+  emitPatientRefresh({
+    patientId: appointment.patientId,
+    token: appointment.token,
+  });
 
   delete appointment.patientDetails;
 
@@ -581,6 +616,16 @@ const endConsultation = async (token) => {
       console.log('Consultation completed email failed', err);
     }
   })();
+
+  emitDoctorRefresh({
+    doctorId: appointment.doctorId?._id || appointment.doctorId,
+    scheduledDate: appointment.scheduledDate,
+  });
+  emitReceptionistRefresh({ scheduledDate: appointment.scheduledDate });
+  emitPatientRefresh({
+    patientId: appointment.patientId?._id || appointment.patientId,
+    token: appointment.token,
+  });
 
   return appointment;
 };

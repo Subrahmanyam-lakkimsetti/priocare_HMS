@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setField } from '../patientSlice';
+import { resetAutofill, setField } from '../patientSlice';
+import { fetchIntakeAutofill } from '../patientThunks';
 
 const PROMPTS = [
   'Fever since yesterday',
@@ -17,6 +18,7 @@ const PROMPTS = [
 function DescriptionStep() {
   const dispatch = useDispatch();
   const value = useSelector((s) => s.patient.intake.description);
+  const autofill = useSelector((s) => s.patient.intakeAutofill);
 
   const charCount = value?.length || 0;
   const isValid = charCount > 10;
@@ -24,6 +26,41 @@ function DescriptionStep() {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Let Priocare help
+        </p>
+        <div className="flex items-center gap-2">
+          {autofill.lastResult && (
+            <button
+              type="button"
+              onClick={() => dispatch(resetAutofill())}
+              className="text-xs font-semibold px-3 py-1.5 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50"
+            >
+              Reset AI suggestions
+            </button>
+          )}
+          <button
+            type="button"
+            disabled={!value || value.length < 5 || autofill.loading}
+            onClick={() =>
+              dispatch(
+                fetchIntakeAutofill({
+                  description: value,
+                }),
+              )
+            }
+            className="text-xs font-semibold px-3 py-1.5 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+          >
+            {autofill.loading ? 'Auto-filling...' : 'Auto-fill form'}
+          </button>
+        </div>
+      </div>
+
+      {autofill.error && (
+        <p className="text-xs text-red-500">{autofill.error}</p>
+      )}
+
       {/* Quick suggestion chips */}
       <div>
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">

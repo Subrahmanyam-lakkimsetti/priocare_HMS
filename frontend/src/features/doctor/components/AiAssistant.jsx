@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAiSummary } from '../doctorThunks';
+import { setAiSummary } from '../doctorSlice';
+import { connectSocket } from '../../../services/socket';
 
 function formatUpdatedAt(dateStr) {
   if (!dateStr) return null;
@@ -103,25 +104,19 @@ export default function AiAssistant() {
   const summaryContent = summaryData?.aiSummary;
   const updatedAt = summaryData?.aisummaryUpdatedAt;
   const hasSummary = !!summaryContent;
-  const pollRef = useRef(null);
 
   useEffect(() => {
-    const stop = () => {
-      if (pollRef.current) {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
+    const socket = connectSocket();
+    const handleSummary = (payload) => {
+      if (!payload?.token || payload.token !== activePatient?.token) return;
+      dispatch(setAiSummary(payload));
     };
-    if (isConsulting && !hasSummary && activePatient?.token) {
-      pollRef.current = setInterval(
-        () => dispatch(fetchAiSummary(activePatient.token)),
-        4000,
-      );
-    } else {
-      stop();
-    }
-    return stop;
-  }, [isConsulting, hasSummary, activePatient?.token, dispatch]);
+
+    socket.on('doctor:aiSummary', handleSummary);
+    return () => {
+      socket.off('doctor:aiSummary', handleSummary);
+    };
+  }, [dispatch, activePatient?.token]);
 
   return (
     <>

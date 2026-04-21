@@ -1,8 +1,12 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { fetchAppointmentByToken } from '../patientThunks';
+import {
+  fetchAppointmentByToken,
+  rescheduleAppointment,
+} from '../patientThunks';
 import { getPrescriptionByAppointmentTokenRequest } from '../patientService';
+import { connectSocket } from '../../../services/socket';
 
 const SEVERITY_CONFIG = {
   critical: {
@@ -52,10 +56,28 @@ export default function AppointmentDetails() {
   const [prescription, setPrescription] = useState(null);
   const [prescriptionLoading, setPrescriptionLoading] = useState(false);
   const [prescriptionError, setPrescriptionError] = useState('');
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [newScheduledDate, setNewScheduledDate] = useState('');
+  const [rescheduleReason, setRescheduleReason] = useState('');
+  const [rescheduleError, setRescheduleError] = useState('');
+  const [rescheduleSubmitting, setRescheduleSubmitting] = useState(false);
 
   useEffect(() => {
     if (!a || a.token !== token) dispatch(fetchAppointmentByToken(token));
   }, [token, a, dispatch]);
+
+  useEffect(() => {
+    const socket = connectSocket();
+    const handleRefresh = (payload) => {
+      if (payload?.token && payload.token !== token) return;
+      dispatch(fetchAppointmentByToken(token));
+    };
+
+    socket.on('patient:refresh', handleRefresh);
+    return () => {
+      socket.off('patient:refresh', handleRefresh);
+    };
+  }, [dispatch, token]);
 
   useEffect(() => {
     let active = true;
@@ -115,6 +137,62 @@ export default function AppointmentDetails() {
     });
   };
 
+  const toDateInputValue = (d) => {
+    if (!d) return '';
+    return new Date(d).toISOString().slice(0, 10);
+  };
+
+  const openRescheduleModal = () => {
+    setNewScheduledDate(toDateInputValue(a?.scheduledDate));
+    setRescheduleReason('');
+    setRescheduleError('');
+    setShowRescheduleModal(true);
+  };
+
+  const closeRescheduleModal = () => {
+    if (rescheduleSubmitting) return;
+    setShowRescheduleModal(false);
+    setRescheduleError('');
+  };
+
+  const handleRescheduleSubmit = async () => {
+    const trimmedReason = rescheduleReason.trim();
+
+    if (!newScheduledDate) {
+      setRescheduleError('Please choose a new date.');
+      return;
+    }
+
+    if (trimmedReason.length < 5) {
+      setRescheduleError('Please enter at least 5 characters for the reason.');
+      return;
+    }
+
+    if (newScheduledDate === toDateInputValue(a?.scheduledDate)) {
+      setRescheduleError('Please select a different date.');
+      return;
+    }
+
+    try {
+      setRescheduleSubmitting(true);
+      setRescheduleError('');
+
+      await dispatch(
+        rescheduleAppointment({
+          token,
+          scheduledDate: newScheduledDate,
+          reason: trimmedReason,
+        }),
+      ).unwrap();
+
+      setShowRescheduleModal(false);
+    } catch (err) {
+      setRescheduleError(err || 'Unable to reschedule appointment');
+    } finally {
+      setRescheduleSubmitting(false);
+    }
+  };
+
   const medicineAvailabilityClass = (status) => {
     if (status === 'available') {
       return 'bg-emerald-100 text-emerald-700';
@@ -167,6 +245,7 @@ export default function AppointmentDetails() {
     a?.status === 'in_consultation' || a?.status === 'in-progress';
   const isCheckedIn = a?.status === 'checked_in';
   const isCompleted = a?.status === 'completed';
+  const canReschedule = a?.status === 'confirmed';
 
   /* ── Loading / Empty ─────────────────────────────────── */
   if (loadingAppointment)
@@ -1102,11 +1181,117 @@ export default function AppointmentDetails() {
                     </p>
                   </div>
                 )}
+
+                {canReschedule && (
+                  <div className="rounded-2xl p-5 border border-cyan-200 bg-cyan-50">
+                    <div className="w-9 h-9 bg-cyan-100 rounded-xl flex items-center justify-center mb-3">
+                      <svg
+                        className="w-5 h-5 text-cyan-700"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm12-8h.01M12 16h.01M7 16h.01"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="font-bold text-sm mb-1 text-cyan-900">
+                      Need to Reschedule?
+                    </h3>
+                    <p className="text-cyan-800/85 text-xs leading-relaxed mb-4">
+                      Pick another appointment date and let us know your reason.
+                    </p>
+                    <button
+                      onClick={openRescheduleModal}
+                      className="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
+                    >
+                      Reschedule Appointment
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      {showRescheduleModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-sm">
+          <div
+            className="absolute inset-0"
+            onClick={closeRescheduleModal}
+            aria-hidden="true"
+          />
+
+          <div className="relative w-full max-w-lg rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-2xl">
+            <div className="bg-linear-to-r from-cyan-600 to-blue-600 px-6 py-4 text-white">
+              <h3 className="text-lg font-bold">Reschedule Appointment</h3>
+              <p className="text-white/80 text-xs mt-1">
+                Current date: {formatDate(a?.scheduledDate)}
+              </p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  Choose New Date
+                </label>
+                <input
+                  type="date"
+                  value={newScheduledDate}
+                  min={toDateInputValue(new Date())}
+                  onChange={(e) => setNewScheduledDate(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-300"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  Reason
+                </label>
+                <textarea
+                  value={rescheduleReason}
+                  onChange={(e) => setRescheduleReason(e.target.value)}
+                  rows={4}
+                  placeholder="Tell us why you want to reschedule this appointment"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:border-cyan-300 resize-none"
+                />
+              </div>
+
+              {rescheduleError && (
+                <p className="text-xs text-red-600 font-medium">
+                  {rescheduleError}
+                </p>
+              )}
+
+              <div className="pt-1 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={closeRescheduleModal}
+                  disabled={rescheduleSubmitting}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 transition-colors disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRescheduleSubmit}
+                  disabled={rescheduleSubmitting}
+                  className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-semibold transition-colors disabled:opacity-60"
+                >
+                  {rescheduleSubmitting
+                    ? 'Rescheduling...'
+                    : 'Confirm Reschedule'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

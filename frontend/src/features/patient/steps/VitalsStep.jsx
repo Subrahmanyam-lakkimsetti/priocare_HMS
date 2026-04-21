@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { setVitals } from '../patientSlice';
+import { fetchIntakeAutofill } from '../patientThunks';
 
 const VITALS = [
   {
@@ -70,9 +71,34 @@ const VITALS = [
 export default function VitalsStep() {
   const dispatch = useDispatch();
   const vitals = useSelector((s) => s.patient.intake.vitals) || {};
+  const intake = useSelector((s) => s.patient.intake);
+  const autofill = useSelector((s) => s.patient.intakeAutofill);
 
   return (
     <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          Optional readings
+        </p>
+        <button
+          type="button"
+          disabled={!intake.description || autofill.loading}
+          onClick={() =>
+            dispatch(
+              fetchIntakeAutofill({
+                description: intake.description,
+                symptoms: intake.symptoms,
+                comorbidities: intake.comorbidities,
+                vitals: intake.vitals,
+                age: intake.age,
+              }),
+            )
+          }
+          className="text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+        >
+          Auto-suggest
+        </button>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {VITALS.map(({ key, label, placeholder, unit, icon }) => (
           <div key={key}>

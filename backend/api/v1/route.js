@@ -5,6 +5,7 @@ const adminRouter = require('./admin/admin.routes');
 const { doctorRouter } = require('./doctors/doctor.route');
 const { appointementRouter } = require('./appointments/appointment.route');
 const receptionistRouter = require('./receptionists/receptionst.routes');
+const { assistantRouter } = require('./assistant/assistant.route');
 
 const apiRouter = express.Router();
 
@@ -16,6 +17,7 @@ apiRouter.use('/auth', authRouter);
 apiRouter.use('/patients', patientRouter);
 apiRouter.use('/doctors', doctorRouter);
 apiRouter.use('/receptionists', receptionistRouter);
+apiRouter.use('/assistant', assistantRouter);
 
 apiRouter.use('/appointments', appointementRouter);
 

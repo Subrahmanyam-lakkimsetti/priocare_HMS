@@ -122,7 +122,7 @@ function waitingWeight(checkedInAt) {
   return mins >= 20 ? 600 : 400;
 }
 
-export default function QueuePanel({ date }) {
+export default function QueuePanel({ date, focusToken }) {
   const dispatch = useDispatch();
   const queue = useSelector((s) => s.doctor.queue);
   const loading = useSelector((s) => s.doctor.loading);
@@ -417,12 +417,17 @@ export default function QueuePanel({ date }) {
             const symptoms = p.triage?.symptoms || [];
             const isNext = idx === 0 && !isQueueBusy && !calling;
             const isCalled = p._id === calledId;
+            const isFocusedToken =
+              focusToken &&
+              String(p.token || '').toUpperCase() ===
+                String(focusToken || '').toUpperCase();
 
             let cardClass = 'qp-card';
             if (isCalled && phase === 'called') cardClass += ' flash';
             if (isCalled && phase === 'done') cardClass += ' exit';
             if (!isCalled && phase !== 'idle') cardClass += ' shift';
             if (isNext && phase === 'idle') cardClass += ' next-up';
+            if (isFocusedToken) cardClass += ' ring-2 ring-blue-400';
 
             return (
               <div
@@ -434,9 +439,30 @@ export default function QueuePanel({ date }) {
                   background: isCalled ? undefined : cfg.cardBg,
                   boxShadow: isCalled
                     ? undefined
-                    : `0 2px 8px ${cfg.cardGlow}, inset 0 0 0 1px ${cfg.cardBorder}`,
+                    : isFocusedToken
+                      ? `0 0 0 2px rgba(59,130,246,0.45), 0 6px 16px rgba(37,99,235,0.2), inset 0 0 0 1px ${cfg.cardBorder}`
+                      : `0 2px 8px ${cfg.cardGlow}, inset 0 0 0 1px ${cfg.cardBorder}`,
                 }}
               >
+                {isFocusedToken && (
+                  <div
+                    className="qp-next-label"
+                    style={{ background: '#dbeafe' }}
+                  >
+                    <svg
+                      width="9"
+                      height="9"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                    </svg>
+                    Escalation token
+                  </div>
+                )}
+
                 {isNext && (
                   <div className="qp-next-label">
                     <svg

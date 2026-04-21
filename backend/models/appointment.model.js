@@ -93,6 +93,38 @@ const appointmentSchema = new mongoose.Schema(
       enum: ['patient', 'staff'],
       required: true,
     },
+
+    rescheduleReason: {
+      type: String,
+      default: null,
+    },
+
+    rescheduledAt: {
+      type: Date,
+      default: null,
+    },
+
+    rescheduleHistory: [
+      {
+        previousDate: {
+          type: Date,
+          required: true,
+        },
+        newDate: {
+          type: Date,
+          required: true,
+        },
+        reason: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        rescheduledAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

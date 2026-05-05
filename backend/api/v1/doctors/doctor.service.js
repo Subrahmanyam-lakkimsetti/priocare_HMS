@@ -177,23 +177,23 @@ const sendPatientCalledEmail = async ({
         <div class="section-title">Consultation Call Details</div>
 
         <div class="detail-row">
-          <span class="detail-label">Token</span>
+          <span class="detail-label">Token:</span>
           <span class="detail-value">${appointment.token || 'N/A'}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Doctor</span>
+          <span class="detail-label">Doctor:</span>
           <span class="detail-value">Dr. ${doctor.firstName || ''} ${doctor.lastName || ''}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Department</span>
+          <span class="detail-label">Department:</span>
           <span class="detail-value">${doctor.department || 'General Medicine'}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Appointment Date</span>
+          <span class="detail-label">Appointment Date:</span>
           <span class="detail-value">${formatDate(appointment.scheduledDate)}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Called At</span>
+          <span class="detail-label">Called At:</span>
           <span class="detail-value">${formatTime(appointment.calledAt)}</span>
         </div>
       </div>
@@ -359,23 +359,23 @@ const sendConsultationCompletedEmail = async ({
         <div class="section-title">Consultation Summary</div>
 
         <div class="detail-row">
-          <span class="detail-label">Token</span>
+          <span class="detail-label">Token:</span>
           <span class="detail-value">${appointment.token || 'N/A'}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Doctor</span>
+          <span class="detail-label">Doctor:</span>
           <span class="detail-value">Dr. ${doctor.firstName || ''} ${doctor.lastName || ''}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Department</span>
+          <span class="detail-label">Department:</span>
           <span class="detail-value">${doctor.department || 'General Medicine'}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Date</span>
+          <span class="detail-label">Date:</span>
           <span class="detail-value">${formatDate(appointment.scheduledDate)}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Completed At</span>
+          <span class="detail-label">Completed At:</span>
           <span class="detail-value">${formatTime(appointment.consulationEndsAt)}</span>
         </div>
       </div>
@@ -683,6 +683,9 @@ const treatedPatientsHistory = async (userId) => {
         doctorId: doctor._id,
         status: 'completed',
       },
+    },
+    {
+      $sort: { createdAt: -1 },
     },
     {
       $lookup: {

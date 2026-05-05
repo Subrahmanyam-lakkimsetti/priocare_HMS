@@ -3,6 +3,7 @@ class UserDTO {
     this.id = user._id;
     this.email = user.email;
     this.role = user.role;
+    this.isProfileComplete = user.isProfileComplete;
   }
 }
 

@@ -11,6 +11,7 @@ const {
 const catchAsync = require('../../../utils/catchAsync.util');
 const { UserDTO } = require('./auth.dto');
 const { setCookie } = require('../../../utils/cookie.util');
+const { generateToken } = require('../../../utils/jwt.util');
 
 const sendOtp = catchAsync(async (req, res) => {
   await sendOtpToUser(req.body);
@@ -108,6 +109,23 @@ const resetPasswordController = catchAsync(async (req, res) => {
   });
 });
 
+const googleAuthCallback = catchAsync(async (req, res) => {
+  const user = req.user;
+
+  // Generate JWT token
+  const token = generateToken({
+    userId: user.id,
+    role: user.role,
+    isActive: user.isActive,
+  });
+
+  // Set cookie
+  setCookie(res, token);
+
+  // Redirect to frontend with success
+  res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+});
+
 module.exports = {
   sendOtp,
   resendOtp,
@@ -118,4 +136,5 @@ module.exports = {
   updatePasswordController,
   forgetPasswordController,
   resetPasswordController,
+  googleAuthCallback,
 };

@@ -2,9 +2,28 @@ const Doctor = require('../../../models/doctor.model');
 const User = require('../../../models/user.model');
 const AppError = require('../../../utils/AppError.util');
 
+const normalizeSpecializations = (value) => {
+  if (Array.isArray(value)) {
+    return value.filter(Boolean);
+  }
+
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
 const createDoctor = async (userId, payload, file) => {
   if (file) {
     payload.photo = file.path;
+  }
+
+  if (payload.specializations) {
+    payload.specializations = normalizeSpecializations(payload.specializations);
   }
 
   // check is Exists
@@ -14,7 +33,7 @@ const createDoctor = async (userId, payload, file) => {
     throw new AppError('profile already exists', 409);
   }
 
-  const doctorProfile = Doctor.create({
+  const doctorProfile = await Doctor.create({
     userId,
     ...payload,
   });
@@ -43,13 +62,35 @@ const updateDoctor = async (id, updateData, file) => {
     updateData.photo = file.path;
   }
 
-  const updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
-    new: true,
-  });
+  if (updateData.specializations) {
+    updateData.specializations = normalizeSpecializations(
+      updateData.specializations,
+    );
+  }
+
+  let updatedDoctor = await Doctor.findOneAndUpdate(
+    { userId: id },
+    updateData,
+    {
+      new: true,
+    },
+  );
+
+  if (!updatedDoctor) {
+    updatedDoctor = await Doctor.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+  }
 
   if (!updatedDoctor) {
     throw new AppError('Not found!', 404);
   }
+
+  // Also update the user's isProfileComplete flag
+  await User.findOneAndUpdate(
+    { _id: updatedDoctor.userId },
+    { isProfileComplete: true },
+  );
 
   return updatedDoctor;
 };

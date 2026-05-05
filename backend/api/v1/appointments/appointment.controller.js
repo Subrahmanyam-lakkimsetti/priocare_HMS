@@ -74,7 +74,7 @@ const getAppointmnetByToken = catchAsync(async (req, res) => {
   );
 
   if (!appointment) {
-    res.status(200).json({
+    return res.status(200).json({
       isSuccess: true,
       message: 'No appointment found',
     });

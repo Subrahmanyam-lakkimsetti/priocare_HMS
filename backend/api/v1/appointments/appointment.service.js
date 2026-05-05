@@ -10,6 +10,26 @@ const assignDoctor = require('./doctorAssign.service');
 const { getDoctorQueue } = require('./doctorQueue.service');
 const evaluateTriage = require('./triage/aiAdapter.triage');
 
+const formatDate = (date) => {
+  if (!date) return 'N/A';
+
+  return new Date(date).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+const formatTime = (date) => {
+  if (!date) return 'N/A';
+
+  return new Date(date).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
 const sendAppointmentConfirmationEmail = async (
   appointment,
   patient,
@@ -224,27 +244,27 @@ const sendAppointmentConfirmationEmail = async (
         <div class="section-title">📋 APPOINTMENT DETAILS</div>
         
         <div class="detail-row">
-          <span class="detail-label">📅 Date</span>
+          <span class="detail-label">📅 Date:</span>
           <span class="detail-value">${formattedDate}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">⏰ Time</span>
+          <span class="detail-label">⏰ Time:</span>
           <span class="detail-value">${formattedTime}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">👨‍⚕️ Doctor</span>
+          <span class="detail-label">👨‍⚕️ Doctor:</span>
           <span class="detail-value">Dr. ${doctor.firstName} ${doctor.lastName}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">🏥 Department</span>
+          <span class="detail-label">🏥 Department:</span>
           <span class="detail-value">${doctor.department || 'General Medicine'}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">⭐ Experience</span>
+          <span class="detail-label">⭐ Experience:</span>
           <span class="detail-value">${doctor.experienceYears || 'N/A'} years</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">💰 Consultation Fee</span>
+          <span class="detail-label">💰 Consultation Fee:</span>
           <span class="detail-value">₹${doctor.consultationFee || '500'}</span>
         </div>
       </div>
@@ -282,6 +302,199 @@ const sendAppointmentConfirmationEmail = async (
     '📅 PrioCare · Your Appointment Confirmation',
     emailHtml,
   );
+};
+
+const sendAppointmentCancelledEmail = async (
+  appointment,
+  patient,
+  doctor,
+  patientEmail,
+  doctorEmail,
+) => {
+  const emailHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointment Cancelled - PrioCare</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #eef2f8;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Sora', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      padding: 24px 16px;
+    }
+    .email-container {
+      max-width: 540px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+    .header {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      padding: 32px 24px;
+      text-align: center;
+      color: #ffffff;
+    }
+    .header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .header p {
+      color: #fecaca;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+    .content {
+      padding: 32px 28px;
+    }
+    .greeting {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    .message {
+      color: #475569;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .appointment-card {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #dc2626;
+      margin-bottom: 18px;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+    .detail-value {
+      font-size: 13px;
+      color: #0f172a;
+      font-weight: 500;
+      text-align: right;
+    }
+    .notice {
+      background: #fef2f2;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 12px;
+      color: #dc2626;
+      text-align: center;
+    }
+    .footer {
+      background: #f9fbfd;
+      padding: 18px 24px;
+      text-align: center;
+      border-top: 1px solid #e9edf2;
+      font-size: 11px;
+      color: #7c8ba0;
+    }
+    .footer a {
+      color: #dc2626;
+      text-decoration: none;
+    }
+    @media (max-width: 520px) {
+      .content { padding: 24px 20px; }
+      .detail-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .detail-value { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>Appointment Cancelled</h1>
+      <p>Your appointment has been cancelled</p>
+    </div>
+
+    <div class="content">
+      <div class="greeting">Dear ${patient.firstName || 'Patient'} ${patient.lastName || ''},</div>
+      <div class="message">
+        We regret to inform you that your appointment has been cancelled. Here are the details:
+      </div>
+
+      <div class="appointment-card">
+        <div class="section-title">Cancelled Appointment Details</div>
+
+        <div class="detail-row">
+          <span class="detail-label">Token:</span>
+          <span class="detail-value">${appointment.token || 'N/A'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Doctor:</span>
+          <span class="detail-value">Dr. ${doctor.firstName || ''} ${doctor.lastName || ''}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Department:</span>
+          <span class="detail-value">${doctor.department || 'General Medicine'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Scheduled Date:</span>
+          <span class="detail-value">${formatDate(appointment.scheduledDate)}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Scheduled Time:</span>
+          <span class="detail-value">${formatTime(appointment.scheduledDate)}</span>
+        </div>
+      </div>
+
+      <div class="notice">
+        If you need to reschedule, please book a new appointment through our portal.
+      </div>
+    </div>
+
+    <div class="footer">
+      PrioCare Hospital Management System<br>
+      <a href="https://priocare.live">priocare.live</a>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  // Send to patient
+  if (patientEmail) {
+    await sendEmail(
+      patientEmail,
+      'PrioCare · Appointment Cancelled',
+      emailHtml,
+    );
+  }
+
+  // Send to doctor
+  if (doctorEmail) {
+    await sendEmail(doctorEmail, 'PrioCare · Appointment Cancelled', emailHtml);
+  }
 };
 
 const getDay = (date) => {
@@ -417,6 +630,7 @@ const getDoctorsAccordingToSpecilization = async (triageData) => {
                 $and: [
                   { $eq: ['$doctorId', '$$doctorId'] },
                   { $eq: ['$scheduledDate', triage.scheduledDate] },
+                  { $ne: ['$status', 'cancelled'] },
                 ],
               },
             },
@@ -518,9 +732,11 @@ const getActiveAppointment = async (userId) => {
       pat.patientId.equals(patient._id),
     );
 
-    exceptedStartTime = details[0].exceptedStartTime;
-    exceptedEndTime = details[0].exceptedEndTime;
-    queuePosition = details[0].queuePosition;
+    if (details.length > 0) {
+      exceptedStartTime = details[0].exceptedStartTime;
+      exceptedEndTime = details[0].exceptedEndTime;
+      queuePosition = details[0].queuePosition;
+    }
   }
 
   return {
@@ -542,7 +758,6 @@ const getAppointmentByToken = async ({ token }, id) => {
   }
 
   const appointmentData = await getActiveAppointment(id);
-  console.log(appointmentData);
 
   let exceptedStartTime = null;
   let exceptedEndTime = null;
@@ -573,11 +788,29 @@ const cancelAppointment = async ({ token }) => {
     {
       new: true,
     },
-  ).populate('doctorId', 'firstName lastName department experienceYears');
+  )
+    .populate(
+      'doctorId',
+      'firstName lastName department experienceYears userId',
+    )
+    .populate('patientId', 'firstName lastName userId');
 
   if (!appointment) {
     throw new AppError('Appointment not found!', 404);
   }
+
+  // Get user emails
+  const patientUser = await User.findById(appointment.patientId.userId);
+  const doctorUser = await User.findById(appointment.doctorId.userId);
+
+  // Send cancellation emails
+  await sendAppointmentCancelledEmail(
+    appointment,
+    appointment.patientId,
+    appointment.doctorId,
+    patientUser?.email,
+    doctorUser?.email,
+  );
 
   return appointment;
 };

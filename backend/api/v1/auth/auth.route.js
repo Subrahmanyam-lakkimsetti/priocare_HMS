@@ -17,8 +17,10 @@ const {
   resetPasswordController,
   sendOtp,
   resendOtp,
+  googleAuthCallback,
 } = require('./auth.controller');
 const { authMiddleware } = require('../../../middlewares/auth.middleware');
+const passport = require('../../../config/passport.config');
 
 const authRouter = express.Router();
 
@@ -33,6 +35,20 @@ authRouter.post(
 
 // login
 authRouter.post('/login', validateInput(loginScheema), loginController);
+
+// Google OAuth routes
+authRouter.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }),
+);
+
+authRouter.get(
+  '/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: `${process.env.FRONTEND_URL}/login`,
+  }),
+  googleAuthCallback,
+);
 
 // forget password
 authRouter.post(

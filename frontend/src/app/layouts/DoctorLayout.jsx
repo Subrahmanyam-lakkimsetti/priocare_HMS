@@ -1,13 +1,14 @@
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { logoutUser } from '../../features/auth/authThunks';
+import { getMyDoctorProfileRequest } from '../../features/doctor/doctorProfile/profileService';
 
 import DoctorSidebar from '../../features/doctor/components/DoctorSidebar';
 import DoctorDashboard from '../../features/doctor/pages/DoctorDashboard';
 import ConsultationRoom from '../../features/doctor/pages/ConsultationRoom';
 import PatientHistory from '../../features/doctor/pages/PatientHistory';
-import DoctorProfile from '../../features/doctor/pages/DoctorProfile';
+import DoctorProfilePage from '../../features/doctor/doctorProfile/pages/DoctorProfilePage';
 
 const NAV_ITEMS = [
   { key: 'dashboard', label: 'Dashboard', path: '/doctor' },
@@ -35,11 +36,28 @@ const PAGE_META = {
 
 export default function DoctorLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [profileExists, setProfileExists] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const nav = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((s) => s.auth?.user);
+
+  // Check if profile exists on mount
+  useEffect(() => {
+    getMyDoctorProfileRequest()
+      .then(() => setProfileExists(true))
+      .catch((err) => {
+        if (err?.response?.status === 404) {
+          setProfileExists(false);
+          // Show modal if on dashboard or other protected pages
+          if (!location.pathname.includes('/profile')) {
+            setShowProfileModal(true);
+          }
+        }
+      });
+  }, [location]);
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -182,9 +200,112 @@ export default function DoctorLayout() {
               <Route index element={<DoctorDashboard />} />
               <Route path="consultation" element={<ConsultationRoom />} />
               <Route path="patients" element={<PatientHistory />} />
-              <Route path="profile" element={<DoctorProfile />} />
+              <Route path="profile" element={<DoctorProfilePage />} />
             </Routes>
           </main>
+
+          {/* Profile Completion Modal */}
+          {showProfileModal && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md"
+              onClick={() => setShowProfileModal(false)}
+            >
+              <div
+                className="relative w-full max-w-md rounded-3xl overflow-hidden bg-white shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Top gradient band */}
+                <div className="h-1.5 w-full bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+
+                <div className="px-8 pt-8 pb-7">
+                  {/* Icon */}
+                  <div className="flex justify-center mb-6">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-linear-to-br from-emerald-50 to-emerald-100 border border-emerald-200">
+                      <svg
+                        className="w-8 h-8 text-emerald-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="font-bold text-slate-900 text-xl tracking-tight mb-2 text-center">
+                    Complete Your Profile
+                  </h3>
+                  <p className="text-sm text-slate-500 leading-relaxed text-center mb-6">
+                    Before you can access the consultation room and manage
+                    patient queues, please complete your professional profile.
+                    This helps us and your patients know more about you.
+                  </p>
+
+                  {/* Checklist */}
+                  <div className="rounded-2xl px-5 py-4 mb-7 space-y-2.5 bg-slate-50 border border-slate-100">
+                    {[
+                      'Basic information (Name & details)',
+                      'Professional qualifications',
+                      'Working hours & availability',
+                    ].map((item) => (
+                      <div key={item} className="flex items-center gap-2.5">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-emerald-100">
+                          <svg
+                            className="w-3 h-3 text-emerald-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={3}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M4.5 12.75l6 6 9-13.5"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-xs text-slate-600 font-medium">
+                          {item}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2.5">
+                    <button
+                      onClick={() => {
+                        setShowProfileModal(false);
+                        nav('/doctor/profile');
+                      }}
+                      className="w-full px-5 py-3 rounded-xl text-sm font-bold bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-200 hover:scale-105 active:scale-95 transition-transform"
+                    >
+                      Set Up My Profile
+                      <svg
+                        className="w-4 h-4 inline ml-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

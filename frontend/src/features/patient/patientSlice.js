@@ -372,17 +372,29 @@ const patientSlice = createSlice({
     });
     b.addCase(fetchAvailableDoctors.fulfilled, (s, a) => {
       s.loadingDoctors = false;
-      // The API returns doctors mixed with triage fields (priorityScore, etc.)
-      // Extract numeric-keyed entries as doctors and triage metadata separately
       const raw = a.payload;
-      const doctors = Object.entries(raw)
-        .filter(([key]) => !isNaN(Number(key)))
-        .map(([, val]) => val);
+
+      // Support both old and new response shapes from the API.
+      let doctors = [];
+      let triage = null;
+
+      if (Array.isArray(raw)) {
+        doctors = raw;
+      } else if (raw && Array.isArray(raw.doctors)) {
+        doctors = raw.doctors;
+        triage = raw.triage || null;
+      } else if (raw && typeof raw === 'object') {
+        doctors = Object.entries(raw)
+          .filter(([key]) => !isNaN(Number(key)))
+          .map(([, val]) => val);
+      }
+
       s.availableDoctors = doctors;
       s.doctorPickerTriage = {
-        priorityScore: raw.priorityScore,
-        severityLevel: raw.severityLevel,
-        recommendedSpecialization: raw.recommendedSpecialization,
+        priorityScore: triage?.priorityScore ?? raw?.priorityScore,
+        severityLevel: triage?.severityLevel ?? raw?.severityLevel,
+        recommendedSpecialization:
+          triage?.recommendedSpecialization ?? raw?.recommendedSpecialization,
       };
     });
     b.addCase(fetchAvailableDoctors.rejected, (s, a) => {

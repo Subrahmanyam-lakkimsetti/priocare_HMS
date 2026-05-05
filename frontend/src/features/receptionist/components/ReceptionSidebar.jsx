@@ -97,6 +97,27 @@ const NAV_ICONS = {
       />
     </svg>
   ),
+  profile: (
+    <svg
+      width="17"
+      height="17"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.8}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 12a4 4 0 100-8 4 4 0 000 8z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 20v-1a6 6 0 0112 0v1"
+      />
+    </svg>
+  ),
 };
 
 export default function ReceptionSidebar({

@@ -64,6 +64,18 @@ doctorRouter.post('/prescription/apptId/:apptId', createPrescription);
 
 // patch
 doctorRouter.patch(
+  '/me',
+  upload.single('photo'),
+  validateInput(updateDoctorValidationSchema),
+  restrictTo('doctor'),
+  (req, res, next) => {
+    // Set :id to the current user's ID for updating their own profile
+    req.params.id = req.data.id;
+    updateDoctor(req, res, next);
+  },
+);
+
+doctorRouter.patch(
   '/:id',
   upload.single('photo'),
   validateInput(updateDoctorValidationSchema),

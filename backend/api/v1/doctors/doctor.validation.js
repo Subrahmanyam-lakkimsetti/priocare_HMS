@@ -2,13 +2,19 @@ const Joi = require('joi');
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
+const specializationsSchema = Joi.alternatives().try(
+  Joi.array().items(Joi.string().trim().min(1)).min(1),
+  Joi.string().trim().min(1),
+);
+
 const doctorValidationSchema = Joi.object({
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
   department: Joi.string().required(),
-  specializations: Joi.array().items(Joi.string().trim()).min(1).required(),
+  specializations: specializationsSchema.required(),
   experienceYears: Joi.number().min(0).required(),
   consultationFee: Joi.number().min(50).required(),
+  MaxDailyAppointments: Joi.number().min(1),
   availabilityStatus: Joi.string().required(),
   workingHours: Joi.object({
     start: Joi.string().pattern(timeRegex).required(),
@@ -20,10 +26,11 @@ const doctorValidationSchema = Joi.object({
 const updateDoctorValidationSchema = Joi.object({
   firstName: Joi.string(),
   lastName: Joi.string(),
-  specializations: Joi.array().items(Joi.string().trim().min(1)),
+  specializations: specializationsSchema,
   department: Joi.string(),
   experienceYears: Joi.number().min(0),
   consultationFee: Joi.number().min(50),
+  MaxDailyAppointments: Joi.number().min(1),
   availabilityStatus: Joi.string().valid('available', 'unavailable'),
   workingHours: Joi.object({
     start: Joi.string().pattern(timeRegex),

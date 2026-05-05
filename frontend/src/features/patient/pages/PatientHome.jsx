@@ -1,16 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchActiveAppointment } from '../patientThunks';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import NoAppointmentPage from './NoAppointmentPage';
 import { getMyProfileRequest } from '../patientProfile/profileService';
-
-const NAV_ITEMS = [
-  { key: 'home', label: 'Dashboard', path: '/patient' },
-  { key: 'appointments', label: 'Appointments', path: '/patient/appointments' },
-  { key: 'records', label: 'Medical Records', path: '/patient/records' },
-  { key: 'profile', label: 'Profile', path: '/patient/profile' },
-];
 
 const SEVERITY_CONFIG = {
   Critical: {
@@ -64,6 +57,21 @@ const STATUS_CONFIG = {
   },
 };
 
+const TIPS = [
+  {
+    icon: '📱',
+    text: 'Keep your phone nearby in case the staff needs to reach you.',
+  },
+  {
+    icon: '🪪',
+    text: 'Have your ID and insurance card ready at the front desk.',
+  },
+  {
+    icon: '🔔',
+    text: 'Let reception know if your symptoms change significantly.',
+  },
+];
+
 function StatusDot({ status }) {
   if (status === 'in-progress') {
     return (
@@ -82,25 +90,141 @@ function StatusDot({ status }) {
   return <span className={`w-2 h-2 rounded-full ${dotColor}`} />;
 }
 
-const TIPS = [
-  {
-    icon: '📱',
-    text: 'Keep your phone nearby in case the staff needs to reach you.',
-  },
-  {
-    icon: '🪪',
-    text: 'Have your ID and insurance card ready at the front desk.',
-  },
-  {
-    icon: '🔔',
-    text: 'Let reception know if your symptoms change significantly.',
-  },
-];
+function generatePatientInstructions(appointment, user) {
+  const triage = appointment?.triage || {};
+  const symptoms = triage.symptoms || [];
+  const age = triage.age || user?.age || 30;
+  const severity = triage.severityLevel || 'low';
+  const comorbidities = triage.comorbidities || [];
+  const vitals = triage.vitals || {};
+
+  const instructions = {
+    whatToBring: [
+      'Valid ID proof (Aadhar, Passport, or Driving License)',
+      'Health insurance card (if applicable)',
+      'Previous medical records or prescriptions',
+      'Current medications in original packaging',
+    ],
+    diet: [
+      'Light breakfast — avoid heavy or oily foods',
+      'Stay hydrated — drink plenty of water',
+      'Avoid caffeine if you have anxiety or heart-related symptoms',
+    ],
+    preparation: [
+      'Get adequate sleep the night before',
+      'Wear comfortable, loose-fitting clothing',
+      'Arrive 15 minutes early for registration',
+    ],
+    special: [],
+  };
+
+  if (age < 12) {
+    instructions.whatToBring.push('Parent/Guardian ID proof');
+    instructions.preparation.push('Bring a parent or guardian');
+    instructions.special.push('Child-friendly environment available');
+  } else if (age > 65) {
+    instructions.preparation.push(
+      'Arrange for transportation assistance if needed',
+    );
+    instructions.special.push('Senior citizen priority assistance available');
+  }
+
+  if (severity === 'Critical' || severity === 'High') {
+    instructions.preparation.unshift('Emergency contact information ready');
+    instructions.special.push('Priority consultation — reduced waiting time');
+    instructions.diet.unshift('Fast if diagnostic tests are required');
+  }
+
+  if (
+    symptoms.some(
+      (s) =>
+        s.toLowerCase().includes('chest pain') ||
+        s.toLowerCase().includes('heart'),
+    )
+  ) {
+    instructions.diet.unshift('Avoid caffeine and nicotine for 24 hours');
+    instructions.whatToBring.push('Recent ECG reports if available');
+    instructions.special.push('Cardiac monitoring may be required');
+  }
+
+  if (
+    symptoms.some(
+      (s) =>
+        s.toLowerCase().includes('fever') || s.toLowerCase().includes('cough'),
+    )
+  ) {
+    instructions.preparation.push('Wear a mask to protect others');
+    instructions.special.push('Infectious disease precautions in place');
+  }
+
+  if (
+    symptoms.some(
+      (s) =>
+        s.toLowerCase().includes('skin') || s.toLowerCase().includes('rash'),
+    )
+  ) {
+    instructions.preparation.push(
+      'Do not apply lotions or makeup on affected areas',
+    );
+    instructions.whatToBring.push('Photos of skin condition for reference');
+  }
+
+  if (
+    symptoms.some(
+      (s) =>
+        s.toLowerCase().includes('joint') || s.toLowerCase().includes('pain'),
+    )
+  ) {
+    instructions.preparation.push('Bring supportive devices if used regularly');
+    instructions.whatToBring.push('Previous X-ray/MRI reports');
+  }
+
+  if (comorbidities.length > 0) {
+    instructions.whatToBring.push(
+      'Complete list of existing medical conditions',
+    );
+    instructions.special.push('Multiple condition management plan available');
+  }
+
+  if (vitals.temperature && vitals.temperature > 100) {
+    instructions.special.push('Fever monitoring station available');
+  }
+
+  if (vitals.bloodPressure && vitals.bloodPressure.includes('/')) {
+    const [systolic] = vitals.bloodPressure.split('/').map(Number);
+    if (systolic > 140) {
+      instructions.diet.unshift('Low-sodium diet recommended');
+      instructions.special.push('Blood pressure monitoring available');
+    }
+  }
+
+  return instructions;
+}
+
+// ── Preparation Guide Section ─────────────────────────────────────
+
+function PrepSection({ icon, title, items, accentClass }) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-lg">{icon}</span>
+        <h4 className={`font-semibold text-sm ${accentClass}`}>{title}</h4>
+      </div>
+      <ul className="space-y-2 ml-7">
+        {items.map((item, i) => (
+          <li key={i} className="flex items-start gap-2">
+            <span className="text-emerald-500 mt-0.5 shrink-0">✓</span>
+            <p className="text-sm text-slate-600 leading-relaxed">{item}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function PatientHome() {
   const dispatch = useDispatch();
   const nav = useNavigate();
-  const location = useLocation();
   const [profileExists, setProfileExists] = useState(true);
   const [profileBannerDismissed, setProfileBannerDismissed] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -135,11 +259,11 @@ export default function PatientHome() {
     message: 'Please check with the front desk for further assistance.',
   };
 
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-
   const showProfileBanner = !profileExists && !profileBannerDismissed;
+
+  const patientInstructions = activeAppointment
+    ? generatePatientInstructions(activeAppointment, user)
+    : null;
 
   return (
     <>
@@ -199,7 +323,7 @@ export default function PatientHome() {
           {/* ── Profile Incomplete Banner ── */}
           {showProfileBanner && (
             <div className="profile-banner max-w-4xl mx-auto mb-5">
-              <div className="relative flex items-center justify-between gap-4 px-5 py-4 rounded-2xl overflow-hidden bg-linear-to-r from-indigo-50 to-indigo-100 border border-indigo-200">
+              <div className="relative flex items-center justify-between gap-4 px-5 py-4 rounded-2xl overflow-hidden bg-gradient-to-r from-indigo-50 to-indigo-100 border border-indigo-200">
                 {/* Decorative blob */}
                 <div className="absolute right-24 -top-6 w-28 h-28 rounded-full opacity-20 pointer-events-none bg-indigo-400 blur-2xl" />
 
@@ -233,7 +357,7 @@ export default function PatientHome() {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => nav('/patient/profile')}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-linear-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-200 hover:scale-105 active:scale-95 transition-transform"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-200 hover:scale-105 active:scale-95 transition-transform"
                   >
                     Complete Profile
                     <svg
@@ -297,9 +421,9 @@ export default function PatientHome() {
 
           {/* ── Active appointment ── */}
           {!loadingAppointment && activeAppointment && (
-            <div className="w-full max-w-4xl mx-auto space-y-4">
+            <div className="w-full max-w-6xl mx-auto">
               {/* Page heading */}
-              <div className="slide-up">
+              <div className="slide-up mb-6">
                 <p className="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-1">
                   Active Visit
                 </p>
@@ -308,116 +432,161 @@ export default function PatientHome() {
                 </h2>
               </div>
 
-              {/* ── Appointment card ── */}
-              <div
-                className={`slide-up border-2 bg-linear-to-br ${sevConfig.bg} ${sevConfig.border} rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl`}
-                onClick={() =>
-                  nav(`/patient/appointment/${activeAppointment.token}`)
-                }
-              >
-                {/* Top section */}
-                <div className="p-6 pb-4">
-                  {/* Doctor row */}
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="flex items-center gap-3.5">
-                      <div className="avatar-ring shrink-0">
-                        <div className="avatar-inner w-12 h-12 flex items-center justify-center text-white font-bold text-base">
-                          {activeAppointment.doctorId?.firstName?.[0]}
-                          {activeAppointment.doctorId?.lastName?.[0]}
+              {/* ── Two-Column Layout ── */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                {/* ── LEFT COLUMN: Preparation Guide ── */}
+                <div className="flex flex-col gap-5">
+                  {patientInstructions && (
+                    <div className="slide-up bg-white border border-slate-200 rounded-2xl p-5">
+                      <h3 className="font-bold text-lg text-slate-900 mb-4">
+                        Preparation Guide
+                      </h3>
+                      <div className="space-y-5">
+                        <PrepSection
+                          icon="🎒"
+                          title="What to Bring"
+                          items={patientInstructions.whatToBring}
+                          accentClass="text-indigo-600"
+                        />
+                        <PrepSection
+                          icon="🥗"
+                          title="Diet & Hydration"
+                          items={patientInstructions.diet}
+                          accentClass="text-emerald-600"
+                        />
+                        <PrepSection
+                          icon="⏰"
+                          title="Preparation Tips"
+                          items={patientInstructions.preparation}
+                          accentClass="text-amber-600"
+                        />
+                        {patientInstructions.special.length > 0 && (
+                          <PrepSection
+                            icon="ℹ️"
+                            title="Special Notes"
+                            items={patientInstructions.special}
+                            accentClass="text-purple-600"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* ── RIGHT COLUMN: Consultation Card + While You Wait ── */}
+                <div className="flex flex-col gap-5">
+                  {/* ── Appointment card ── */}
+                  <div
+                    className={`slide-up border-2 bg-gradient-to-br ${sevConfig.bg} ${sevConfig.border} rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl`}
+                    onClick={() =>
+                      nav(`/patient/appointment/${activeAppointment.token}`)
+                    }
+                  >
+                    {/* Top section */}
+                    <div className="p-6 pb-4">
+                      {/* Doctor row */}
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="flex items-center gap-3.5">
+                          <div className="avatar-ring shrink-0">
+                            <div className="avatar-inner w-12 h-12 flex items-center justify-center text-white font-bold text-base">
+                              {activeAppointment.doctorId?.firstName?.[0]}
+                              {activeAppointment.doctorId?.lastName?.[0]}
+                            </div>
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-slate-900 text-base leading-tight">
+                              Dr. {activeAppointment.doctorId?.firstName}{' '}
+                              {activeAppointment.doctorId?.lastName}
+                            </h3>
+                            <p className="text-sm text-slate-500 mt-0.5">
+                              {activeAppointment.doctorId?.department}
+                            </p>
+                          </div>
+                        </div>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${sevConfig.badge}`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${sevConfig.dot}`}
+                          />
+                          {severity}
+                        </span>
+                      </div>
+
+                      {/* Token + Status grid */}
+                      <div className="grid grid-cols-2 gap-3">
+                        {/* Token */}
+                        <div className="token-glow bg-white rounded-2xl p-4 flex flex-col gap-1 border border-indigo-100">
+                          <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                            Token
+                          </p>
+                          <p className="font-bold tracking-widest leading-none text-[2rem] text-indigo-700">
+                            {activeAppointment.token}
+                          </p>
+                        </div>
+
+                        {/* Status */}
+                        <div className="bg-white rounded-2xl p-4 flex flex-col gap-1 border border-slate-100">
+                          <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                            Current Status
+                          </p>
+                          <span
+                            className={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-bold w-fit mt-0.5 ${statusCfg.color}`}
+                          >
+                            <StatusDot status={status} />
+                            {statusCfg.label}
+                          </span>
                         </div>
                       </div>
-                      <div>
-                        <h3 className="font-bold text-slate-900 text-base leading-tight">
-                          Dr. {activeAppointment.doctorId?.firstName}{' '}
-                          {activeAppointment.doctorId?.lastName}
-                        </h3>
-                        <p className="text-sm text-slate-500 mt-0.5">
-                          {activeAppointment.doctorId?.department}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${sevConfig.badge}`}
-                    >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${sevConfig.dot}`}
-                      />
-                      {severity}
-                    </span>
-                  </div>
-
-                  {/* Token + Status grid */}
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* Token */}
-                    <div className="token-glow bg-white rounded-2xl p-4 flex flex-col gap-1 border border-indigo-100">
-                      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-                        Token
-                      </p>
-                      <p className="font-bold tracking-widest leading-none text-[2rem] text-indigo-700">
-                        {activeAppointment.token}
-                      </p>
                     </div>
 
-                    {/* Status */}
-                    <div className="bg-white rounded-2xl p-4 flex flex-col gap-1 border border-slate-100">
-                      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-                        Current Status
+                    {/* CTA footer */}
+                    <div className="px-6 py-3.5 flex items-center justify-between bg-white/50 border-t border-black/5">
+                      <p className="text-xs text-slate-400">
+                        Tap to view full details
                       </p>
-                      <span
-                        className={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-bold w-fit mt-0.5 ${statusCfg.color}`}
-                      >
-                        <StatusDot status={status} />
-                        {statusCfg.label}
+                      <span className="flex items-center gap-1.5 text-sm font-semibold text-indigo-500">
+                        View details
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M13 7l5 5m0 0l-5 5m5-5H6"
+                          />
+                        </svg>
                       </span>
                     </div>
                   </div>
-                </div>
 
-                {/* CTA footer */}
-                <div className="px-6 py-3.5 flex items-center justify-between bg-white/50 border-t border-black/5">
-                  <p className="text-xs text-slate-400">
-                    Tap to view full details
-                  </p>
-                  <span className="flex items-center gap-1.5 text-sm font-semibold text-indigo-500">
-                    View details
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13 7l5 5m0 0l-5 5m5-5H6"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              {/* ── While you wait ── */}
-              <div className="slide-up bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                <div className="px-5 py-4 dot-pattern border-b border-slate-100">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
-                    While you wait
-                  </p>
-                </div>
-                <div className="divide-y divide-slate-50">
-                  {TIPS.map((tip) => (
-                    <div
-                      key={tip.text}
-                      className="flex items-start gap-3.5 px-5 py-3 hover:bg-slate-50 transition-colors"
-                    >
-                      <span className="text-lg shrink-0 mt-0.5">
-                        {tip.icon}
-                      </span>
-                      <p className="text-sm text-slate-600 leading-relaxed">
-                        {tip.text}
+                  {/* ── While you wait ── */}
+                  <div className="slide-up bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                    <div className="px-5 py-4 dot-pattern border-b border-slate-100">
+                      <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                        While you wait
                       </p>
                     </div>
-                  ))}
+                    <div className="divide-y divide-slate-50">
+                      {TIPS.map((tip) => (
+                        <div
+                          key={tip.text}
+                          className="flex items-start gap-3.5 px-5 py-3 hover:bg-slate-50 transition-colors"
+                        >
+                          <span className="text-lg shrink-0 mt-0.5">
+                            {tip.icon}
+                          </span>
+                          <p className="text-sm text-slate-600 leading-relaxed">
+                            {tip.text}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -436,12 +605,12 @@ export default function PatientHome() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top gradient band */}
-            <div className="h-1.5 w-full bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500" />
+            <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-500" />
 
             <div className="px-8 pt-8 pb-7">
               {/* Icon */}
               <div className="flex justify-center mb-6">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-linear-to-br from-indigo-50 to-indigo-100 border border-indigo-200">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200">
                   <svg
                     className="w-8 h-8 text-indigo-500"
                     fill="none"
@@ -505,7 +674,7 @@ export default function PatientHome() {
                     setShowProfileModal(false);
                     nav('/patient/profile');
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold bg-linear-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-200 hover:scale-[1.02] active:scale-[0.98] transition-transform"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-200 hover:scale-[1.02] active:scale-[0.98] transition-transform"
                 >
                   Set Up My Profile
                   <svg

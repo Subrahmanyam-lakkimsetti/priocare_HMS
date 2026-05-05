@@ -13,6 +13,10 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/google`;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(loginUser(form));
@@ -20,6 +24,10 @@ export default function Login() {
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
+    if (!user.isProfileComplete) {
+      navigate('/patient/profile');
+      return;
+    }
     if (user.role === 'patient') navigate('/patient');
     else if (user.role === 'doctor') navigate('/doctor');
     else if (user.role === 'admin') navigate('/admin');
@@ -148,6 +156,7 @@ export default function Login() {
             {/* Google Sign In */}
             <button
               type="button"
+              onClick={handleGoogleLogin}
               className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl py-2.5 px-4 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm mb-5"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

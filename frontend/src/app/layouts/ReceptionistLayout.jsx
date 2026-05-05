@@ -1,7 +1,8 @@
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { logoutUser } from '../../features/auth/authThunks';
+import { getMyReceptionistProfileRequest } from '../../features/receptionist/receptionistProfile/profileService';
 
 import ReceptionSidebar from '../../features/receptionist/components/ReceptionSidebar';
 import ReceptionDashboard from '../../features/receptionist/pages/ReceptionDashboard';
@@ -9,6 +10,7 @@ import PatientCheckIn from '../../features/receptionist/pages/PatientCheckIn';
 import TodayAppointments from '../../features/receptionist/pages/TodayAppointments';
 import QueueStatus from '../../features/receptionist/pages/QueueStatus';
 import TokenSearch from '../../features/receptionist/pages/TokenSearch';
+import ReceptionistProfilePage from '../../features/receptionist/receptionistProfile/pages/ReceptionistProfilePage';
 import ConfirmDialog from '../../features/receptionist/components/Confirmdialog';
 
 const NAV_ITEMS = [
@@ -21,6 +23,7 @@ const NAV_ITEMS = [
   },
   { key: 'queue', label: 'Queue Status', path: '/receptionist/queue' },
   { key: 'search', label: 'Token Search', path: '/receptionist/search' },
+  { key: 'profile', label: 'My Profile', path: '/receptionist/profile' },
 ];
 
 const PAGE_TITLES = {
@@ -29,16 +32,34 @@ const PAGE_TITLES = {
   appointments: "Today's Appointments",
   queue: 'Queue Status',
   search: 'Token Search',
+  profile: 'My Profile',
 };
 
 export default function ReceptionistLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [profileExists, setProfileExists] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const nav = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((s) => s.auth?.user);
+
+  // Check if profile exists on mount
+  useEffect(() => {
+    getMyReceptionistProfileRequest()
+      .then(() => setProfileExists(true))
+      .catch((err) => {
+        if (err?.response?.status === 404) {
+          setProfileExists(false);
+          // Show modal if on protected pages
+          if (!location.pathname.includes('/profile')) {
+            setShowProfileModal(true);
+          }
+        }
+      });
+  }, [location]);
 
   const handleLogout = async () => {
     setShowLogoutConfirm(false);
@@ -390,8 +411,111 @@ export default function ReceptionistLayout() {
               <Route path="appointments" element={<TodayAppointments />} />
               <Route path="queue" element={<QueueStatus />} />
               <Route path="search" element={<TokenSearch />} />
+              <Route path="profile" element={<ReceptionistProfilePage />} />
             </Routes>
           </main>
+
+          {/* Profile Completion Modal */}
+          {showProfileModal && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md"
+              onClick={() => setShowProfileModal(false)}
+            >
+              <div
+                className="relative w-full max-w-md rounded-3xl overflow-hidden bg-white shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Top gradient band */}
+                <div className="h-1.5 w-full bg-linear-to-r from-sky-500 via-cyan-500 to-blue-500" />
+
+                <div className="px-8 pt-8 pb-7">
+                  {/* Icon */}
+                  <div className="flex justify-center mb-6">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-linear-to-br from-sky-50 to-sky-100 border border-sky-200">
+                      <svg
+                        className="w-8 h-8 text-sky-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="font-bold text-slate-900 text-xl tracking-tight mb-2 text-center">
+                    Complete Your Profile
+                  </h3>
+                  <p className="text-sm text-slate-500 leading-relaxed text-center mb-6">
+                    Before you can check in patients and manage appointments,
+                    please complete your profile with your contact information.
+                  </p>
+
+                  {/* Checklist */}
+                  <div className="rounded-2xl px-5 py-4 mb-7 space-y-2.5 bg-slate-50 border border-slate-100">
+                    {[
+                      'Personal name information',
+                      'Contact phone number',
+                      'Professional identification',
+                    ].map((item) => (
+                      <div key={item} className="flex items-center gap-2.5">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-sky-100">
+                          <svg
+                            className="w-3 h-3 text-sky-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={3}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M4.5 12.75l6 6 9-13.5"
+                            />
+                          </svg>
+                        </div>
+                        <p className="text-xs text-slate-600 font-medium">
+                          {item}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2.5">
+                    <button
+                      onClick={() => {
+                        setShowProfileModal(false);
+                        nav('/receptionist/profile');
+                      }}
+                      className="w-full px-5 py-3 rounded-xl text-sm font-bold bg-linear-to-r from-sky-500 to-cyan-500 text-white shadow-lg shadow-sky-200 hover:scale-105 active:scale-95 transition-transform"
+                    >
+                      Set Up My Profile
+                      <svg
+                        className="w-4 h-4 inline ml-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

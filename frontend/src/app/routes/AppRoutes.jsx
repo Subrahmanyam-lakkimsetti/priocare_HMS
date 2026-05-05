@@ -9,6 +9,8 @@ import { fetchCurrentUser } from '../../features/auth/authThunks';
 
 import Login from '../../features/auth/Login';
 import Register from '../../features/auth/register';
+import ForgetPassword from '../../features/auth/ForgetPassword';
+import ResetPassword from '../../features/auth/ResetPassword';
 
 import PatientLayout from '../layouts/PatientLayout';
 import DoctorLayout from '../layouts/DoctorLayout';
@@ -24,9 +26,10 @@ function AuthLoader({ children }) {
   const location = useLocation();
   const { sessionInitialized, manualLogout } = useSelector((s) => s.auth);
 
-  const isPublicPage = ['/', '/login', '/register'].includes(
-    location.pathname.split('?')[0],
-  );
+  const isPublicPage =
+    ['/', '/login', '/register', '/forgot-password'].includes(
+      location.pathname.split('?')[0],
+    ) || location.pathname.startsWith('/reset-password/');
 
   useEffect(() => {
     if (!sessionInitialized && !isPublicPage && !manualLogout) {
@@ -85,6 +88,24 @@ export default function AppRoutes() {
             element={
               <AnimatedAuthLayout>
                 <Register />
+              </AnimatedAuthLayout>
+            }
+          />
+
+          <Route
+            path="/forgot-password"
+            element={
+              <AnimatedAuthLayout>
+                <ForgetPassword />
+              </AnimatedAuthLayout>
+            }
+          />
+
+          <Route
+            path="/reset-password/:resetToken"
+            element={
+              <AnimatedAuthLayout>
+                <ResetPassword />
               </AnimatedAuthLayout>
             }
           />

@@ -28,3 +28,20 @@ export const resendOtpRequest = async ({ email }) => {
   const res = await api.patch('/auth/resend-otp', { email });
   return res.data;
 };
+
+export const forgetPasswordRequest = async ({ email }) => {
+  const res = await api.post('/auth/forgetPassword', { email });
+  return res.data;
+};
+
+export const resetPasswordRequest = async ({
+  resetToken,
+  newPassword,
+  confirmPassword,
+}) => {
+  const res = await api.patch(`/auth/reset-password/resetToken/${resetToken}`, {
+    newPassword,
+    confirmPassword,
+  });
+  return res.data;
+};

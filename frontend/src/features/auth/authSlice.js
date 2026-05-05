@@ -1,5 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginUser, fetchCurrentUser, registerUser, sendOtp, resendOtp } from './authThunks';
+import {
+  loginUser,
+  fetchCurrentUser,
+  registerUser,
+  sendOtp,
+  resendOtp,
+  forgetPassword,
+  resetPassword,
+} from './authThunks';
 
 const initialState = {
   user: null,
@@ -11,6 +19,12 @@ const initialState = {
   otpSent: false,
   otpLoading: false,
   otpError: null,
+  forgetPasswordLoading: false,
+  forgetPasswordError: null,
+  forgetPasswordSuccess: false,
+  resetPasswordLoading: false,
+  resetPasswordError: null,
+  resetPasswordSuccess: false,
 };
 
 const authSlice = createSlice({
@@ -122,6 +136,36 @@ const authSlice = createSlice({
         state.sessionInitialized = true;
         state.user = null;
         state.isAuthenticated = false;
+      })
+
+      // Forget Password
+      .addCase(forgetPassword.pending, (state) => {
+        state.forgetPasswordLoading = true;
+        state.forgetPasswordError = null;
+        state.forgetPasswordSuccess = false;
+      })
+      .addCase(forgetPassword.fulfilled, (state) => {
+        state.forgetPasswordLoading = false;
+        state.forgetPasswordSuccess = true;
+      })
+      .addCase(forgetPassword.rejected, (state, action) => {
+        state.forgetPasswordLoading = false;
+        state.forgetPasswordError = action.payload;
+      })
+
+      // Reset Password
+      .addCase(resetPassword.pending, (state) => {
+        state.resetPasswordLoading = true;
+        state.resetPasswordError = null;
+        state.resetPasswordSuccess = false;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.resetPasswordLoading = false;
+        state.resetPasswordSuccess = true;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.resetPasswordLoading = false;
+        state.resetPasswordError = action.payload;
       });
   },
 });

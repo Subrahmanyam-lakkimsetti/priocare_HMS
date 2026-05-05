@@ -6,6 +6,8 @@ import {
   registerRequest,
   sendOtpRequest,
   resendOtpRequest,
+  forgetPasswordRequest,
+  resetPasswordRequest,
 } from './authService';
 import { logout } from './authSlice';
 import { initIntake, resetIntake } from '../patient/patientSlice';
@@ -96,6 +98,40 @@ export const fetchCurrentUser = createAsyncThunk(
       return user;
     } catch {
       return fulfillWithValue(null);
+    }
+  },
+);
+
+export const forgetPassword = createAsyncThunk(
+  'auth/forgetPassword',
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const res = await forgetPasswordRequest({ email });
+      return res;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message ||
+          'Failed to send reset email. Please try again.',
+      );
+    }
+  },
+);
+
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async ({ resetToken, newPassword, confirmPassword }, { rejectWithValue }) => {
+    try {
+      const res = await resetPasswordRequest({
+        resetToken,
+        newPassword,
+        confirmPassword,
+      });
+      return res;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message ||
+          'Failed to reset password. Please try again.',
+      );
     }
   },
 );

@@ -230,12 +230,7 @@ export default function Login() {
                   <label className="block text-sm font-medium text-gray-700">
                     Password
                   </label>
-                  <button
-                    type="button"
-                    className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                  >
-                    Forgot password?
-                  </button>
+                
                 </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -359,6 +354,16 @@ export default function Login() {
                 )}
               </button>
             </form>
+
+            {/* Forgot Password Link */}
+            <div className="text-center mt-4">
+              <Link
+                to="/forgot-password"
+                className="text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+              >
+                Forgot your password?
+              </Link>
+            </div>
 
             {/* Footer note */}
             <p className="text-center text-xs text-gray-400 mt-6">

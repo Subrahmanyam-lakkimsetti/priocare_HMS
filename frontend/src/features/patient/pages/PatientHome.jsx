@@ -28,10 +28,10 @@ const SEVERITY_CONFIG = {
     accent: '#eab308',
   },
   Low: {
-    bg: 'from-emerald-50 to-teal-50',
-    border: 'border-emerald-200',
-    badge: 'bg-emerald-100 text-emerald-700',
-    dot: 'bg-emerald-500',
+    bg: 'from-blue-50 to-cyan-50',
+    border: 'border-blue-200',
+    badge: 'bg-blue-100 text-blue-700',
+    dot: 'bg-blue-500',
     accent: '#10b981',
   },
 };
@@ -51,7 +51,7 @@ const STATUS_CONFIG = {
   },
   completed: {
     label: 'Completed',
-    color: 'bg-emerald-100 text-emerald-700',
+    color: 'bg-blue-100 text-blue-700',
     message:
       'Your consultation is complete. Please collect your prescription or follow-up instructions from the front desk.',
   },
@@ -85,7 +85,7 @@ function StatusDot({ status }) {
     status === 'waiting'
       ? 'bg-amber-400'
       : status === 'completed'
-        ? 'bg-emerald-500'
+        ? 'bg-blue-500'
         : 'bg-gray-400';
   return <span className={`w-2 h-2 rounded-full ${dotColor}`} />;
 }
@@ -213,7 +213,7 @@ function PrepSection({ icon, title, items, accentClass }) {
       <ul className="space-y-2 ml-7">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5 shrink-0">✓</span>
+            <span className="text-blue-500 mt-0.5 shrink-0">✓</span>
             <p className="text-sm text-slate-600 leading-relaxed">{item}</p>
           </li>
         ))}
@@ -452,7 +452,7 @@ export default function PatientHome() {
                           icon="🥗"
                           title="Diet & Hydration"
                           items={patientInstructions.diet}
-                          accentClass="text-emerald-600"
+                          accentClass="text-blue-600"
                         />
                         <PrepSection
                           icon="⏰"

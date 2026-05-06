@@ -17,8 +17,8 @@ const STATUS_CONFIG = {
   },
   checked_in: {
     label: 'Checked In',
-    gradient: 'from-cyan-500 to-teal-500',
-    gradientBg: 'bg-gradient-to-br from-cyan-500 to-teal-500',
+    gradient: 'from-cyan-500 to-cyan-500',
+    gradientBg: 'bg-gradient-to-br from-cyan-500 to-cyan-500',
     light: 'bg-cyan-50',
     text: 'text-cyan-700',
     border: 'border-cyan-200',
@@ -39,14 +39,14 @@ const STATUS_CONFIG = {
   },
   completed: {
     label: 'Completed',
-    gradient: 'from-emerald-400 to-green-500',
-    gradientBg: 'bg-gradient-to-br from-emerald-400 to-green-500',
-    light: 'bg-emerald-50',
-    text: 'text-emerald-700',
-    border: 'border-emerald-200',
-    dot: 'bg-emerald-500',
-    ring: 'ring-emerald-200',
-    softBg: 'bg-emerald-50/60',
+    gradient: 'from-blue-400 to-green-500',
+    gradientBg: 'bg-gradient-to-br from-blue-400 to-green-500',
+    light: 'bg-blue-50',
+    text: 'text-blue-700',
+    border: 'border-blue-200',
+    dot: 'bg-blue-500',
+    ring: 'ring-blue-200',
+    softBg: 'bg-blue-50/60',
   },
   cancelled: {
     label: 'Cancelled',
@@ -194,7 +194,7 @@ export default function PatientAppointments() {
             <span className="bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1 rounded-full border border-blue-100">
               {appointments.length} total
             </span>
-            <span className="bg-emerald-50 text-emerald-700 text-sm font-semibold px-3 py-1 rounded-full border border-emerald-100">
+            <span className="bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1 rounded-full border border-blue-100">
               {appointments.filter((a) => a.status === 'completed').length}{' '}
               completed
             </span>

@@ -83,7 +83,7 @@ export default function DateSelector({ selectedDate, onChange }) {
                 <span
                   className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                     isToday
-                      ? 'bg-emerald-100 text-emerald-700'
+                      ? 'bg-blue-100 text-blue-700'
                       : 'bg-gray-100 text-gray-600'
                   }`}
                 >

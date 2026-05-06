@@ -17,8 +17,8 @@ const DoctorProfilePage = () => {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
           <div className="relative w-14 h-14">
-            <div className="absolute inset-0 rounded-2xl bg-emerald-100 animate-ping opacity-40" />
-            <div className="relative w-14 h-14 rounded-2xl bg-linear-to-br from-emerald-600 to-emerald-800 flex items-center justify-center shadow-lg">
+            <div className="absolute inset-0 rounded-2xl bg-blue-100 animate-ping opacity-40" />
+            <div className="relative w-14 h-14 rounded-2xl bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg">
               <svg
                 className="w-7 h-7 text-white"
                 fill="currentColor"

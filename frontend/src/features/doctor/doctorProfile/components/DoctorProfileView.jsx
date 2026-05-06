@@ -17,7 +17,7 @@ const InfoRow = ({ label, value }) => (
 const Section = ({ title, children }) => (
   <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
     <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-      <span className="w-1 h-5 bg-emerald-500 rounded-full"></span>
+      <span className="w-1 h-5 bg-blue-500 rounded-full"></span>
       {title}
     </h3>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">{children}</div>
@@ -120,7 +120,7 @@ const DoctorProfileView = ({ profile }) => {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold text-emerald-600 uppercase tracking-wider mb-1">
+          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wider mb-1">
             My Account
           </p>
           <h1 className="text-2xl font-bold text-gray-900">Medical Profile</h1>
@@ -132,7 +132,7 @@ const DoctorProfileView = ({ profile }) => {
         <div className="flex flex-col sm:flex-row items-start gap-5">
           {/* Avatar with upload overlay */}
           <div className="relative shrink-0">
-            <div className="w-20 h-20 rounded-xl overflow-hidden bg-linear-to-br from-emerald-50 to-teal-50 flex items-center justify-center border-2 border-white shadow-md">
+            <div className="w-20 h-20 rounded-xl overflow-hidden bg-linear-to-br from-blue-50 to-cyan-50 flex items-center justify-center border-2 border-white shadow-md">
               {displayPhoto ? (
                 <img
                   src={displayPhoto}
@@ -140,7 +140,7 @@ const DoctorProfileView = ({ profile }) => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-2xl font-bold text-emerald-600">
+                <span className="text-2xl font-bold text-blue-600">
                   {initials || '?'}
                 </span>
               )}
@@ -155,7 +155,7 @@ const DoctorProfileView = ({ profile }) => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 rounded-lg flex items-center justify-center shadow-lg transition-colors"
+              className="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 rounded-lg flex items-center justify-center shadow-lg transition-colors"
               title="Update photo"
             >
               <svg
@@ -197,8 +197,8 @@ const DoctorProfileView = ({ profile }) => {
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-3">
               {profile.specializations && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-100">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium border border-blue-100">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                   {profile.specializations}
                 </span>
               )}
@@ -213,7 +213,7 @@ const DoctorProfileView = ({ profile }) => {
           {/* Edit button */}
           <button
             onClick={() => setEditing(true)}
-            className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-sm"
+            className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-sm"
           >
             <svg
               className="w-4 h-4"

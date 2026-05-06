@@ -82,14 +82,14 @@ const SmartHospitalLanding = () => {
       hero: [
         {
           type: 'blob',
-          color: 'emerald',
+          color: 'blue',
           position: 'top-1/4 left-1/4',
           size: 'w-96 h-96',
           opacity: 0.1,
         },
         {
           type: 'blob',
-          color: 'teal',
+          color: 'cyan',
           position: 'bottom-1/4 right-1/4',
           size: 'w-96 h-96',
           opacity: 0.1,
@@ -99,7 +99,7 @@ const SmartHospitalLanding = () => {
         {
           type: 'gradient',
           direction: 'conic',
-          from: 'emerald',
+          from: 'blue',
           to: 'transparent',
           opacity: 0.05,
         },
@@ -112,18 +112,18 @@ const SmartHospitalLanding = () => {
         { type: 'perspective-grid', opacity: 0.05 },
         { type: 'beam', position: 'center' },
       ],
-      postcare: [{ type: 'conic', from: 'teal', to: 'emerald', opacity: 0.06 }],
+      postcare: [{ type: 'conic', from: 'cyan', to: 'blue', opacity: 0.06 }],
       for: [
         {
           type: 'blob',
-          color: 'emerald',
+          color: 'blue',
           position: 'top-0 left-1/4',
           size: 'w-64 h-64',
           opacity: 0.05,
         },
         {
           type: 'blob',
-          color: 'teal',
+          color: 'cyan',
           position: 'bottom-0 right-1/4',
           size: 'w-64 h-64',
           opacity: 0.05,
@@ -131,7 +131,7 @@ const SmartHospitalLanding = () => {
       ],
       emergency: [{ type: 'pulse', color: 'red', count: 2 }],
       trust: [{ type: 'pattern', repeat: 'linear', angle: 45, opacity: 0.02 }],
-      cta: [{ type: 'radial', color: 'emerald', size: '70%', opacity: 0.1 }],
+      cta: [{ type: 'radial', color: 'blue', size: '70%', opacity: 0.1 }],
     };
 
     const elements = sectionElements[sectionKey] || [];
@@ -236,7 +236,7 @@ const SmartHospitalLanding = () => {
                   {Array.from({ length: element.count }).map((_, i) => (
                     <div
                       key={i}
-                      className="absolute w-0.5 h-0.5 bg-emerald-400/20 rounded-full animate-pulse"
+                      className="absolute w-0.5 h-0.5 bg-blue-400/20 rounded-full animate-pulse"
                       style={{
                         left: `${Math.random() * 100}%`,
                         top: `${Math.random() * 100}%`,
@@ -282,7 +282,7 @@ const SmartHospitalLanding = () => {
               return (
                 <div
                   key={index}
-                  className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-linear-to-b from-emerald-400/0 via-emerald-400/10 to-emerald-400/0"
+                  className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-linear-to-b from-blue-400/0 via-blue-400/10 to-blue-400/0"
                 />
               );
 
@@ -354,7 +354,7 @@ const SmartHospitalLanding = () => {
     <div className="min-h-screen bg-black text-white overflow-hidden">
       <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-black/30 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <span className="text-xl font-light tracking-wide text-emerald-400">
+          <span className="text-xl font-light tracking-wide text-blue-400">
             PrioCare
           </span>
 
@@ -373,7 +373,7 @@ const SmartHospitalLanding = () => {
             </button>
           </div>
 
-          <button className="px-6 py-2 rounded-full bg-linear-to-r from-emerald-500 to-teal-500 text-sm font-light hover:opacity-90 transition-opacity">
+          <button className="px-6 py-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 text-sm font-light hover:opacity-90 transition-opacity">
             Book Visit
           </button>
         </div>
@@ -390,7 +390,7 @@ const SmartHospitalLanding = () => {
 
           {/* Interactive Glow */}
           <div
-            className="absolute w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl transition-all duration-300 pointer-events-none"
+            className="absolute w-64 h-64 bg-blue-500/20 rounded-full blur-3xl transition-all duration-300 pointer-events-none"
             style={{
               left: `${mousePos.x - 128}px`,
               top: `${mousePos.y - 128}px`,
@@ -402,7 +402,7 @@ const SmartHospitalLanding = () => {
         {particles.map((p) => (
           <div
             key={p.id}
-            className="absolute w-1 h-1 bg-emerald-400/30 rounded-full"
+            className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
             style={{
               left: `${p.x}%`,
               top: `${p.y}%`,
@@ -430,10 +430,10 @@ const SmartHospitalLanding = () => {
               }}
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl opacity-50" />
-                <div className="relative w-16 h-16 backdrop-blur-sm bg-emerald-500/10 rounded-2xl border border-emerald-400/20 flex items-center justify-center">
+                <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl opacity-50" />
+                <div className="relative w-16 h-16 backdrop-blur-sm bg-blue-500/10 rounded-2xl border border-blue-400/20 flex items-center justify-center">
                   <item.icon
-                    className="w-8 h-8 text-emerald-400"
+                    className="w-8 h-8 text-blue-400"
                     strokeWidth={1.5}
                   />
                 </div>
@@ -446,9 +446,9 @@ const SmartHospitalLanding = () => {
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
           <div className="space-y-8">
             {/* Glowing Tag */}
-            <div className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-500/10 backdrop-blur-lg rounded-full border border-emerald-400/20 mb-8 animate-fade-in">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-light tracking-wide">
+            <div className="inline-flex items-center gap-2 px-6 py-2 bg-blue-500/10 backdrop-blur-lg rounded-full border border-blue-400/20 mb-8 animate-fade-in">
+              <Sparkles className="w-4 h-4 text-blue-400" />
+              <span className="text-blue-400 text-sm font-light tracking-wide">
                 PRIORITY-BASED CARE
               </span>
             </div>
@@ -456,16 +456,16 @@ const SmartHospitalLanding = () => {
             {/* Main Headline */}
             <h1 className="text-6xl md:text-7xl font-light leading-tight animate-fade-in-up">
               <span className="block mb-4">Healthcare,</span>
-              <span className="block bg-linear-to-r from-emerald-400 via-teal-300 to-blue-400 bg-clip-text text-transparent">
+              <span className="block bg-linear-to-r from-blue-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
                 That Knows What Comes First.
               </span>
             </h1>
 
             {/* Divider */}
             <div className="flex justify-center gap-3 my-8 animate-fade-in">
-              <div className="w-4 h-4 rounded-full bg-emerald-400/50" />
-              <div className="w-4 h-4 rounded-full bg-teal-400/50" />
-              <div className="w-4 h-4 rounded-full bg-emerald-400/50" />
+              <div className="w-4 h-4 rounded-full bg-blue-400/50" />
+              <div className="w-4 h-4 rounded-full bg-cyan-400/50" />
+              <div className="w-4 h-4 rounded-full bg-blue-400/50" />
             </div>
 
             {/* Description */}
@@ -485,14 +485,14 @@ const SmartHospitalLanding = () => {
               className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-12 animate-fade-in-up"
               style={{ animationDelay: '0.4s' }}
             >
-              <button className="group px-8 py-4 bg-linear-to-r from-emerald-500 to-teal-500 rounded-full text-white font-light tracking-wide transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/25">
+              <button className="group px-8 py-4 bg-linear-to-r from-blue-500 to-cyan-500 rounded-full text-white font-light tracking-wide transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25">
                 <span className="flex items-center gap-3">
                   Begin Your Journey
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
 
-              <button className="group px-8 py-4 bg-white/5 backdrop-blur-lg rounded-full border border-emerald-400/20 text-gray-300 font-light transition-all duration-300 hover:bg-white/10 hover:text-white">
+              <button className="group px-8 py-4 bg-white/5 backdrop-blur-lg rounded-full border border-blue-400/20 text-gray-300 font-light transition-all duration-300 hover:bg-white/10 hover:text-white">
                 <span className="flex items-center gap-3">
                   <Phone className="w-5 h-5" />
                   Talk to Someone
@@ -503,8 +503,8 @@ const SmartHospitalLanding = () => {
 
           {/* Scroll Indicator */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <div className="w-8 h-12 rounded-full border-2 border-emerald-400/30 flex justify-center p-2">
-              <div className="w-1 h-3 bg-linear-to-b from-emerald-400 to-teal-400 rounded-full" />
+            <div className="w-8 h-12 rounded-full border-2 border-blue-400/30 flex justify-center p-2">
+              <div className="w-1 h-3 bg-linear-to-b from-blue-400 to-cyan-400 rounded-full" />
             </div>
           </div>
         </div>
@@ -518,16 +518,16 @@ const SmartHospitalLanding = () => {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Section Header */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-500/10 backdrop-blur-lg rounded-full border border-emerald-400/20 mb-6">
-              <Check className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-light tracking-wide">
+            <div className="inline-flex items-center gap-2 px-6 py-2 bg-blue-500/10 backdrop-blur-lg rounded-full border border-blue-400/20 mb-6">
+              <Check className="w-5 h-5 text-blue-400" />
+              <span className="text-blue-400 text-sm font-light tracking-wide">
                 WHY CHOOSE PRIOCARE
               </span>
             </div>
 
             <h2 className="text-5xl md:text-6xl font-light mb-8">
               Healthcare That{' '}
-              <span className="text-emerald-400">Actually Works</span> For You
+              <span className="text-blue-400">Actually Works</span> For You
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto text-lg font-light">
               We've redesigned the healthcare experience around what truly
@@ -539,7 +539,7 @@ const SmartHospitalLanding = () => {
           <div className="relative">
             {/* Background Circles */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full max-w-4xl h-64 border-2 border-emerald-400/10 rounded-full" />
+              <div className="w-full max-w-4xl h-64 border-2 border-blue-400/10 rounded-full" />
             </div>
 
             {/* Features in Circular Layout */}
@@ -571,14 +571,14 @@ const SmartHospitalLanding = () => {
               ].map((benefit, i) => (
                 <div key={i} className="group relative">
                   {/* Animated Border */}
-                  <div className="absolute -inset-1 bg-linear-to-r from-emerald-500/20 to-teal-500/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute -inset-1 bg-linear-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                   {/* Circular Card */}
-                  <div className="relative aspect-square rounded-full bg-linear-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-400/20 p-8 flex flex-col items-center justify-center text-center backdrop-blur-sm transition-all duration-500 group-hover:scale-105 group-hover:border-emerald-400/40">
+                  <div className="relative aspect-square rounded-full bg-linear-to-br from-blue-500/10 to-cyan-500/10 border border-blue-400/20 p-8 flex flex-col items-center justify-center text-center backdrop-blur-sm transition-all duration-500 group-hover:scale-105 group-hover:border-blue-400/40">
                     {/* Icon */}
-                    <div className="w-20 h-20 rounded-full bg-linear-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <div className="w-20 h-20 rounded-full bg-linear-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
                       <benefit.icon
-                        className="w-10 h-10 text-emerald-400"
+                        className="w-10 h-10 text-blue-400"
                         strokeWidth={1.5}
                       />
                     </div>
@@ -607,16 +607,16 @@ const SmartHospitalLanding = () => {
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Section Header - Compact */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-emerald-500/5 backdrop-blur-sm rounded-2xl border border-emerald-400/10 mb-6">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              <span className="text-emerald-400 text-sm font-medium tracking-wider">
+            <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-blue-500/5 backdrop-blur-sm rounded-2xl border border-blue-400/10 mb-6">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+              <span className="text-blue-400 text-sm font-medium tracking-wider">
                 Your Care Pathway
               </span>
             </div>
 
             <h2 className="text-4xl md:text-6xl font-light mb-5">
               A Clear Path to
-              <span className="block text-emerald-400 mt-2">Better Health</span>
+              <span className="block text-blue-400 mt-2">Better Health</span>
             </h2>
             <p className="text-gray-400 max-w-xl mx-auto text-base">
               Follow a guided journey where each step naturally leads to the
@@ -629,11 +629,11 @@ const SmartHospitalLanding = () => {
             {/* Central Progress Indicator */}
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block">
               <div className="relative w-48 h-48">
-                <div className="absolute inset-0 border-2 border-emerald-400/10 rounded-full animate-spin-slow" />
-                <div className="absolute inset-8 border-2 border-emerald-400/5 rounded-full animate-spin-slow-reverse" />
+                <div className="absolute inset-0 border-2 border-blue-400/10 rounded-full animate-spin-slow" />
+                <div className="absolute inset-8 border-2 border-blue-400/5 rounded-full animate-spin-slow-reverse" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="text-4xl text-emerald-400 font-light mb-2">
+                    <div className="text-4xl text-blue-400 font-light mb-2">
                       4
                     </div>
                     <div className="text-sm text-gray-400 font-light">
@@ -658,7 +658,7 @@ const SmartHospitalLanding = () => {
                     'Priority matching',
                     'Flexible timing',
                   ],
-                  color: 'emerald',
+                  color: 'blue',
                 },
                 {
                   step: '02',
@@ -671,7 +671,7 @@ const SmartHospitalLanding = () => {
                     'Clear roles',
                     'Direct contact',
                   ],
-                  color: 'teal',
+                  color: 'cyan',
                 },
                 {
                   step: '03',
@@ -707,7 +707,7 @@ const SmartHospitalLanding = () => {
                 >
                   {/* Connection Arc (Visible on desktop) */}
                   <div
-                    className="hidden lg:block absolute top-1/2 -translate-y-1/2 w-24 h-24 border-2 border-emerald-400/10 rounded-full -z-10"
+                    className="hidden lg:block absolute top-1/2 -translate-y-1/2 w-24 h-24 border-2 border-blue-400/10 rounded-full -z-10"
                     style={{
                       left: index % 2 === 0 ? 'calc(100% + 20px)' : 'auto',
                       right: index % 2 === 1 ? 'calc(100% + 20px)' : 'auto',
@@ -723,7 +723,7 @@ const SmartHospitalLanding = () => {
                   />
 
                   {/* Step Card */}
-                  <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-sm border border-gray-800/30 rounded-2xl p-8 group-hover:border-emerald-400/20 transition-all duration-500 group-hover:scale-[1.02] overflow-hidden">
+                  <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-sm border border-gray-800/30 rounded-2xl p-8 group-hover:border-blue-400/20 transition-all duration-500 group-hover:scale-[1.02] overflow-hidden">
                     {/* Background Glow */}
                     <div
                       className={`absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-${item.color}-500/5 to-transparent rounded-full blur-xl`}
@@ -804,8 +804,8 @@ const SmartHospitalLanding = () => {
                     </div>
 
                     {/* Corner Accents */}
-                    <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-emerald-400/20 rounded-tl-2xl" />
-                    <div className="absolute bottom-0 right-0 w-6 h-6 border-r border-b border-emerald-400/20 rounded-br-2xl" />
+                    <div className="absolute top-0 left-0 w-6 h-6 border-l border-t border-blue-400/20 rounded-tl-2xl" />
+                    <div className="absolute bottom-0 right-0 w-6 h-6 border-r border-b border-blue-400/20 rounded-br-2xl" />
                   </div>
 
                   {/* Floating Indicator */}
@@ -821,11 +821,11 @@ const SmartHospitalLanding = () => {
             {/* Mobile Connection Lines */}
             <div className="lg:hidden relative h-12 mx-auto max-w-md">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-full h-0.5 bg-linear-to-r from-emerald-400/10 via-teal-400/10 to-cyan-400/10" />
+                <div className="w-full h-0.5 bg-linear-to-r from-blue-400/10 via-cyan-400/10 to-cyan-400/10" />
                 {[0, 1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="absolute w-3 h-3 bg-emerald-400/30 rounded-full animate-pulse"
+                    className="absolute w-3 h-3 bg-blue-400/30 rounded-full animate-pulse"
                     style={{
                       left: `${(i + 1) * 25}%`,
                       animationDelay: `${i * 0.2}s`,
@@ -838,7 +838,7 @@ const SmartHospitalLanding = () => {
 
           {/* Journey Summary */}
           <div className="mt-24 max-w-3xl mx-auto">
-            <div className="bg-linear-to-b from-emerald-500/5 to-transparent backdrop-blur-sm border border-emerald-400/10 rounded-2xl p-8">
+            <div className="bg-linear-to-b from-blue-500/5 to-transparent backdrop-blur-sm border border-blue-400/10 rounded-2xl p-8">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
                   <h4 className="text-xl font-light text-white mb-3">
@@ -849,8 +849,8 @@ const SmartHospitalLanding = () => {
                     continuum of care
                   </p>
                 </div>
-                <button className="group relative px-8 py-3.5 bg-linear-to-r from-emerald-500 to-teal-500 rounded-xl text-white font-light hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 overflow-hidden">
-                  <div className="absolute inset-0 bg-linear-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <button className="group relative px-8 py-3.5 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl text-white font-light hover:shadow-xl hover:shadow-blue-500/20 transition-all duration-300 overflow-hidden">
+                  <div className="absolute inset-0 bg-linear-to-r from-blue-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <span className="relative flex items-center gap-3">
                     Start Your Journey
                     <svg
@@ -887,9 +887,9 @@ const SmartHospitalLanding = () => {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Section Header */}
           <div className="text-center mb-32">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-12 transform-gpu transition-all duration-500 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/10">
-              <Eye className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-medium tracking-wider">
+            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-blue-500/10 to-cyan-500/10 backdrop-blur-xl rounded-2xl border border-blue-400/20 mb-12 transform-gpu transition-all duration-500 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/10">
+              <Eye className="w-5 h-5 text-blue-400" />
+              <span className="text-blue-400 text-sm font-medium tracking-wider">
                 BEFORE YOUR VISIT
               </span>
             </div>
@@ -898,10 +898,10 @@ const SmartHospitalLanding = () => {
               Preparing You For
               <span className="block mt-6">
                 <span className="relative inline-block">
-                  <span className="text-transparent bg-linear-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text animate-gradient">
+                  <span className="text-transparent bg-linear-to-r from-blue-400 via-cyan-400 to-cyan-400 bg-clip-text animate-gradient">
                     Better Care
                   </span>
-                  <span className="absolute -bottom-4 left-0 right-0 h-px bg-linear-to-r from-emerald-400/0 via-emerald-400/50 to-emerald-400/0" />
+                  <span className="absolute -bottom-4 left-0 right-0 h-px bg-linear-to-r from-blue-400/0 via-blue-400/50 to-blue-400/0" />
                 </span>
               </span>
             </h2>
@@ -916,14 +916,14 @@ const SmartHospitalLanding = () => {
             {/* Central Doorway */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 pointer-events-none">
               {/* Door Frame */}
-              <div className="absolute inset-0 border-4 border-emerald-400/20 rounded-2xl" />
+              <div className="absolute inset-0 border-4 border-blue-400/20 rounded-2xl" />
 
               {/* Door Opening */}
-              <div className="absolute inset-8 bg-linear-to-br from-emerald-500/5 to-teal-500/5 backdrop-blur-sm rounded-lg border-2 border-emerald-400/30" />
+              <div className="absolute inset-8 bg-linear-to-br from-blue-500/5 to-cyan-500/5 backdrop-blur-sm rounded-lg border-2 border-blue-400/30" />
 
               {/* Door Handle */}
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <div className="w-4 h-12 bg-linear-to-b from-emerald-400 to-teal-400 rounded-full shadow-lg" />
+                <div className="w-4 h-12 bg-linear-to-b from-blue-400 to-cyan-400 rounded-full shadow-lg" />
               </div>
             </div>
 
@@ -938,7 +938,7 @@ const SmartHospitalLanding = () => {
                   position: 'md:col-start-1 md:row-start-1',
                   perspective:
                     'perspective-1000 transform-gpu rotate-y-[-20deg]',
-                  color: 'emerald',
+                  color: 'blue',
                   step: '01',
                 },
                 {
@@ -948,7 +948,7 @@ const SmartHospitalLanding = () => {
                     'Tips to get your home ready for recovery and ongoing care',
                   position: 'md:col-start-2 md:row-start-1 md:mt-24',
                   perspective: 'perspective-1000 transform-gpu',
-                  color: 'teal',
+                  color: 'cyan',
                   step: '02',
                 },
                 {
@@ -968,7 +968,7 @@ const SmartHospitalLanding = () => {
                   className={`${step.position} ${step.perspective} group`}
                 >
                   {/* Step Pathway Line */}
-                  <div className="hidden md:block absolute top-1/2 left-1/2 w-32 h-0.5 bg-linear-to-r from-emerald-400/20 to-transparent origin-left rotate-60" />
+                  <div className="hidden md:block absolute top-1/2 left-1/2 w-32 h-0.5 bg-linear-to-r from-blue-400/20 to-transparent origin-left rotate-60" />
 
                   {/* Step Container */}
                   <div className="relative">
@@ -984,9 +984,9 @@ const SmartHospitalLanding = () => {
                     </div>
 
                     {/* Step Card */}
-                    <div className="relative bg-linear-to-br from-gray-900/90 to-black/90 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-8 transform-gpu transition-all duration-700 group-hover:scale-110 group-hover:border-emerald-400/40 group-hover:shadow-2xl group-hover:shadow-emerald-500/20 overflow-hidden">
+                    <div className="relative bg-linear-to-br from-gray-900/90 to-black/90 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-8 transform-gpu transition-all duration-700 group-hover:scale-110 group-hover:border-blue-400/40 group-hover:shadow-2xl group-hover:shadow-blue-500/20 overflow-hidden">
                       {/* Animated Glow */}
-                      <div className="absolute -inset-1 bg-linear-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute -inset-1 bg-linear-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                       {/* Icon Container */}
                       <div className="relative w-16 h-16 mx-auto mb-6">
@@ -1030,7 +1030,7 @@ const SmartHospitalLanding = () => {
 
                     {/* Direction Arrow */}
                     <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 opacity-30 group-hover:opacity-100 transition-opacity duration-300">
-                      <ArrowRight className="w-6 h-6 text-emerald-400" />
+                      <ArrowRight className="w-6 h-6 text-blue-400" />
                     </div>
                   </div>
                 </div>
@@ -1042,8 +1042,8 @@ const SmartHospitalLanding = () => {
               <div className="inline-flex items-center gap-6">
                 {/* Preparation Start */}
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-linear-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-400/20 flex items-center justify-center">
-                    <span className="text-emerald-400 text-sm font-light">
+                  <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500/20 to-cyan-500/20 border-2 border-blue-400/20 flex items-center justify-center">
+                    <span className="text-blue-400 text-sm font-light">
                       Start
                     </span>
                   </div>
@@ -1053,14 +1053,14 @@ const SmartHospitalLanding = () => {
                 </div>
 
                 {/* Pathway Line */}
-                <div className="w-24 h-1 bg-linear-to-r from-emerald-400/20 to-teal-400/20 rounded-full" />
+                <div className="w-24 h-1 bg-linear-to-r from-blue-400/20 to-cyan-400/20 rounded-full" />
 
                 {/* Care Doorway */}
                 <div className="relative">
-                  <div className="w-16 h-16 rounded-xl bg-linear-to-br from-emerald-500/30 to-cyan-500/30 border-2 border-emerald-400/30 flex items-center justify-center shadow-lg">
-                    <DoorOpen className="w-8 h-8 text-emerald-400" />
+                  <div className="w-16 h-16 rounded-xl bg-linear-to-br from-blue-500/30 to-cyan-500/30 border-2 border-blue-400/30 flex items-center justify-center shadow-lg">
+                    <DoorOpen className="w-8 h-8 text-blue-400" />
                   </div>
-                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-emerald-400 font-light">
+                  <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-blue-400 font-light">
                     Care Access
                   </div>
                 </div>
@@ -1088,16 +1088,16 @@ const SmartHospitalLanding = () => {
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Section Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-2xl border border-emerald-400/20 mb-10">
-              <RefreshCw className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-medium tracking-wider">
+            <div className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-blue-500/10 to-cyan-500/10 backdrop-blur-xl rounded-2xl border border-blue-400/20 mb-10">
+              <RefreshCw className="w-5 h-5 text-blue-400" />
+              <span className="text-blue-400 text-sm font-medium tracking-wider">
                 AFTER YOUR VISIT
               </span>
             </div>
 
             <h2 className="text-5xl md:text-7xl font-light mb-8 leading-tight">
               Care That Continues
-              <span className="block mt-4 text-transparent bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text">
+              <span className="block mt-4 text-transparent bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text">
                 Beyond The Visit
               </span>
             </h2>
@@ -1116,14 +1116,14 @@ const SmartHospitalLanding = () => {
                   title: 'Follow-up Check-ins',
                   description:
                     'Regular calls and messages to monitor your recovery progress',
-                  color: 'emerald',
+                  color: 'blue',
                 },
                 {
                   icon: MessageCircle,
                   title: '24/7 Support',
                   description:
                     'Always available to answer questions and provide guidance',
-                  color: 'teal',
+                  color: 'cyan',
                 },
                 {
                   icon: TrendingUp,
@@ -1134,7 +1134,7 @@ const SmartHospitalLanding = () => {
                 },
               ].map((feature, i) => (
                 <div key={i} className="group relative">
-                  <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-6 transform-gpu transition-all duration-500 hover:border-emerald-400/30">
+                  <div className="relative bg-linear-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-800/50 rounded-3xl p-6 transform-gpu transition-all duration-500 hover:border-blue-400/30">
                     <div className="flex items-start gap-6">
                       <div
                         className={`w-14 h-14 rounded-xl bg-linear-to-br from-${feature.color}-500/10 to-${feature.color}-600/10 border border-${feature.color}-400/20 flex items-center justify-center shrink-0`}
@@ -1165,7 +1165,7 @@ const SmartHospitalLanding = () => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative w-64 h-64">
                     {/* Outer Ring */}
-                    <div className="absolute inset-0 border-4 border-emerald-400/10 rounded-full animate-pulse" />
+                    <div className="absolute inset-0 border-4 border-blue-400/10 rounded-full animate-pulse" />
 
                     {/* Progress Ring */}
                     <div
@@ -1179,9 +1179,9 @@ const SmartHospitalLanding = () => {
                     />
 
                     {/* Center Content */}
-                    <div className="absolute inset-16 bg-linear-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 flex items-center justify-center">
+                    <div className="absolute inset-16 bg-linear-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-blue-400/20 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="text-4xl text-emerald-400 font-light mb-2">
+                        <div className="text-4xl text-blue-400 font-light mb-2">
                           75%
                         </div>
                         <div className="text-sm text-gray-400 font-light">
@@ -1193,9 +1193,9 @@ const SmartHospitalLanding = () => {
                 </div>
 
                 {/* Floating Elements */}
-                <div className="absolute top-1/4 left-1/4 w-12 h-12 bg-linear-to-br from-teal-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-teal-400/20 animate-float-slow" />
+                <div className="absolute top-1/4 left-1/4 w-12 h-12 bg-linear-to-br from-cyan-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-cyan-400/20 animate-float-slow" />
                 <div
-                  className="absolute bottom-1/4 right-1/4 w-16 h-16 bg-linear-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-xl rounded-full border border-emerald-400/20 animate-float-slow"
+                  className="absolute bottom-1/4 right-1/4 w-16 h-16 bg-linear-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-xl rounded-full border border-blue-400/20 animate-float-slow"
                   style={{ animationDelay: '1s' }}
                 />
               </div>
@@ -1213,16 +1213,16 @@ const SmartHospitalLanding = () => {
         <div className="max-w-6xl mx-auto relative z-10">
           {/* Section Header */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-emerald-500/5 backdrop-blur-sm rounded-full border border-emerald-400/10 mb-8">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full" />
-              <span className="text-emerald-400 text-sm font-medium tracking-wider">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-blue-500/5 backdrop-blur-sm rounded-full border border-blue-400/10 mb-8">
+              <div className="w-2 h-2 bg-blue-400 rounded-full" />
+              <span className="text-blue-400 text-sm font-medium tracking-wider">
                 DESIGNED FOR YOU
               </span>
             </div>
 
             <h2 className="text-4xl md:text-6xl font-light mb-6">
               For Everyone Who
-              <span className="block mt-4 text-emerald-400">
+              <span className="block mt-4 text-blue-400">
                 Cares About Health
               </span>
             </h2>
@@ -1235,7 +1235,7 @@ const SmartHospitalLanding = () => {
           {/* Accordion Stack Layout - Performance Optimized */}
           <div className="relative">
             {/* Stacking lines indicator */}
-            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-emerald-400/20 via-transparent to-emerald-400/20" />
+            <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-blue-400/20 via-transparent to-blue-400/20" />
 
             {/* Card Stack Container */}
             <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
@@ -1250,7 +1250,7 @@ const SmartHospitalLanding = () => {
                     'Clear instructions',
                     'Follow-up support',
                   ],
-                  color: 'emerald',
+                  color: 'blue',
                 },
                 {
                   title: 'Families',
@@ -1262,7 +1262,7 @@ const SmartHospitalLanding = () => {
                     'Care coordination',
                     'Peace of mind',
                   ],
-                  color: 'teal',
+                  color: 'cyan',
                 },
                 {
                   title: 'Care Teams',
@@ -1279,13 +1279,13 @@ const SmartHospitalLanding = () => {
               ].map((role, i) => (
                 <div key={i} className="group">
                   {/* Stack Card */}
-                  <div className="relative bg-linear-to-br from-gray-900/90 to-black/90 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-8 transition-all duration-300 hover:border-emerald-400/30 hover:-translate-y-1">
+                  <div className="relative bg-linear-to-br from-gray-900/90 to-black/90 backdrop-blur-sm border border-gray-800/50 rounded-2xl p-8 transition-all duration-300 hover:border-blue-400/30 hover:-translate-y-1">
                     {/* Stack layer indicators */}
-                    <div className="absolute -top-2 left-6 right-6 h-2 bg-linear-to-r from-emerald-400/10 via-teal-400/10 to-transparent rounded-t-lg" />
-                    <div className="absolute -bottom-2 left-6 right-6 h-2 bg-linear-to-r from-transparent via-teal-400/10 to-emerald-400/10 rounded-b-lg" />
+                    <div className="absolute -top-2 left-6 right-6 h-2 bg-linear-to-r from-blue-400/10 via-cyan-400/10 to-transparent rounded-t-lg" />
+                    <div className="absolute -bottom-2 left-6 right-6 h-2 bg-linear-to-r from-transparent via-cyan-400/10 to-blue-400/10 rounded-b-lg" />
 
                     {/* Number indicator */}
-                    <div className="absolute -left-3 top-8 w-8 h-8 bg-linear-to-br from-emerald-600 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-light shadow-lg">
+                    <div className="absolute -left-3 top-8 w-8 h-8 bg-linear-to-br from-blue-600 to-cyan-600 rounded-full flex items-center justify-center text-white text-sm font-light shadow-lg">
                       {i + 1}
                     </div>
 
@@ -1329,12 +1329,12 @@ const SmartHospitalLanding = () => {
                     </div>
 
                     {/* Hover indicator */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-linear-to-r from-transparent via-emerald-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-linear-to-r from-transparent via-blue-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
 
                   {/* Desktop connection lines */}
                   {i < 2 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-8 w-8 h-0.5 bg-linear-to-r from-emerald-400/20 to-transparent" />
+                    <div className="hidden lg:block absolute top-1/2 -right-8 w-8 h-0.5 bg-linear-to-r from-blue-400/20 to-transparent" />
                   )}
                 </div>
               ))}
@@ -1344,18 +1344,18 @@ const SmartHospitalLanding = () => {
             <div className="hidden lg:block">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%+4rem)] h-[calc(100%+4rem)]">
                 {/* Stack shadow effects */}
-                <div className="absolute -top-5 -left-5 -right-5 -bottom-5 bg-linear-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
+                <div className="absolute -top-5 -left-5 -right-5 -bottom-5 bg-linear-to-br from-blue-500/5 to-cyan-500/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500" />
               </div>
             </div>
           </div>
 
           {/* Unifying description */}
           <div className="mt-16 text-center">
-            <div className="inline-flex items-center gap-4 px-6 py-3 bg-emerald-500/5 backdrop-blur-sm rounded-full border border-emerald-400/10">
+            <div className="inline-flex items-center gap-4 px-6 py-3 bg-blue-500/5 backdrop-blur-sm rounded-full border border-blue-400/10">
               <div className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-                <div className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full" />
-                <div className="w-1.5 h-1.5 bg-emerald-400/40 rounded-full" />
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                <div className="w-1.5 h-1.5 bg-blue-400/60 rounded-full" />
+                <div className="w-1.5 h-1.5 bg-blue-400/40 rounded-full" />
               </div>
               <span className="text-gray-400 text-sm font-light">
                 Each role plays a vital part in the healthcare journey
@@ -1492,16 +1492,16 @@ const SmartHospitalLanding = () => {
         <div className="max-w-5xl mx-auto relative z-10">
           {/* Section Header */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-500/10 backdrop-blur-lg rounded-full border border-emerald-400/20 mb-6">
-              <Shield className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 text-sm font-light tracking-wide">
+            <div className="inline-flex items-center gap-2 px-6 py-2 bg-blue-500/10 backdrop-blur-lg rounded-full border border-blue-400/20 mb-6">
+              <Shield className="w-5 h-5 text-blue-400" />
+              <span className="text-blue-400 text-sm font-light tracking-wide">
                 YOUR TRUST, OUR PRIORITY
               </span>
             </div>
 
             <h2 className="text-5xl md:text-6xl font-light mb-8">
               Built on{' '}
-              <span className="text-emerald-400">Trust & Security</span>
+              <span className="text-blue-400">Trust & Security</span>
             </h2>
           </div>
 
@@ -1528,16 +1528,16 @@ const SmartHospitalLanding = () => {
             ].map((item, i) => (
               <div key={i} className="relative group">
                 {/* Hover Effect */}
-                <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-teal-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-cyan-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {/* Content */}
-                <div className="relative p-8 border border-gray-800/50 rounded-3xl backdrop-blur-sm transition-all duration-500 group-hover:border-emerald-400/30">
+                <div className="relative p-8 border border-gray-800/50 rounded-3xl backdrop-blur-sm transition-all duration-500 group-hover:border-blue-400/30">
                   {/* Stats Badge */}
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full mb-6">
-                    {i === 0 && <Lock className="w-4 h-4 text-emerald-400" />}
-                    {i === 1 && <Bell className="w-4 h-4 text-emerald-400" />}
-                    {i === 2 && <Zap className="w-4 h-4 text-emerald-400" />}
-                    <span className="text-emerald-400 text-sm font-light">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 rounded-full mb-6">
+                    {i === 0 && <Lock className="w-4 h-4 text-blue-400" />}
+                    {i === 1 && <Bell className="w-4 h-4 text-blue-400" />}
+                    {i === 2 && <Zap className="w-4 h-4 text-blue-400" />}
+                    <span className="text-blue-400 text-sm font-light">
                       {item.stats}
                     </span>
                   </div>
@@ -1565,10 +1565,10 @@ const SmartHospitalLanding = () => {
                 key={i}
                 className="flex flex-col items-center gap-3 group cursor-pointer"
               >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-400/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <badge.icon className="w-8 h-8 text-emerald-400" />
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-400/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <badge.icon className="w-8 h-8 text-blue-400" />
                 </div>
-                <span className="text-gray-500 text-sm font-light group-hover:text-emerald-400 transition-colors">
+                <span className="text-gray-500 text-sm font-light group-hover:text-blue-400 transition-colors">
                   {badge.label}
                 </span>
               </div>
@@ -1585,8 +1585,8 @@ const SmartHospitalLanding = () => {
 
         <div className="relative max-w-4xl mx-auto text-center">
           {/* Floating Elements */}
-          <div className="absolute top-10 left-10 w-8 h-8 bg-emerald-400/20 rounded-full blur-sm" />
-          <div className="absolute bottom-10 right-10 w-12 h-12 bg-teal-400/20 rounded-full blur-sm" />
+          <div className="absolute top-10 left-10 w-8 h-8 bg-blue-400/20 rounded-full blur-sm" />
+          <div className="absolute bottom-10 right-10 w-12 h-12 bg-cyan-400/20 rounded-full blur-sm" />
           <div className="absolute top-20 right-20 w-6 h-6 bg-blue-400/20 rounded-full blur-sm" />
 
           {/* Content */}
@@ -1598,19 +1598,19 @@ const SmartHospitalLanding = () => {
               </span>
             </h2>
 
-            <p className="text-emerald-100 text-xl mb-12 max-w-2xl mx-auto font-light">
+            <p className="text-blue-100 text-xl mb-12 max-w-2xl mx-auto font-light">
               Join thousands who experience healthcare differently
             </p>
 
-            <button className="group relative px-12 py-6 bg-gradient-to-r from-white to-gray-100 text-emerald-600 rounded-full text-lg font-light tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 mb-8">
+            <button className="group relative px-12 py-6 bg-gradient-to-r from-white to-gray-100 text-blue-600 rounded-full text-lg font-light tracking-wide overflow-hidden transition-all duration-500 hover:scale-105 mb-8">
               <span className="relative z-10 flex items-center gap-3">
                 Start Your Journey
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-100 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-100 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </button>
 
-            <p className="text-emerald-200 text-sm font-light">
+            <p className="text-blue-200 text-sm font-light">
               No commitment required. See how it works first.
             </p>
           </div>
@@ -1624,10 +1624,10 @@ const SmartHospitalLanding = () => {
             {/* Brand */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                   <Heart className="w-6 h-6 text-white" fill="white" />
                 </div>
-                <span className="text-xl font-light tracking-wide text-emerald-300">
+                <span className="text-xl font-light tracking-wide text-blue-300">
                   PrioCare
                 </span>
               </div>
@@ -1650,7 +1650,7 @@ const SmartHospitalLanding = () => {
                   <a
                     key={link}
                     href="#"
-                    className="block text-gray-500 hover:text-emerald-400 text-sm font-light transition-colors"
+                    className="block text-gray-500 hover:text-blue-400 text-sm font-light transition-colors"
                   >
                     {link}
                   </a>
@@ -1679,9 +1679,9 @@ const SmartHospitalLanding = () => {
                   <input
                     type="email"
                     placeholder="Your email"
-                    className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-800 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50"
+                    className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-800 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50"
                   />
-                  <button className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg text-sm text-white hover:opacity-90 transition-opacity">
+                  <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg text-sm text-white hover:opacity-90 transition-opacity">
                     Join
                   </button>
                 </div>

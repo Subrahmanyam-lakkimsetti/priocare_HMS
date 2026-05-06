@@ -107,9 +107,9 @@ const SEVERITY = {
     accent: '#f59e0b',
   },
   low: {
-    gradient: 'from-emerald-400 to-teal-500',
-    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    dot: 'bg-emerald-500',
+    gradient: 'from-blue-400 to-cyan-500',
+    badge: 'bg-blue-50 text-blue-700 border-blue-200',
+    dot: 'bg-blue-500',
     label: 'Low',
     accent: '#10b981',
   },
@@ -547,7 +547,7 @@ export default function PatientHistory() {
                 Math.round((history.length / Math.max(totalDays, 1)) * 10) / 10
               }
               label="Avg / Day"
-              accent="bg-emerald-50 text-emerald-600"
+              accent="bg-blue-50 text-blue-600"
               icon={
                 <svg
                   className="w-5 h-5"

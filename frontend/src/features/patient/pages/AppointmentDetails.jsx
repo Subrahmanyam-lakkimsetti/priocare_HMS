@@ -24,7 +24,7 @@ const SEVERITY_CONFIG = {
     message: 'Your doctor will see you shortly. Please stay nearby.',
   },
   low: {
-    gradient: 'from-green-600 to-teal-500',
+    gradient: 'from-green-600 to-cyan-500',
     message:
       "Your case is non-urgent. Please wait comfortably — we'll call your token soon.",
   },
@@ -195,7 +195,7 @@ export default function AppointmentDetails() {
 
   const medicineAvailabilityClass = (status) => {
     if (status === 'available') {
-      return 'bg-emerald-100 text-emerald-700';
+      return 'bg-blue-100 text-blue-700';
     }
 
     return 'bg-rose-100 text-rose-700';

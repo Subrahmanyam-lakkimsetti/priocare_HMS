@@ -102,10 +102,13 @@ export default function ActiveConsultation({ date }) {
   const activePatient = useSelector((s) => s.doctor.activePatient);
   const calledPatient = useSelector((s) => s.doctor.calledPatient);
   const prescriptionLoading = useSelector((s) => s.doctor.prescriptionLoading);
+  const currentPrescription = useSelector((s) => s.doctor.currentPrescription);
 
   const [bodyVisible, setBodyVisible] = useState(true);
   const [showEndModal, setShowEndModal] = useState(false);
   const [showPrescriptionModal, setShowPrescriptionModal] = useState(false);
+  const [showViewPrescriptionModal, setShowViewPrescriptionModal] =
+    useState(false);
   const [ending, setEnding] = useState(false);
   const [prescriptionSaved, setPrescriptionSaved] = useState(false);
   const [prescriptionError, setPrescriptionError] = useState('');
@@ -947,7 +950,24 @@ export default function ActiveConsultation({ date }) {
           <div className="ac-footer">
             {prescriptionSaved && (
               <div className="ac-pres-status ac-pres-status-success">
-                Prescription saved successfully.
+                <span>Prescription saved successfully.</span>
+                <button
+                  type="button"
+                  className="ac-btn-link"
+                  onClick={() => setShowViewPrescriptionModal(true)}
+                  style={{
+                    marginLeft: '8px',
+                    textDecoration: 'underline',
+                    color: '#16a34a',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    font: 'inherit',
+                  }}
+                >
+                  View Prescription
+                </button>
               </div>
             )}
             <button
@@ -968,7 +988,7 @@ export default function ActiveConsultation({ date }) {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              Add Prescription
+              {prescriptionSaved ? 'Update Prescription' : 'Add Prescription'}
             </button>
             <button
               className="ac-btn ac-btn-end"
@@ -1310,6 +1330,290 @@ export default function ActiveConsultation({ date }) {
                   ) : (
                     'Save Prescription'
                   )}
+                </button>
+              </div>
+            </div>
+          </div>,
+          portalTarget,
+        )}
+
+      {portalTarget &&
+        showViewPrescriptionModal &&
+        currentPrescription &&
+        createPortal(
+          <div className="ac-modal-overlay">
+            <div
+              className="ac-modal ac-modal-lg"
+              style={{ maxWidth: '800px', width: '90%' }}
+            >
+              <div className="ac-modal-hdr">
+                <h3>View Prescription</h3>
+                <button
+                  className="ac-modal-close"
+                  onClick={() => setShowViewPrescriptionModal(false)}
+                >
+                  &times;
+                </button>
+              </div>
+              <div
+                className="ac-pres-body"
+                style={{ padding: '24px', background: '#fff' }}
+              >
+                <div
+                  style={{
+                    marginBottom: '24px',
+                    paddingBottom: '16px',
+                    borderBottom: '1px solid #e2e8f0',
+                  }}
+                >
+                  <h4
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#0f172a',
+                      marginBottom: '16px',
+                    }}
+                  >
+                    Diagnosis
+                  </h4>
+                  <p
+                    style={{
+                      fontSize: '15px',
+                      color: '#334155',
+                      lineHeight: '1.6',
+                    }}
+                  >
+                    {currentPrescription.diagnosis || 'No diagnosis provided'}
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    marginBottom: '24px',
+                    paddingBottom: '16px',
+                    borderBottom: '1px solid #e2e8f0',
+                  }}
+                >
+                  <h4
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#0f172a',
+                      marginBottom: '16px',
+                    }}
+                  >
+                    Medications
+                  </h4>
+                  {currentPrescription.medications &&
+                  currentPrescription.medications.length > 0 ? (
+                    <div style={{ display: 'grid', gap: '16px' }}>
+                      {currentPrescription.medications.map((med, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            background: '#f8fafc',
+                            padding: '16px',
+                            borderRadius: '8px',
+                            border: '1px solid #e2e8f0',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'flex-start',
+                              marginBottom: '8px',
+                            }}
+                          >
+                            <h5
+                              style={{
+                                fontSize: '16px',
+                                fontWeight: '600',
+                                color: '#0f172a',
+                                margin: 0,
+                              }}
+                            >
+                              {med.name}
+                            </h5>
+                            <span
+                              style={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#0f172a',
+                              }}
+                            >
+                              {med.dosage}
+                            </span>
+                          </div>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              gap: '16px',
+                              fontSize: '14px',
+                              color: '#475569',
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                              }}
+                            >
+                              <svg
+                                width="16"
+                                height="16"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                              <span>{med.frequency}</span>
+                            </div>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                              }}
+                            >
+                              <svg
+                                width="16"
+                                height="16"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              <span>{med.duration}</span>
+                            </div>
+                          </div>
+                          {med.instructions && (
+                            <p
+                              style={{
+                                fontSize: '14px',
+                                color: '#64748b',
+                                marginTop: '12px',
+                                paddingTop: '12px',
+                                borderTop: '1px dashed #cbd5e1',
+                              }}
+                            >
+                              <span
+                                style={{ fontWeight: '500', color: '#475569' }}
+                              >
+                                Instructions:{' '}
+                              </span>
+                              {med.instructions}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: '15px', color: '#334155' }}>
+                      No medications prescribed.
+                    </p>
+                  )}
+                </div>
+
+                <div style={{ marginBottom: '24px' }}>
+                  <h4
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: '#0f172a',
+                      marginBottom: '16px',
+                    }}
+                  >
+                    Additional Information
+                  </h4>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'minmax(0, 1fr) auto',
+                      gap: '24px',
+                      background: '#f8fafc',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      border: '1px solid #e2e8f0',
+                    }}
+                  >
+                    <div>
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          color: '#64748b',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        Notes
+                      </span>
+                      <p
+                        style={{
+                          fontSize: '15px',
+                          color: '#334155',
+                          margin: 0,
+                        }}
+                      >
+                        {currentPrescription.notes || 'None'}
+                      </p>
+                    </div>
+                    {currentPrescription.followUpDate && (
+                      <div style={{ textAlign: 'right' }}>
+                        <span
+                          style={{
+                            display: 'block',
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            color: '#64748b',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            marginBottom: '4px',
+                          }}
+                        >
+                          Follow-up Date
+                        </span>
+                        <p
+                          style={{
+                            fontSize: '15px',
+                            fontWeight: '500',
+                            color: '#0f172a',
+                            margin: 0,
+                          }}
+                        >
+                          {new Date(
+                            currentPrescription.followUpDate,
+                          ).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="ac-pres-foot">
+                <button
+                  style={{ marginLeft: 'auto' }}
+                  className="ac-pres-btn ac-pres-btn-primary"
+                  onClick={() => setShowViewPrescriptionModal(false)}
+                >
+                  Close
                 </button>
               </div>
             </div>

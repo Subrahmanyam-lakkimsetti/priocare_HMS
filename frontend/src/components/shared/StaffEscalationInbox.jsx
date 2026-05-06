@@ -182,7 +182,7 @@ export default function StaffEscalationInbox({ className = '' }) {
                     type="button"
                     disabled={resolvingId === item._id}
                     onClick={() => resolveEscalation(item._id)}
-                    className="text-xs font-semibold px-2.5 py-1.5 rounded-md bg-emerald-600 text-white disabled:opacity-60 hover:bg-emerald-700"
+                    className="text-xs font-semibold px-2.5 py-1.5 rounded-md bg-blue-600 text-white disabled:opacity-60 hover:bg-blue-700"
                   >
                     {resolvingId === item._id
                       ? 'Resolving...'

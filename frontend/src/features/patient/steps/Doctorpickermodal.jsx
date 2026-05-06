@@ -5,10 +5,10 @@ import { fetchAvailableDoctors } from '../patientThunks';
 
 const severityColors = {
   low: {
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-700',
-    border: 'border-emerald-200',
-    dot: 'bg-emerald-500',
+    bg: 'bg-blue-50',
+    text: 'text-blue-700',
+    border: 'border-blue-200',
+    dot: 'bg-blue-500',
   },
   medium: {
     bg: 'bg-amber-50',
@@ -245,7 +245,7 @@ function DoctorCard({ doctor, isSelected, onSelect }) {
                       ? 'bg-red-500'
                       : availabilityPercentage >= 50
                         ? 'bg-amber-500'
-                        : 'bg-emerald-500'
+                        : 'bg-blue-500'
                   }`}
                   style={{ width: `${Math.min(availabilityPercentage, 100)}%` }}
                 />

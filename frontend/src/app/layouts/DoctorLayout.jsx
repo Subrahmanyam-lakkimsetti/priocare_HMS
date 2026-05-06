@@ -215,14 +215,14 @@ export default function DoctorLayout() {
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Top gradient band */}
-                <div className="h-1.5 w-full bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+                <div className="h-1.5 w-full bg-linear-to-r from-blue-500 via-cyan-500 to-cyan-500" />
 
                 <div className="px-8 pt-8 pb-7">
                   {/* Icon */}
                   <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-linear-to-br from-emerald-50 to-emerald-100 border border-emerald-200">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-linear-to-br from-blue-50 to-blue-100 border border-blue-200">
                       <svg
-                        className="w-8 h-8 text-emerald-600"
+                        className="w-8 h-8 text-blue-600"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -255,9 +255,9 @@ export default function DoctorLayout() {
                       'Working hours & availability',
                     ].map((item) => (
                       <div key={item} className="flex items-center gap-2.5">
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-emerald-100">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-blue-100">
                           <svg
-                            className="w-3 h-3 text-emerald-600"
+                            className="w-3 h-3 text-blue-600"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -284,7 +284,7 @@ export default function DoctorLayout() {
                         setShowProfileModal(false);
                         nav('/doctor/profile');
                       }}
-                      className="w-full px-5 py-3 rounded-xl text-sm font-bold bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-200 hover:scale-105 active:scale-95 transition-transform"
+                      className="w-full px-5 py-3 rounded-xl text-sm font-bold bg-linear-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-200 hover:scale-105 active:scale-95 transition-transform"
                     >
                       Set Up My Profile
                       <svg

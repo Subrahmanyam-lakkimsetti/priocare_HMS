@@ -791,7 +791,7 @@ function DoctorsByDept({
                       0,
                     ),
                     label: 'confirmed',
-                    color: 'text-emerald-600',
+                    color: 'text-blue-600',
                   },
                   {
                     v: dept.doctors.reduce(

@@ -455,7 +455,7 @@ export default function IntakeFlow() {
               </p>
               <p className="text-blue-200/70 text-xs mt-0.5">required done</p>
               {ready && (
-                <p className="text-emerald-400 text-xs font-bold mt-1">
+                <p className="text-blue-400 text-xs font-bold mt-1">
                   ✓ Ready to submit
                 </p>
               )}

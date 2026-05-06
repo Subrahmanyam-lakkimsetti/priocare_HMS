@@ -21,14 +21,14 @@ const PasswordStrength = ({ password }) => {
     'bg-red-500',
     'bg-orange-400',
     'bg-yellow-400',
-    'bg-emerald-500',
+    'bg-blue-500',
   ][strength];
   const strengthTextColor = [
     '',
     'text-red-500',
     'text-orange-400',
     'text-yellow-500',
-    'text-emerald-500',
+    'text-blue-500',
   ][strength];
 
   if (!password) return null;
@@ -50,7 +50,7 @@ const PasswordStrength = ({ password }) => {
         {checks.map((c) => (
           <div key={c.label} className="flex items-center gap-1.5">
             <div
-              className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-all duration-200 ${c.pass ? 'bg-emerald-500' : 'bg-gray-200'}`}
+              className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-all duration-200 ${c.pass ? 'bg-blue-500' : 'bg-gray-200'}`}
             >
               {c.pass && (
                 <svg
@@ -69,7 +69,7 @@ const PasswordStrength = ({ password }) => {
               )}
             </div>
             <span
-              className={`text-xs transition-colors ${c.pass ? 'text-emerald-600' : 'text-gray-400'}`}
+              className={`text-xs transition-colors ${c.pass ? 'text-blue-600' : 'text-gray-400'}`}
             >
               {c.label}
             </span>
@@ -616,7 +616,7 @@ export default function Register() {
                 <ErrorMsg field="confirmPassword" />
                 {form.confirmPassword &&
                   form.password === form.confirmPassword && (
-                    <p className="mt-1 text-xs text-emerald-600 flex items-center gap-1">
+                    <p className="mt-1 text-xs text-blue-600 flex items-center gap-1">
                       <svg
                         className="w-3 h-3"
                         fill="none"

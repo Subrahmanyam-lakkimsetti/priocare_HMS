@@ -17,7 +17,7 @@ export default function Confirmation() {
         {/* Success card */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           {/* Success Header */}
-          <div className="bg-linear-to-br from-green-600 to-emerald-600 px-6 py-12 text-center relative">
+          <div className="bg-linear-to-br from-green-600 to-blue-600 px-6 py-12 text-center relative">
             {/* Decorative circles */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-8 -mb-8" />
@@ -44,7 +44,7 @@ export default function Confirmation() {
             <h1 className="text-2xl font-bold text-white mb-1">
               Appointment Confirmed!
             </h1>
-            <p className="text-emerald-100 text-sm">
+            <p className="text-blue-100 text-sm">
               Your consultation has been successfully booked
             </p>
           </div>

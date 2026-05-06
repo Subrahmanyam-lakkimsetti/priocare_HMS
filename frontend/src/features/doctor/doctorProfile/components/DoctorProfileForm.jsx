@@ -253,14 +253,14 @@ const DoctorProfileForm = ({ existingProfile, onDone }) => {
     <div className="w-full">
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-linear-to-r from-emerald-900 via-emerald-800 to-emerald-900 px-6 py-5">
+        <div className="bg-linear-to-r from-blue-900 via-blue-800 to-blue-900 px-6 py-5">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-white">
                 {existingProfile ? 'Update Your' : 'Complete Your'} Medical
                 Profile
               </h2>
-              <p className="text-sm text-emerald-100 mt-1">
+              <p className="text-sm text-blue-100 mt-1">
                 Provide your professional details for your medical practice
               </p>
             </div>
@@ -268,16 +268,16 @@ const DoctorProfileForm = ({ existingProfile, onDone }) => {
           {/* Progress bar */}
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-emerald-100">
+              <span className="text-xs font-medium text-blue-100">
                 Progress
               </span>
-              <span className="text-xs font-semibold text-emerald-100">
+              <span className="text-xs font-semibold text-blue-100">
                 {progress}%
               </span>
             </div>
-            <div className="h-2 bg-emerald-700 rounded-full overflow-hidden">
+            <div className="h-2 bg-blue-700 rounded-full overflow-hidden">
               <div
-                className="h-full bg-linear-to-r from-emerald-400 to-teal-400 transition-all duration-500"
+                className="h-full bg-linear-to-r from-blue-400 to-cyan-400 transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -313,7 +313,7 @@ const DoctorProfileForm = ({ existingProfile, onDone }) => {
           {/* Basic Info */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <span className="w-1 h-5 bg-emerald-500 rounded-full"></span>
+              <span className="w-1 h-5 bg-blue-500 rounded-full"></span>
               Basic Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -343,7 +343,7 @@ const DoctorProfileForm = ({ existingProfile, onDone }) => {
           {/* Professional Details */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <span className="w-1 h-5 bg-emerald-500 rounded-full"></span>
+              <span className="w-1 h-5 bg-blue-500 rounded-full"></span>
               Professional Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -415,7 +415,7 @@ const DoctorProfileForm = ({ existingProfile, onDone }) => {
           {/* Working Hours */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <span className="w-1 h-5 bg-emerald-500 rounded-full"></span>
+              <span className="w-1 h-5 bg-blue-500 rounded-full"></span>
               Working Hours
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -447,7 +447,7 @@ const DoctorProfileForm = ({ existingProfile, onDone }) => {
           {/* Available Days */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <span className="w-1 h-5 bg-emerald-500 rounded-full"></span>
+              <span className="w-1 h-5 bg-blue-500 rounded-full"></span>
               Available Days
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -458,7 +458,7 @@ const DoctorProfileForm = ({ existingProfile, onDone }) => {
                   onClick={() => handleDayToggle(day)}
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
                     form.availableDays.includes(day)
-                      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -491,7 +491,7 @@ const DoctorProfileForm = ({ existingProfile, onDone }) => {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 px-6 py-3 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="flex-1 px-6 py-3 rounded-xl bg-linear-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {submitting ? (
                 <span className="flex items-center justify-center gap-2">

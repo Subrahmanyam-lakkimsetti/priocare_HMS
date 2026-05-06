@@ -540,11 +540,27 @@ const forgetPassword = async (req) => {
   }
 
   const token = await user.generateResetPasswordToken();
-  user.save();
+  await user.save({ validateBeforeSave: false });
 
-  const backendResetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/resetToken/${token}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
-  return backendResetUrl;
+  const emailHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+      <h2 style="color: #6d28d9; text-align: center;">Password Reset Request</h2>
+      <p>Hello ${user.firstName || 'User'},</p>
+      <p>We received a request to reset your password for your Priocare account. This link is valid for 10 minutes.</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${resetUrl}" style="background-color: #6d28d9; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Reset Password</a>
+      </div>
+      <p>If you didn't request this, you can safely ignore this email. Your password will remain unchanged.</p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+      <p style="font-size: 12px; color: #999; text-align: center;">&copy; ${new Date().getFullYear()} Priocare. All rights reserved.</p>
+    </div>
+  `;
+
+  await sendEmail(user.email, 'Priocare - Password Reset Request', emailHtml);
+
+  return resetUrl;
 };
 
 const resetPassword = async (resetToken, newPassword) => {

@@ -15,7 +15,7 @@ const isGeminiLimitError = (error) => {
   const status =
     error?.status || error?.response?.status || error?.error?.status;
 
-  if (Number(status) === 429) {
+  if (Number(status) === 429 || Number(status) === 503) {
     return true;
   }
 
@@ -31,6 +31,10 @@ const isGeminiLimitError = (error) => {
     'exceeded',
     '429',
     'limit',
+    'high demand',
+    'overloaded',
+    'service unavailable',
+    '503',
   ].some((token) => normalizedMessage.includes(token));
 };
 
@@ -87,7 +91,7 @@ const callOpenRouter = async (prompt) => {
   const shouldRetryDefaultModel =
     !response.ok &&
     usedModel !== 'openai/gpt-4o-mini' &&
-    [400, 401, 403, 404].includes(response.status);
+    [400, 401, 403, 404, 429, 502, 503].includes(response.status);
 
   if (shouldRetryDefaultModel) {
     console.warn(

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PrioCare favicon">
+  <defs>
+    <linearGradient id="pcGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#pcGrad)"/>
+  <path d="M32 16c-7.2 0-13 5.8-13 13 0 10.8 13 19 13 19s13-8.2 13-19c0-7.2-5.8-13-13-13z" fill="#ffffff" fill-opacity="0.16"/>
+  <path d="M34.8 22h-5.6v7.2H22v5.6h7.2V42h5.6v-7.2H42v-5.6h-7.2V22z" fill="#ffffff"/>
+</svg>

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { callNextPatient, fetchQueue } from '../doctorThunks';
+import { connectSocket } from '../../../services/socket';
 
 const SEVERITY_CONFIG = {
   emergency: {
@@ -152,6 +153,23 @@ export default function QueuePanel({ date, focusToken }) {
     setCalling(false);
     setPhase('idle');
   };
+
+  // Socket listener for automatic queue updates
+  useEffect(() => {
+    const socket = connectSocket();
+
+    const handleRefresh = (payload) => {
+      // Only refresh if the date matches or if no date is specified
+      const dateKey = payload?.date;
+      if (dateKey && dateKey !== date) return;
+      dispatch(fetchQueue(date));
+    };
+
+    socket.on('doctor:refresh', handleRefresh);
+    return () => {
+      socket.off('doctor:refresh', handleRefresh);
+    };
+  }, [date, dispatch]);
 
   return (
     <>

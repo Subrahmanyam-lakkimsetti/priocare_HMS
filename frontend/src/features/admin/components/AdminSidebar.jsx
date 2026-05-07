@@ -1,3 +1,4 @@
+import Logo from '../../../components/shared/Logo';
 import { useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
@@ -107,29 +108,11 @@ export default function AdminSidebar({
         `}
       >
         {/* Brand */}
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
-            <svg
-              width="18"
-              height="18"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="white"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p className="text-sm font-extrabold text-white tracking-tight">
-              PrioCare
-            </p>
-            <p className="text-xs text-slate-500 font-medium">Admin Portal</p>
-          </div>
+        <div className="flex flex-col px-6 py-5 border-b border-slate-800">
+          <Logo className="scale-[0.85] origin-left brightness-200 contrast-125 saturate-0 text-white" />
+          <p className="text-xs text-slate-500 font-medium mt-2.5">
+            Admin Portal
+          </p>
         </div>
 
         {/* Nav */}

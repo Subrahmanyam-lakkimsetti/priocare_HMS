@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTodaysAppointments } from '../receptionistThunks';
+import { connectSocket } from '../../../services/socket';
 import TokenBadge from '../components/Tokenbadge';
 import TokenDetailModal from '../components/Tokendetailmodal';
 
@@ -78,6 +79,21 @@ export default function TodayAppointments() {
   useEffect(() => {
     setMounted(true);
     dispatch(fetchTodaysAppointments());
+  }, [dispatch]);
+
+  // Socket listener for automatic appointments list updates
+  useEffect(() => {
+    const socket = connectSocket();
+
+    const handleRefresh = (payload) => {
+      // Refresh appointments when any appointment status changes
+      dispatch(fetchTodaysAppointments());
+    };
+
+    socket.on('receptionist:refresh', handleRefresh);
+    return () => {
+      socket.off('receptionist:refresh', handleRefresh);
+    };
   }, [dispatch]);
 
   const filtered = appointments.filter((a) => {

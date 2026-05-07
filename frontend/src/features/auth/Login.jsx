@@ -1,3 +1,4 @@
+import Logo from '../../components/shared/Logo';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from './authThunks';
@@ -14,7 +15,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/google`;
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
   };
 
   const handleSubmit = (e) => {
@@ -140,9 +141,7 @@ export default function Login() {
                 />
               </svg>
             </div>
-            <span className="text-blue-900 text-2xl font-bold tracking-tight">
-              Prio<span className="text-cyan-600">Care</span>
-            </span>
+            <Logo />
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">

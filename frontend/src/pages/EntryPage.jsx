@@ -1,3 +1,4 @@
+import Logo from '../components/shared/Logo';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,24 +33,7 @@ function Nav({ onBook }) {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center shrink-0">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            >
-              <path d="M12 4v16M4 12h16" />
-            </svg>
-          </div>
-          <span className="text-blue-900 text-xl font-bold tracking-tight">
-            Prio<span className="text-cyan-600">Care</span>
-          </span>
-        </div>
+        <Logo />
 
         {/* Links */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
@@ -948,24 +932,7 @@ function Footer() {
         <div className="grid md:grid-cols-4 gap-10 mb-10">
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                >
-                  <path d="M12 4v16M4 12h16" />
-                </svg>
-              </div>
-              <span className="text-blue-900 text-xl font-bold">
-                Prio<span className="text-cyan-600">Care</span>
-              </span>
-            </div>
+            <Logo />
             <p className="text-sm text-gray-400 leading-relaxed">
               Healthcare that understands what comes first in your life.
             </p>

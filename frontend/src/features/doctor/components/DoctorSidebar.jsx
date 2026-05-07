@@ -1,3 +1,4 @@
+import Logo from '../../../components/shared/Logo';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -324,44 +325,23 @@ export default function DoctorSidebar({
         `}
       >
         {/* Logo */}
-        <div className="px-5 py-5 border-b border-gray-50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 sb-logo-icon-wrap">
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-            </div>
-            <div>
-              <span className="text-base font-bold text-gray-900 leading-tight block">
-                PrioCare
-              </span>
-              <span className="sb-logo-tag">HMS</span>
+        <div className="px-5 py-5 border-b border-gray-50 flex flex-col">
+          <Logo className="scale-90 origin-left" />
+          <span className="text-[11px] font-semibold text-slate-400 mt-2.5 leading-none uppercase tracking-widest">
+            Doctor Portal
+          </span>
+        </div>
+
+        {/* User chip */}
+        {user?.name && (
+          <div className="sb-user-chip">
+            <div className="sb-avatar">{user.name.charAt(0).toUpperCase()}</div>
+            <div style={{ minWidth: 0 }}>
+              <div className="sb-user-name">Dr. {user.name}</div>
+              <div className="sb-user-role">Physician</div>
             </div>
           </div>
-
-          {/* User chip */}
-          {user?.name && (
-            <div className="sb-user-chip">
-              <div className="sb-avatar">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-              <div style={{ minWidth: 0 }}>
-                <div className="sb-user-name">Dr. {user.name}</div>
-                <div className="sb-user-role">Physician</div>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Nav */}
         <nav className="flex flex-col gap-1 px-3 py-4 flex-1">

@@ -5,6 +5,7 @@ import {
   fetchDashboardStats,
   fetchRecentCheckins,
 } from '../receptionistThunks';
+import { connectSocket } from '../../../services/socket';
 import TokenBadge from '../components/Tokenbadge';
 import TokenDetailModal from '../components/Tokendetailmodal';
 
@@ -119,6 +120,22 @@ export default function ReceptionDashboard() {
     setMounted(true);
     dispatch(fetchDashboardStats());
     dispatch(fetchRecentCheckins());
+  }, [dispatch]);
+
+  // Socket listener for automatic dashboard updates
+  useEffect(() => {
+    const socket = connectSocket();
+
+    const handleRefresh = (payload) => {
+      // Refresh dashboard stats and recent checkins when appointments change
+      dispatch(fetchDashboardStats());
+      dispatch(fetchRecentCheckins());
+    };
+
+    socket.on('receptionist:refresh', handleRefresh);
+    return () => {
+      socket.off('receptionist:refresh', handleRefresh);
+    };
   }, [dispatch]);
 
   const h = new Date().getHours();

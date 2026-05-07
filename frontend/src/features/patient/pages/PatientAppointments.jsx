@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllAppointments, cancelAppointment } from '../patientThunks';
+import { connectSocket } from '../../../services/socket';
 
 const STATUS_CONFIG = {
   confirmed: {
@@ -107,6 +108,21 @@ export default function PatientAppointments() {
 
   useEffect(() => {
     dispatch(fetchAllAppointments());
+  }, [dispatch]);
+
+  // Socket listener for automatic appointment updates
+  useEffect(() => {
+    const socket = connectSocket();
+
+    const handleRefresh = (payload) => {
+      // Refresh all appointments when any appointment status changes
+      dispatch(fetchAllAppointments());
+    };
+
+    socket.on('patient:refresh', handleRefresh);
+    return () => {
+      socket.off('patient:refresh', handleRefresh);
+    };
   }, [dispatch]);
 
   if (loadingAppointmentsList) {

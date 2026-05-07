@@ -1,3 +1,4 @@
+import Logo from '../../components/shared/Logo';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, sendOtp, resendOtp } from './authThunks';
@@ -368,9 +369,7 @@ export default function Register() {
                 />
               </svg>
             </div>
-            <span className="text-blue-900 text-2xl font-bold tracking-tight">
-              Prio<span className="text-cyan-600">Care</span>
-            </span>
+            <Logo />
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">

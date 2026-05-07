@@ -1,3 +1,4 @@
+import Logo from './Logo';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../../features/auth/authThunks';
@@ -185,11 +186,8 @@ export default function PatientSidebar({ sidebarOpen, setSidebarOpen }) {
           lg:translate-x-0`}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2.5 px-6 py-5 border-b border-gray-100">
-          <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center" />
-          <span className="text-blue-900 text-xl font-bold tracking-tight">
-            Prio<span className="text-cyan-600">Care</span>
-          </span>
+        <div className="h-16 px-6 border-b border-gray-100 flex items-center shrink-0">
+          <Logo className="scale-95 origin-left" />
         </div>
 
         {/* Nav */}

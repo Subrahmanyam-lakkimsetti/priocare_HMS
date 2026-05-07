@@ -39,13 +39,17 @@ authRouter.post('/login', validateInput(loginScheema), loginController);
 // Google OAuth routes
 authRouter.get(
   '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] }),
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false,
+  }),
 );
 
 authRouter.get(
   '/google/callback',
   passport.authenticate('google', {
     failureRedirect: `${process.env.FRONTEND_URL}/login`,
+    session: false,
   }),
   googleAuthCallback,
 );

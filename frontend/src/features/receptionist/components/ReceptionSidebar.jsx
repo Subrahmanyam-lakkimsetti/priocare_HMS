@@ -1,3 +1,4 @@
+import Logo from '../../../components/shared/Logo';
 import { useNavigate } from 'react-router-dom';
 
 const NAV_ICONS = {
@@ -143,27 +144,11 @@ export default function ReceptionSidebar({
       `}
     >
       {/* Logo */}
-      <div className="px-5 pt-6 pb-5 border-b border-slate-100 flex items-center gap-2.5">
-        <div className="w-9 h-9 rounded-[10px] bg-blue-600 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
-          <svg
-            width="18"
-            height="18"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="white"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16M3 21h18M9 7h1m-1 4h1m4-4h1m-1 4h1"
-            />
-          </svg>
-        </div>
-        <div>
-          <p className="text-[14px] font-bold text-slate-900">PrioCare HMS</p>
-          <p className="text-[11px] text-slate-400 mt-px">Reception Portal</p>
-        </div>
+      <div className="flex flex-col px-5 py-4 border-b border-slate-100 pt-6">
+        <Logo className="scale-[0.85] origin-left" />
+        <span className="text-[11px] font-bold text-slate-400 mt-2.5 leading-none uppercase tracking-widest">
+          Reception Portal
+        </span>
       </div>
 
       {/* User */}

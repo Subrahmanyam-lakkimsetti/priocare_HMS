@@ -112,18 +112,28 @@ const resetPasswordController = catchAsync(async (req, res) => {
 const googleAuthCallback = catchAsync(async (req, res) => {
   const user = req.user;
 
-  // Generate JWT token
   const token = generateToken({
     userId: user.id,
     role: user.role,
     isActive: user.isActive,
   });
 
-  // Set cookie
   setCookie(res, token);
 
-  // Redirect to frontend with success
-  res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+  // Redirect based on role + profile completion
+  if (!user.isProfileComplete) {
+    return res.redirect(`${process.env.FRONTEND_URL}/patient/profile`);
+  }
+
+  const roleRedirects = {
+    patient: '/patient',
+    doctor: '/doctor',
+    admin: '/admin',
+    receptionist: '/receptionist',
+  };
+
+  const path = roleRedirects[user.role] || '/patient';
+  res.redirect(`${process.env.FRONTEND_URL}${path}`);
 });
 
 module.exports = {

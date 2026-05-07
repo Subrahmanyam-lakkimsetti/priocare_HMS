@@ -10,6 +10,8 @@ const {
   emitPatientRefresh,
 } = require('../../../utils/realtime.util');
 
+const getDateKey = (date) => new Date(date).toISOString().slice(0, 10);
+
 const patientCheckin = async ({ token }) => {
   const appointment = await Appointment.findOne({ token }).populate([
     {
@@ -24,6 +26,16 @@ const patientCheckin = async ({ token }) => {
 
   if (!appointment) {
     throw new AppError('No appointment found!', 404);
+  }
+
+  const todayDateKey = getDateKey(new Date());
+  const scheduledDateKey = getDateKey(appointment.scheduledDate);
+
+  if (scheduledDateKey !== todayDateKey) {
+    throw new AppError(
+      `Patient is not allowed to check in. Scheduled date is ${scheduledDateKey}`,
+      400,
+    );
   }
 
   if (appointment.status !== 'confirmed') {
